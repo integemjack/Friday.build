@@ -15,21 +15,21 @@
     "source": "",
     "branch": "main"
   },
-  "updatedAt": "2026-09-30T19:59:38Z",
+  "updatedAt": "2026-09-30T20:14:30Z",
   "stable": {
-    "tag": "v1.0.3",
-    "version": "1.0.3",
-    "build": 30,
+    "tag": "v1.0.4",
+    "version": "1.0.4",
+    "build": 31,
     "channel": "stable",
-    "date": "2026-09-30T19:59:38Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.3/Friday-v1.0.3-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.3/Friday-v1.0.3-macOS-arm64.dmg",
-    "sha256": "b055019efc94f5cda9e5592a3b8b6d5a5ded35893c4db340e92a4bad68c11fa4",
-    "size": 29788816,
-    "notes": "大任务时界面卡顿、CPU 占满：流式刷新 0.1 秒合并一次，消息按块 Equatable 只重排变化的块，运行中的子 Agent 记录只显示最近 4 步，消息列表包 GeometryRe",
+    "date": "2026-09-30T20:14:30Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.4/Friday-v1.0.4-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.4/Friday-v1.0.4-macOS-arm64.dmg",
+    "sha256": "cc63b353aa5c7440ef7f669eabe9bb51f2b2dd9f71e636572e42900ebc45c853",
+    "size": 29810078,
+    "notes": "流式输出时输入栏、侧边栏不再跟着重算：会话元信息单独放 summaries 供它们读取，ComposerView 改 Equatable；修正 token 统计：在线引擎首 token 延迟与生成�",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.3",
-    "source": "dfb0220b11790aae8ccea75e10b6f41e946ef7f9",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.4",
+    "source": "e1029004d88c1792c7a9ccaeb0325f4ca7018e71",
     "branch": "main"
   }
 }
