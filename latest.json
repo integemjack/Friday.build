@@ -15,21 +15,21 @@
     "source": "",
     "branch": "main"
   },
-  "updatedAt": "2026-09-30T18:42:01Z",
+  "updatedAt": "2026-09-30T18:51:02Z",
   "stable": {
-    "tag": "v1.0.1",
-    "version": "1.0.1",
-    "build": 28,
+    "tag": "v1.0.2",
+    "version": "1.0.2",
+    "build": 29,
     "channel": "stable",
-    "date": "2026-09-30T18:42:01Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.1/Friday-v1.0.1-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.1/Friday-v1.0.1-macOS-arm64.dmg",
-    "sha256": "7d232d54758e2d060f758583acdde8f7410218ed39d2d2d3b04e9fc668e1294a",
-    "size": 29769588,
-    "notes": "窗口拉到最小（内容宽度 < 840）自动收起侧边栏，拉宽到 900 以上自动展开；用户手动打开的侧边栏不干预",
+    "date": "2026-09-30T18:51:02Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.2/Friday-v1.0.2-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.2/Friday-v1.0.2-macOS-arm64.dmg",
+    "sha256": "542cf5520cded64484d96876d53d8e7d66cf30e22165ee896cfcf34dd7a15dc5",
+    "size": 29769699,
+    "notes": "输入框占位文字改用二级标签色，玻璃底上看得清",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.1",
-    "source": "1cb6b65986e43a630f1fc9ac8bc33a82f9f7fe27",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.2",
+    "source": "9c89d72f89ac435923804182e4d1a9b990a309e2",
     "branch": "main"
   }
 }
