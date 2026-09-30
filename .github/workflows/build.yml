@@ -1,0 +1,232 @@
+name: Build and release Friday
+
+# 本仓库只负责构建与发布：
+#   1. 由源码仓库（integemjack/Friday）每次提交通过 repository_dispatch 触发，或在 Actions 页面手动运行；
+#   2. 用 SOURCE_TOKEN 拉取私有源码仓库的指定提交；
+#   3. 导入 Developer ID 证书，调用源码里的 Friday/Tools/CI/build.sh 构建、签名、打包；
+#   4. 发布到本仓库 Releases：推送 v* 标签发正式版，普通提交发预发布（v<版本>-build.<序号>）。
+on:
+  repository_dispatch:
+    types: [build]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "源码分支、标签或提交（默认 main）"
+        required: false
+        default: "main"
+      version:
+        description: "发布版本号（如 v1.2.0）。留空则按提交发预发布"
+        required: false
+        default: ""
+      prerelease:
+        description: "强制标记为预发布"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+# 所有构建串行排队（不取消），保证每次提交都产出一个包，也避免缓存互相覆盖
+concurrency:
+  group: friday-build
+  cancel-in-progress: false
+
+env:
+  SOURCE_REPO: ${{ vars.SOURCE_REPO || 'integemjack/Friday' }}
+  DERIVED_DATA: ${{ github.workspace }}/build/DerivedData
+  PACKAGES_DIR: ${{ github.workspace }}/build/SourcePackages
+
+jobs:
+  build:
+    name: Build, sign and release (macOS arm64)
+    runs-on: macos-26
+    timeout-minutes: 180
+    steps:
+      - name: Resolve source revision
+        id: src
+        env:
+          DISPATCH_SHA: ${{ github.event.client_payload.sha }}
+          DISPATCH_REF_NAME: ${{ github.event.client_payload.ref_name }}
+          DISPATCH_TAG: ${{ github.event.client_payload.tag }}
+          DISPATCH_SUBJECT: ${{ github.event.client_payload.subject }}
+          INPUT_REF: ${{ inputs.ref }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = "repository_dispatch" ]; then
+            REF="$DISPATCH_SHA"; REF_NAME="$DISPATCH_REF_NAME"; TAG="$DISPATCH_TAG"; SUBJECT="$DISPATCH_SUBJECT"
+          else
+            REF="${INPUT_REF:-main}"; REF_NAME="$REF"; TAG="${INPUT_VERSION:-}"; SUBJECT="手动构建"
+            if [ -n "$TAG" ] && [[ "$TAG" != v* ]]; then TAG="v$TAG"; fi
+          fi
+          {
+            echo "ref=$REF"
+            echo "ref_name=$REF_NAME"
+            echo "tag=$TAG"
+            echo "subject=$SUBJECT"
+          } >> "$GITHUB_OUTPUT"
+          echo "源码 $SOURCE_REPO @ $REF（$REF_NAME），标签 '$TAG'：$SUBJECT"
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SOURCE_REPO }}
+          ref: ${{ steps.src.outputs.ref }}
+          token: ${{ secrets.SOURCE_TOKEN }}
+          path: src
+          fetch-depth: 1
+
+      - name: Select Xcode 26
+        run: |
+          XCODE="$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)"
+          [ -n "$XCODE" ] || XCODE="/Applications/Xcode.app"
+          echo "使用 $XCODE"
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
+          sw_vers
+
+      - name: Install Metal toolchain
+        run: |
+          # MLX 的 Metal 内核需要 Metal 编译器（Xcode 26 起需单独下载）
+          if xcrun metal --version >/dev/null 2>&1; then
+            echo "Metal 编译器已可用"
+          else
+            xcodebuild -downloadComponent MetalToolchain 2>&1 | tail -3
+          fi
+          xcrun metal --version
+
+      - name: Cache Swift packages
+        uses: actions/cache@v4
+        with:
+          path: build/SourcePackages
+          key: spm-${{ runner.os }}-${{ hashFiles('src/Friday/Friday.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      - name: Cache build products
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/DerivedData/Build
+            build/DerivedData/ModuleCache.noindex
+          key: build-${{ runner.os }}-${{ hashFiles('src/Friday/Friday.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-${{ steps.src.outputs.ref }}
+          restore-keys: |
+            build-${{ runner.os }}-${{ hashFiles('src/Friday/Friday.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-
+            build-${{ runner.os }}-
+
+      - name: Import signing certificate
+        id: signing
+        env:
+          MACOS_CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "${MACOS_CERTIFICATE_P12:-}" ]; then
+            echo "未配置 MACOS_CERTIFICATE_P12，跳过导入（将使用临时签名）"
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          CERT="$RUNNER_TEMP/certificate.p12"
+          echo "$MACOS_CERTIFICATE_P12" | base64 --decode > "$CERT"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$CERT" -P "$MACOS_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" >/dev/null
+          security list-keychains -d user -s "$KEYCHAIN" login.keychain
+          rm -f "$CERT"
+          echo "可用签名身份："
+          security find-identity -v -p codesigning "$KEYCHAIN"
+          echo "available=true" >> "$GITHUB_OUTPUT"
+          echo "keychain=$KEYCHAIN" >> "$GITHUB_OUTPUT"
+
+      - name: Determine version
+        id: version
+        env:
+          TAG: ${{ steps.src.outputs.tag }}
+          REF_NAME: ${{ steps.src.outputs.ref_name }}
+          FORCE_PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          set -euo pipefail
+          PROJECT_VERSION="$(grep -m1 -E 'MARKETING_VERSION = ' src/Friday/Friday.xcodeproj/project.pbxproj | sed -E 's/.*= *([^;]+);.*/\1/' | tr -d '"')"
+          PROJECT_VERSION="${PROJECT_VERSION:-1.0}"
+          if [ -n "$TAG" ]; then
+            RELEASE_TAG="$TAG"
+            MARKETING="${TAG#v}"
+            PRERELEASE="${FORCE_PRERELEASE:-false}"
+            TITLE="Friday $TAG"
+          else
+            RELEASE_TAG="v$PROJECT_VERSION-build.$GITHUB_RUN_NUMBER"
+            MARKETING="$PROJECT_VERSION"
+            PRERELEASE=true
+            TITLE="Friday $PROJECT_VERSION 构建 $GITHUB_RUN_NUMBER（$REF_NAME）"
+          fi
+          {
+            echo "release_tag=$RELEASE_TAG"
+            echo "marketing=$MARKETING"
+            echo "prerelease=$PRERELEASE"
+            echo "title=$TITLE"
+          } >> "$GITHUB_OUTPUT"
+          echo "版本 $MARKETING，构建号 $GITHUB_RUN_NUMBER，Release 标签 $RELEASE_TAG，预发布=$PRERELEASE"
+
+      - name: Build, sign and package
+        env:
+          PROJECT_DIR: ${{ github.workspace }}/src/Friday
+          OUTPUT_DIR: ${{ github.workspace }}/dist
+          LABEL: ${{ steps.version.outputs.release_tag }}
+          MARKETING_VERSION: ${{ steps.version.outputs.marketing }}
+          BUILD_NUMBER: ${{ github.run_number }}
+          CODE_SIGN_IDENTITY: ${{ steps.signing.outputs.available == 'true' && vars.CODE_SIGN_IDENTITY || '' }}
+          DEVELOPMENT_TEAM: ${{ vars.DEVELOPMENT_TEAM }}
+        run: bash src/Friday/Tools/CI/build.sh
+
+      - name: Notarize (optional)
+        if: ${{ steps.signing.outputs.available == 'true' }}
+        env:
+          NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
+          NOTARY_ISSUER_ID: ${{ secrets.NOTARY_ISSUER_ID }}
+          NOTARY_KEY_P8: ${{ secrets.NOTARY_KEY_P8 }}
+          LABEL: ${{ steps.version.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NOTARY_KEY_ID:-}" ] || [ -z "${NOTARY_ISSUER_ID:-}" ] || [ -z "${NOTARY_KEY_P8:-}" ]; then
+            echo "未配置 App Store Connect API 密钥（NOTARY_KEY_ID / NOTARY_ISSUER_ID / NOTARY_KEY_P8），跳过公证"
+            exit 0
+          fi
+          APP="$DERIVED_DATA/Build/Products/Release/Friday.app"
+          KEY="$RUNNER_TEMP/notary.p8"
+          printf '%s' "$NOTARY_KEY_P8" > "$KEY"
+          xcrun notarytool submit "dist/Friday-$LABEL-macOS-arm64.zip" --key "$KEY" --key-id "$NOTARY_KEY_ID" --issuer "$NOTARY_ISSUER_ID" --wait
+          xcrun stapler staple "$APP"
+          rm -f "$KEY" dist/*.zip dist/SHA256SUMS.txt
+          ditto -c -k --sequesterRsrc --keepParent "$APP" "dist/Friday-$LABEL-macOS-arm64.zip"
+          (cd dist && shasum -a 256 *.zip > SHA256SUMS.txt)
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Friday-${{ steps.version.outputs.release_tag }}-macOS-arm64
+          path: dist/*
+          if-no-files-found: error
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.release_tag }}
+          name: ${{ steps.version.outputs.title }}
+          prerelease: ${{ steps.version.outputs.prerelease == 'true' }}
+          files: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
+          body: |
+            Friday（macOS 26+，Apple Silicon）
+
+            - 源码：${{ env.SOURCE_REPO }} @ `${{ steps.src.outputs.ref }}`（${{ steps.src.outputs.ref_name }}）
+            - 提交：${{ steps.src.outputs.subject }}
+            - 构建：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            - 签名：Developer ID，未公证时首次打开需在「系统设置 → 隐私与安全性」中点“仍要打开”
+
+      - name: Remove temporary keychain
+        if: ${{ always() && steps.signing.outputs.keychain != '' }}
+        run: security delete-keychain "${{ steps.signing.outputs.keychain }}" || true
