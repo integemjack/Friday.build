@@ -196,14 +196,21 @@ jobs:
             echo "未配置 App Store Connect API 密钥（NOTARY_KEY_ID / NOTARY_ISSUER_ID / NOTARY_KEY_P8），跳过公证"
             exit 0
           fi
-          APP="$DERIVED_DATA/Build/Products/Release/Friday.app"
-          KEY="$RUNNER_TEMP/notary.p8"
-          printf '%s' "$NOTARY_KEY_P8" > "$KEY"
-          xcrun notarytool submit "dist/Friday-$LABEL-macOS-arm64.zip" --key "$KEY" --key-id "$NOTARY_KEY_ID" --issuer "$NOTARY_ISSUER_ID" --wait
-          xcrun stapler staple "$APP"
-          rm -f "$KEY" dist/*.zip dist/SHA256SUMS.txt
-          ditto -c -k --sequesterRsrc --keepParent "$APP" "dist/Friday-$LABEL-macOS-arm64.zip"
-          (cd dist && shasum -a 256 *.zip > SHA256SUMS.txt)
+          APP="${DERIVED_DATA}/Build/Products/Release/Friday.app"
+          BASENAME="Friday-${LABEL}-macOS-arm64"
+          KEY="${RUNNER_TEMP}/notary.p8"
+          printf '%s' "${NOTARY_KEY_P8}" > "${KEY}"
+          # 公证 dmg（里面的 app 一并公证），然后把票据钉到 dmg 和 app 上，再用钉过票据的 app 重打 zip
+          if [ -f "dist/${BASENAME}.dmg" ]; then
+            xcrun notarytool submit "dist/${BASENAME}.dmg" --key "${KEY}" --key-id "${NOTARY_KEY_ID}" --issuer "${NOTARY_ISSUER_ID}" --wait --timeout 45m
+            xcrun stapler staple "dist/${BASENAME}.dmg"
+          else
+            xcrun notarytool submit "dist/${BASENAME}.zip" --key "${KEY}" --key-id "${NOTARY_KEY_ID}" --issuer "${NOTARY_ISSUER_ID}" --wait --timeout 45m
+          fi
+          xcrun stapler staple "${APP}"
+          rm -f "${KEY}" "dist/${BASENAME}.zip"
+          ditto -c -k --sequesterRsrc --keepParent "${APP}" "dist/${BASENAME}.zip"
+          (cd dist && shasum -a 256 *.zip *.dmg > SHA256SUMS.txt && cat SHA256SUMS.txt)
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -219,6 +226,7 @@ jobs:
           name: ${{ steps.version.outputs.title }}
           prerelease: ${{ steps.version.outputs.prerelease == 'true' }}
           files: |
+            dist/*.dmg
             dist/*.zip
             dist/SHA256SUMS.txt
           body: |
@@ -227,6 +235,7 @@ jobs:
             - 源码：${{ env.SOURCE_REPO }} @ `${{ steps.src.outputs.ref }}`（${{ steps.src.outputs.ref_name }}）
             - 提交：${{ steps.src.outputs.subject }}
             - 构建：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            - 安装：打开 dmg，双击图标即可运行（也可拖到「应用程序」）；zip 为纯 app 包
             - 签名：Developer ID，未公证时首次打开需在「系统设置 → 隐私与安全性」中点“仍要打开”
 
       - name: Remove temporary keychain
