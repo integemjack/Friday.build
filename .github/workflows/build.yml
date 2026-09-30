@@ -32,6 +32,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  LANG: en_US.UTF-8
+  LC_ALL: en_US.UTF-8
   SOURCE_REPO: ${{ vars.SOURCE_REPO || 'integemjack/Friday' }}
   DERIVED_DATA: ${{ github.workspace }}/build/DerivedData
   PACKAGES_DIR: ${{ github.workspace }}/build/SourcePackages
@@ -65,7 +67,7 @@ jobs:
             echo "tag=$TAG"
             echo "subject=$SUBJECT"
           } >> "$GITHUB_OUTPUT"
-          echo "源码 $SOURCE_REPO @ $REF（$REF_NAME），标签 '$TAG'：$SUBJECT"
+          echo "源码 $SOURCE_REPO @ ${REF}（${REF_NAME}），标签 '$TAG'：$SUBJECT"
 
       - name: Checkout source
         uses: actions/checkout@v4
@@ -160,7 +162,7 @@ jobs:
             RELEASE_TAG="v$PROJECT_VERSION-build.$GITHUB_RUN_NUMBER"
             MARKETING="$PROJECT_VERSION"
             PRERELEASE=true
-            TITLE="Friday $PROJECT_VERSION 构建 $GITHUB_RUN_NUMBER（$REF_NAME）"
+            TITLE="Friday $PROJECT_VERSION 构建 ${GITHUB_RUN_NUMBER}（${REF_NAME}）"
           fi
           {
             echo "release_tag=$RELEASE_TAG"
@@ -168,7 +170,7 @@ jobs:
             echo "prerelease=$PRERELEASE"
             echo "title=$TITLE"
           } >> "$GITHUB_OUTPUT"
-          echo "版本 $MARKETING，构建号 $GITHUB_RUN_NUMBER，Release 标签 $RELEASE_TAG，预发布=$PRERELEASE"
+          echo "版本 ${MARKETING}，构建号 ${GITHUB_RUN_NUMBER}，Release 标签 ${RELEASE_TAG}，预发布=$PRERELEASE"
 
       - name: Build, sign and package
         env:
