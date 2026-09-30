@@ -15,21 +15,21 @@
     "source": "",
     "branch": "main"
   },
-  "updatedAt": "2026-09-30T18:29:50Z",
+  "updatedAt": "2026-09-30T18:42:01Z",
   "stable": {
-    "tag": "v1.0.0",
-    "version": "1.0.0",
-    "build": 27,
+    "tag": "v1.0.1",
+    "version": "1.0.1",
+    "build": 28,
     "channel": "stable",
-    "date": "2026-09-30T18:29:50Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.0/Friday-v1.0.0-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.0/Friday-v1.0.0-macOS-arm64.dmg",
-    "sha256": "85adf9d879816bee4fffb57eb8b1071f72987f798ec478bfd63b374ad9f6042d",
-    "size": 29753513,
-    "notes": "所有窗口改为跟随系统外观的纯色背景；版本标签解析支持 vX.Y.Z / vX.Y.Z-beta；任何分支推送都触发打包；开发版只提示更新不自动下载；项目约定写入 C",
+    "date": "2026-09-30T18:42:01Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.1/Friday-v1.0.1-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.1/Friday-v1.0.1-macOS-arm64.dmg",
+    "sha256": "7d232d54758e2d060f758583acdde8f7410218ed39d2d2d3b04e9fc668e1294a",
+    "size": 29769588,
+    "notes": "窗口拉到最小（内容宽度 < 840）自动收起侧边栏，拉宽到 900 以上自动展开；用户手动打开的侧边栏不干预",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.0",
-    "source": "6266ed37a9879b7b5b158328a9fc933afc397efa",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.1",
+    "source": "1cb6b65986e43a630f1fc9ac8bc33a82f9f7fe27",
     "branch": "main"
   }
 }
