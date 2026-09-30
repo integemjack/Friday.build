@@ -4,7 +4,8 @@ name: Build and release Friday
 #   1. 由源码仓库（integemjack/Friday）每次提交通过 repository_dispatch 触发，或在 Actions 页面手动运行；
 #   2. 用 SOURCE_TOKEN 拉取私有源码仓库的指定提交；
 #   3. 导入 Developer ID 证书，调用源码里的 Friday/Tools/CI/build.sh 构建、签名、打包；
-#   4. 发布到本仓库 Releases：推送 v* 标签发正式版，普通提交发预发布（v<版本>-build.<序号>）。
+#   4. 发布到本仓库 Releases：源码仓库推 v* 标签发正式版（标签 v1.1），普通提交发 Beta（标签 v<版本>-beta.<序号>，预发布）；
+#   5. 发布后更新仓库根目录的 latest.json（每个渠道最新的一次发布），Friday 应用定期读它来自动更新。
 on:
   repository_dispatch:
     types: [build]
@@ -153,24 +154,33 @@ jobs:
           set -euo pipefail
           PROJECT_VERSION="$(grep -m1 -E 'MARKETING_VERSION = ' src/Friday/Friday.xcodeproj/project.pbxproj | sed -E 's/.*= *([^;]+);.*/\1/' | tr -d '"')"
           PROJECT_VERSION="${PROJECT_VERSION:-1.0}"
-          if [ -n "$TAG" ]; then
+          if [ -n "$TAG" ] && [[ ! "$TAG" =~ ^v[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "标签 '$TAG' 不是 v<数字>.<数字> 的形式，无法作为版本号" >&2
+            exit 1
+          fi
+          if [ -n "$TAG" ] && [ "${FORCE_PRERELEASE:-false}" != "true" ]; then
+            # 正式版：源码仓库打的 v* 标签
             RELEASE_TAG="$TAG"
             MARKETING="${TAG#v}"
-            PRERELEASE="${FORCE_PRERELEASE:-false}"
-            TITLE="Friday $TAG"
+            CHANNEL=stable
+            PRERELEASE=false
+            TITLE="Friday ${MARKETING} 正式版"
           else
-            RELEASE_TAG="v$PROJECT_VERSION-build.$GITHUB_RUN_NUMBER"
-            MARKETING="$PROJECT_VERSION"
+            # Beta：main 的每次提交（或手动要求预发布）
+            MARKETING="${TAG:+${TAG#v}}"; MARKETING="${MARKETING:-$PROJECT_VERSION}"
+            RELEASE_TAG="v${MARKETING}-beta.${GITHUB_RUN_NUMBER}"
+            CHANNEL=beta
             PRERELEASE=true
-            TITLE="Friday $PROJECT_VERSION 构建 ${GITHUB_RUN_NUMBER}（${REF_NAME}）"
+            TITLE="Friday ${MARKETING} Beta ${GITHUB_RUN_NUMBER}"
           fi
           {
             echo "release_tag=$RELEASE_TAG"
             echo "marketing=$MARKETING"
+            echo "channel=$CHANNEL"
             echo "prerelease=$PRERELEASE"
             echo "title=$TITLE"
           } >> "$GITHUB_OUTPUT"
-          echo "版本 ${MARKETING}，构建号 ${GITHUB_RUN_NUMBER}，Release 标签 ${RELEASE_TAG}，预发布=$PRERELEASE"
+          echo "版本 ${MARKETING}，构建号 ${GITHUB_RUN_NUMBER}，渠道 ${CHANNEL}，Release 标签 ${RELEASE_TAG}，预发布=${PRERELEASE}"
 
       - name: Build, sign and package
         env:
@@ -179,6 +189,8 @@ jobs:
           LABEL: ${{ steps.version.outputs.release_tag }}
           MARKETING_VERSION: ${{ steps.version.outputs.marketing }}
           BUILD_NUMBER: ${{ github.run_number }}
+          RELEASE_TAG: ${{ steps.version.outputs.release_tag }}
+          RELEASE_CHANNEL: ${{ steps.version.outputs.channel }}
           CODE_SIGN_IDENTITY: ${{ steps.signing.outputs.available == 'true' && vars.CODE_SIGN_IDENTITY || '' }}
           DEVELOPMENT_TEAM: ${{ vars.DEVELOPMENT_TEAM }}
         run: bash src/Friday/Tools/CI/build.sh
@@ -230,13 +242,71 @@ jobs:
             dist/*.zip
             dist/SHA256SUMS.txt
           body: |
-            Friday（macOS 26+，Apple Silicon）
+            Friday ${{ steps.version.outputs.marketing }} ${{ steps.version.outputs.channel == 'stable' && '正式版' || format('Beta {0}', github.run_number) }}（macOS 26+，Apple Silicon）
 
+            - 渠道：${{ steps.version.outputs.channel == 'stable' && '正式版（源码仓库的版本标签）' || 'Beta（main 分支每次提交的构建）' }}，构建号 ${{ github.run_number }}
             - 源码：${{ env.SOURCE_REPO }} @ `${{ steps.src.outputs.ref }}`（${{ steps.src.outputs.ref_name }}）
             - 提交：${{ steps.src.outputs.subject }}
             - 构建：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
             - 安装：打开 dmg，双击图标即可运行（也可拖到「应用程序」）；zip 为纯 app 包
+            - 自动更新：Friday 会定期读取本仓库的 latest.json，发现新版本后自动下载、验签、换包重启（设置 › 通用 里可关，也可选只收正式版）
             - 签名：Developer ID，未公证时首次打开需在「系统设置 → 隐私与安全性」中点“仍要打开”
+
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+        with:
+          path: self
+          ref: main
+          fetch-depth: 1
+
+      - name: Update latest.json
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.release_tag }}
+          MARKETING: ${{ steps.version.outputs.marketing }}
+          CHANNEL: ${{ steps.version.outputs.channel }}
+          SUBJECT: ${{ steps.src.outputs.subject }}
+          SOURCE_REF: ${{ steps.src.outputs.ref }}
+        run: |
+          set -euo pipefail
+          # 每个渠道只记录最新的一次发布；应用按渠道读取并与自己的版本比较
+          MIN_OS="$(grep -m1 -E 'MACOSX_DEPLOYMENT_TARGET = ' src/Friday/Friday.xcodeproj/project.pbxproj | sed -E 's/.*= *([^;]+);.*/\1/' | tr -d '"')"
+          export MIN_OS="${MIN_OS:-26.0}" BASENAME="Friday-${RELEASE_TAG}-macOS-arm64" REPO="${GITHUB_REPOSITORY}" RUN_NUMBER="${GITHUB_RUN_NUMBER}"
+          python3 - <<'PY'
+          import datetime, json, os, pathlib
+          tag, channel, basename, repo = os.environ["RELEASE_TAG"], os.environ["CHANNEL"], os.environ["BASENAME"], os.environ["REPO"]
+          sums = {line.split()[1].lstrip("*"): line.split()[0] for line in pathlib.Path("dist/SHA256SUMS.txt").read_text().splitlines() if line.strip()}
+          zip_name, dmg_name = f"{basename}.zip", f"{basename}.dmg"
+          entry = {
+              "tag": tag,
+              "version": os.environ["MARKETING"],
+              "build": int(os.environ["RUN_NUMBER"]),
+              "channel": channel,
+              "date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "zip": f"https://github.com/{repo}/releases/download/{tag}/{zip_name}",
+              "dmg": f"https://github.com/{repo}/releases/download/{tag}/{dmg_name}" if os.path.exists(f"dist/{dmg_name}") else None,
+              "sha256": sums[zip_name],
+              "size": os.path.getsize(f"dist/{zip_name}"),
+              "notes": os.environ.get("SUBJECT", ""),
+              "minOS": os.environ["MIN_OS"],
+              "release": f"https://github.com/{repo}/releases/tag/{tag}",
+              "source": os.environ.get("SOURCE_REF", ""),
+          }
+          path = pathlib.Path("self/latest.json")
+          manifest = json.loads(path.read_text()) if path.exists() else {}
+          manifest[channel] = entry
+          manifest["updatedAt"] = entry["date"]
+          path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+          print(path.read_text())
+          PY
+          cd self
+          git config user.name "integemjack"
+          git config user.email "jack.wang@integem.com"
+          git add latest.json
+          git commit -m "latest.json：${CHANNEL} → ${RELEASE_TAG}"
+          for attempt in 1 2 3; do
+            git push origin HEAD:main && break
+            git pull --rebase origin main || true
+          done
 
       - name: Remove temporary keychain
         if: ${{ always() && steps.signing.outputs.keychain != '' }}

@@ -1,0 +1,18 @@
+{
+  "beta": {
+    "tag": "v1.0-build.8",
+    "version": "1.0",
+    "build": 8,
+    "channel": "beta",
+    "date": "2026-09-30T15:06:57Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0-build.8/Friday-v1.0-build.8-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0-build.8/Friday-v1.0-build.8-macOS-arm64.dmg",
+    "sha256": "931d9bfee7e20dac6e996b2fd740b1ca7a560455964c277f6a006d9d1ed1584c",
+    "size": 29250709,
+    "notes": "输入区底栏：去掉「工具」开关，胶囊放进独立的玻璃容器",
+    "minOS": "26.0",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0-build.8",
+    "source": ""
+  },
+  "updatedAt": "2026-09-30T15:06:57Z"
+}
