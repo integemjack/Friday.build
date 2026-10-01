@@ -1,7 +1,7 @@
 # Friday.build
 
 Friday 的构建产物与发布页。二进制由 GitHub Actions 从源码仓库自动构建后发布到本仓库的 Releases：macOS 版用
-Developer ID 证书签名，Windows / Linux 版（Qt）为 CUDA 与 Vulkan 各打一个包。
+Developer ID 证书签名并经 Apple 公证，Windows / Linux 版（Qt）为 CUDA 与 Vulkan 各打一个包。
 
 ## 产物
 
@@ -32,7 +32,7 @@ llama-server、stable-diffusion.cpp 的 sd-cli）不同。包的目录布局与�
 [`.github/workflows/build.yml`](.github/workflows/build.yml) 由源码仓库每次推送通过 `repository_dispatch` 触发（也可以在 Actions 页面手动运行，可选择是否同时构建 Qt 版），所有运行串行排队：
 
 1. **prepare**：解析源码提交，算版本号、渠道和 Release 标签；
-2. **macos**：Xcode 构建、Developer ID 签名、（可选）公证，产物上传为 artifact；
+2. **macos**：Xcode 构建、Developer ID 签名，dmg 也签名，公证 dmg 后把票据钉到 dmg 和 app 上、用钉过的 app 重打 zip，并用 Gatekeeper（`spctl`）确认是「Notarized Developer ID」，产物上传为 artifact；缺证书或公证密钥、公证不通过都直接失败，不发布未公证的包；
 3. **qt**：`{windows-2022, ubuntu-22.04} × {cuda, vulkan}` 四个组合并行，互不影响（`fail-fast: false`）。调用源码 `qt/ci/` 下的脚本：取依赖 → 构建推理后端 → 构建应用并跑单元测试 → 打包。Qt、CUDA、Vulkan SDK 与依赖的版本都钉在源码的 `qt/ci/deps.env` 里；推理后端按组件分别缓存（CUDA 编译很慢，依赖和工具链不变就不重编），另有 ccache；
 4. **release**：macOS 成功才发布；某个 Qt 组合失败时照样发布其余产物，并在 Release 说明里注明缺哪些。一次性上传全部文件与重新计算的 `SHA256SUMS.txt`，然后删掉同渠道的旧 Release、更新 `latest.json`。
 
@@ -50,3 +50,21 @@ llama-server、stable-diffusion.cpp 的 sd-cli）不同。包的目录布局与�
 ```
 
 macOS 版 Friday 每小时读一次这个文件，比自己新就下载 zip、校验 SHA-256 和 Developer ID 签名，Agent 空闲时自动换包重启，正在工作时在侧边栏底部提示「点击更新到 …」；设置 › 通用 里可以关掉自动更新或只接收正式版。Windows / Linux 版按「系统-架构-后端」（如 `windows-x64-cuda`）取 `assets` 里自己的包，校验 SHA-256 后换包；这次构建缺某个组合时对应的键不存在，那个平台就保持原版本。
+
+## 签名与公证
+
+macOS 包的签名和公证依赖本仓库的 Actions 配置（Settings › Secrets and variables › Actions）：
+
+| 名称 | 类型 | 说明 |
+| --- | --- | --- |
+| `MACOS_CERTIFICATE_P12` | secret | Developer ID Application 证书（含私钥）导出的 .p12，base64 编码 |
+| `MACOS_CERTIFICATE_PASSWORD` | secret | .p12 的密码 |
+| `KEYCHAIN_PASSWORD` | secret | 运行器上临时钥匙串的密码（随便设一个） |
+| `CODE_SIGN_IDENTITY` | variable | 签名身份，如 `Developer ID Application: yuehong sun (6AXTRT5TV4)` |
+| `DEVELOPMENT_TEAM` | variable | 团队 ID |
+| `NOTARY_KEY_ID` | secret | App Store Connect API 密钥的 Key ID（`AuthKey_<Key ID>.p8` 文件名里那段） |
+| `NOTARY_ISSUER_ID` | secret | App Store Connect API 的 Issuer ID |
+| `NOTARY_KEY_P8` | secret | `AuthKey_<Key ID>.p8` 文件的原文 |
+
+本机验证下载的包：`spctl -a -vvv -t exec Friday.app` 应输出 `source=Notarized Developer ID`，
+`xcrun stapler validate Friday-<标签>-macOS-arm64.dmg` 应输出 `The validate action worked!`。

@@ -5,7 +5,8 @@ name: Build and release Friday
 #   2. 用 SOURCE_TOKEN 拉取私有源码仓库的指定提交；
 #   3. prepare：定版本号 X.Y.Z：vX.Y 分支用分支名做前缀，其余用工程 MARKETING_VERSION 的前两位；第三位从 0 起，
 #      每次打包自动 +1（按已有标签数）；main 分支的提交发正式版（标签 vX.Y.Z），其他分支发预发布（vX.Y.Z-beta）；
-#   4. macos：导入 Developer ID 证书，调用源码里的 Friday/Tools/CI/build.sh 构建、签名、打包（可选公证）；
+#   4. macos：导入 Developer ID 证书，调用源码里的 Friday/Tools/CI/build.sh 构建、签名、打包，再签 dmg、公证并钉票据
+#      （缺证书或公证密钥、公证不通过都直接失败，不发未公证的包）；
 #      qt：Windows / Linux 的 Qt 版，CUDA 与 Vulkan 各一个包（调用源码里的 qt/ci/ 脚本）；
 #   5. release：macOS 成功才发布（Qt 某个组合失败照样发布其余产物，并在说明里注明缺哪些）；
 #      正式版和预发布各只保留最新的一个 Release（旧的连安装包一起删，标签保留以便继续计数）；
@@ -266,18 +267,19 @@ jobs:
             build-${{ runner.os }}-${{ hashFiles('src/Friday/Friday.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-
             build-${{ runner.os }}-
 
+      # 发布出去的 macOS 包必须是 Developer ID 签名 + 公证的：缺证书时直接失败，不再退回临时签名
       - name: Import signing certificate
         id: signing
         env:
           MACOS_CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
           MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          CODE_SIGN_IDENTITY: ${{ vars.CODE_SIGN_IDENTITY }}
         run: |
           set -euo pipefail
-          if [ -z "${MACOS_CERTIFICATE_P12:-}" ]; then
-            echo "未配置 MACOS_CERTIFICATE_P12，跳过导入（将使用临时签名）"
-            echo "available=false" >> "${GITHUB_OUTPUT}"
-            exit 0
+          if [ -z "${MACOS_CERTIFICATE_P12:-}" ] || [ -z "${CODE_SIGN_IDENTITY:-}" ]; then
+            echo "::error::未配置 Developer ID 证书（secrets.MACOS_CERTIFICATE_P12 / vars.CODE_SIGN_IDENTITY），macOS 包必须签名公证后才发布"
+            exit 1
           fi
           KEYCHAIN="${RUNNER_TEMP}/signing.keychain-db"
           CERT="${RUNNER_TEMP}/certificate.p12"
@@ -289,10 +291,11 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "${KEYCHAIN_PASSWORD}" "${KEYCHAIN}" >/dev/null
           security list-keychains -d user -s "${KEYCHAIN}" login.keychain
           rm -f "${CERT}"
-          echo "可用签名身份："
-          security find-identity -v -p codesigning "${KEYCHAIN}"
-          echo "available=true" >> "${GITHUB_OUTPUT}"
           echo "keychain=${KEYCHAIN}" >> "${GITHUB_OUTPUT}"
+          echo "可用签名身份："
+          security find-identity -v -p codesigning "${KEYCHAIN}" | tee "${RUNNER_TEMP}/identities.txt"
+          # 证书过期 / 导错证书时在这里停下，而不是到构建时才发现
+          grep -qF "\"${CODE_SIGN_IDENTITY}\"" "${RUNNER_TEMP}/identities.txt" || { echo "::error::钥匙串里没有有效的「${CODE_SIGN_IDENTITY}」"; exit 1; }
 
       - name: Build, sign and package
         env:
@@ -303,13 +306,16 @@ jobs:
           BUILD_NUMBER: ${{ github.run_number }}
           RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
           RELEASE_CHANNEL: ${{ needs.prepare.outputs.channel }}
-          CODE_SIGN_IDENTITY: ${{ steps.signing.outputs.available == 'true' && vars.CODE_SIGN_IDENTITY || '' }}
+          CODE_SIGN_IDENTITY: ${{ vars.CODE_SIGN_IDENTITY }}
           DEVELOPMENT_TEAM: ${{ vars.DEVELOPMENT_TEAM }}
         run: bash src/Friday/Tools/CI/build.sh
 
-      - name: Notarize (optional)
-        if: ${{ steps.signing.outputs.available == 'true' }}
+      # build.sh 只签 app，dmg 在这里补 Developer ID 签名；公证 dmg（Apple 会一并登记里面 app 的票据），
+      # 把票据钉到 dmg 和 app 上，用钉过票据的 app 重打 zip（自动更新用 zip），最后用 Gatekeeper 的判定确认已公证。
+      # 缺公证密钥或公证没通过都直接失败：未公证的包打开时会被 Gatekeeper 拦下，不能发出去。
+      - name: Sign dmg, notarize and staple
         env:
+          CODE_SIGN_IDENTITY: ${{ vars.CODE_SIGN_IDENTITY }}
           NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
           NOTARY_ISSUER_ID: ${{ secrets.NOTARY_ISSUER_ID }}
           NOTARY_KEY_P8: ${{ secrets.NOTARY_KEY_P8 }}
@@ -317,24 +323,71 @@ jobs:
         run: |
           set -euo pipefail
           if [ -z "${NOTARY_KEY_ID:-}" ] || [ -z "${NOTARY_ISSUER_ID:-}" ] || [ -z "${NOTARY_KEY_P8:-}" ]; then
-            echo "未配置 App Store Connect API 密钥（NOTARY_KEY_ID / NOTARY_ISSUER_ID / NOTARY_KEY_P8），跳过公证"
-            exit 0
+            echo "::error::未配置公证用的 App Store Connect API 密钥（secrets.NOTARY_KEY_ID / NOTARY_ISSUER_ID / NOTARY_KEY_P8）"
+            exit 1
           fi
           APP="${DERIVED_DATA}/Build/Products/Release/Friday.app"
           BASENAME="Friday-${LABEL}-macOS-arm64"
+          DMG="dist/${BASENAME}.dmg"
+          ZIP="dist/${BASENAME}.zip"
           KEY="${RUNNER_TEMP}/notary.p8"
-          printf '%s' "${NOTARY_KEY_P8}" > "${KEY}"
-          # 公证 dmg（里面的 app 一并公证），然后把票据钉到 dmg 和 app 上，再用钉过票据的 app 重打 zip
-          if [ -f "dist/${BASENAME}.dmg" ]; then
-            xcrun notarytool submit "dist/${BASENAME}.dmg" --key "${KEY}" --key-id "${NOTARY_KEY_ID}" --issuer "${NOTARY_ISSUER_ID}" --wait --timeout 45m
-            xcrun stapler staple "dist/${BASENAME}.dmg"
+          printf '%s\n' "${NOTARY_KEY_P8}" > "${KEY}"
+          trap 'rm -f "${KEY}"' EXIT
+          NOTARY=(--key "${KEY}" --key-id "${NOTARY_KEY_ID}" --issuer "${NOTARY_ISSUER_ID}")
+
+          # notarytool 在结果为 Invalid 时不一定返回非零，按 JSON 里的 status 判；没拿到提交号（网络抖动）时重试
+          notarize() {
+            local file="$1" out id status
+            for attempt in 1 2 3; do
+              out="$(xcrun notarytool submit "${file}" "${NOTARY[@]}" --wait --timeout 45m --output-format json | grep '^{' | tail -1)" || true
+              echo "${out}"
+              id="$(plutil -extract id raw -o - - <<< "${out}" 2>/dev/null || true)"
+              status="$(plutil -extract status raw -o - - <<< "${out}" 2>/dev/null || true)"
+              [ -n "${id}" ] && break
+              echo "提交公证失败（第 ${attempt}/3 次），30 秒后重试"; sleep 30
+            done
+            if [ "${status}" != "Accepted" ]; then
+              echo "::error::$(basename "${file}") 公证未通过（${status:-提交失败}）"
+              [ -n "${id}" ] && xcrun notarytool log "${id}" "${NOTARY[@]}" || true
+              return 1
+            fi
+          }
+
+          if [ -f "${DMG}" ]; then
+            echo "▶ 签名 dmg"
+            codesign --force --sign "${CODE_SIGN_IDENTITY}" --timestamp "${DMG}"
+            codesign --verify --strict --verbose=2 "${DMG}"
+            echo "▶ 公证 dmg"
+            notarize "${DMG}"
+            xcrun stapler staple "${DMG}"
           else
-            xcrun notarytool submit "dist/${BASENAME}.zip" --key "${KEY}" --key-id "${NOTARY_KEY_ID}" --issuer "${NOTARY_ISSUER_ID}" --wait --timeout 45m
+            echo "▶ 公证 zip"
+            notarize "${ZIP}"
           fi
           xcrun stapler staple "${APP}"
-          rm -f "${KEY}" "dist/${BASENAME}.zip"
-          ditto -c -k --sequesterRsrc --keepParent "${APP}" "dist/${BASENAME}.zip"
-          (cd dist && shasum -a 256 *.zip *.dmg > SHA256SUMS.txt && cat SHA256SUMS.txt)
+          rm -f "${ZIP}"
+          ditto -c -k --sequesterRsrc --keepParent "${APP}" "${ZIP}"
+
+          echo "▶ 校验公证票据与 Gatekeeper 判定"
+          xcrun stapler validate "${APP}"
+          [ -f "${DMG}" ] && xcrun stapler validate "${DMG}"
+          if spctl --status | grep -q "assessments enabled"; then
+            REPORT="${RUNNER_TEMP}/spctl.txt"
+            spctl -a -vvv -t exec "${APP}" > "${REPORT}" 2>&1 || true
+            EXPECT=1
+            if [ -f "${DMG}" ]; then
+              spctl -a -vvv -t open --context context:primary-signature "${DMG}" >> "${REPORT}" 2>&1 || true
+              EXPECT=2
+            fi
+            cat "${REPORT}"
+            if [ "$(grep -c "^source=Notarized Developer ID" "${REPORT}")" -ne "${EXPECT}" ]; then
+              echo "::error::Gatekeeper 没有把产物认作已公证的 Developer ID"
+              exit 1
+            fi
+          else
+            echo "::warning::运行器关闭了 Gatekeeper 评估，只校验了钉上的票据"
+          fi
+          (cd dist && shopt -s nullglob && shasum -a 256 *.zip *.dmg > SHA256SUMS.txt && cat SHA256SUMS.txt)
 
       # GitHub 的产物服务偶尔整段超时（CreateArtifact 重试 5 次都失败）：等一分钟再传一次，免得一次抖动挡住整轮发布
       - name: Upload artifact
@@ -703,7 +756,7 @@ jobs:
               "",
               "- 安装：打开 dmg，双击图标即可运行（也可拖到「应用程序」）；zip 为纯 app 包",
               "- 自动更新：Friday 会定期读取本仓库的 latest.json，发现新版本后自动下载、验签、换包重启（设置 › 通用 里可关，也可选只收正式版）",
-              "- 签名：Developer ID，未公证时首次打开需在「系统设置 → 隐私与安全性」中点“仍要打开”",
+              "- 签名：Developer ID 签名并经 Apple 公证（dmg 与 app 都钉了公证票据），下载后直接打开",
           ]
           if env["HAS_QT"] == "true":
               lines += [
