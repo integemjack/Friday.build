@@ -35,10 +35,11 @@ on:
 permissions:
   contents: write
 
-# 所有构建串行排队（不取消），保证每次提交都产出一个包，也避免缓存互相覆盖
-concurrency:
-  group: friday-build
-  cancel-in-progress: false
+# 不设工作流级并发组：GitHub 的并发组只保留一个排队中的运行，新的推送会把排队中的旧运行直接取消
+# （Qt 版一轮要很久，多个分支 / 会话同时推送时几乎每次都会被顶掉）。改为：
+#   - 各次运行的构建互不等待、并行进行；
+#   - 版本号在 prepare 里用「推送标签」原子预留（撞号就重试），并行运行不会拿到同一个号；
+#   - release 只往前走：每个渠道只保留版本最大的 Release，latest.json 不会被较旧的运行改回去。
 
 env:
   LANG: en_US.UTF-8
@@ -128,6 +129,13 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
           echo "提交 ${SHA}，最低 macOS ${MIN_OS:-26.0}，构建 Qt 版=${HAS_QT}"
 
+      - name: Checkout this repository (for tag reservation)
+        uses: actions/checkout@v4
+        with:
+          path: self
+          ref: main
+          fetch-depth: 1
+
       - name: Determine version
         id: version
         env:
@@ -150,25 +158,47 @@ jobs:
           else
             CHANNEL=beta
           fi
+          tag_for() { if [ "${CHANNEL}" = "stable" ]; then echo "v$1"; else echo "v$1-beta"; fi; }
+          other_for() { if [ "${CHANNEL}" = "stable" ]; then echo "v$1-beta"; else echo "v$1"; fi; }
           if [ -n "${INPUT_VERSION}" ]; then
             MARKETING="${INPUT_VERSION#v}"
             [[ "${MARKETING}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "版本号 '${INPUT_VERSION}' 必须是 X.Y.Z" >&2; exit 1; }
+            # 手动指定的版本：标签已存在就沿用（重新发布同一个版本），不存在就建
+            git -C self push -q origin "HEAD:refs/tags/$(tag_for "${MARKETING}")" 2>/dev/null || true
           else
-            # 第三位：这个前缀下已有标签（正式版、预发布共用一个序列）的最大值 +1，没有就从 0 开始
+            # 第三位：这个前缀下已有标签（正式版、预发布共用一个序列）的最大值 +1，没有就从 0 开始。
+            # 并行的运行可能同时算出同一个号，所以用「推送标签」原子预留：推不上去（已被占）就重算重试；
+            # 推上去以后如果另一个渠道同时占了同一个号（v1.2.3 与 v1.2.3-beta 是两个不同的标签），自己让出再重试。
+            # 预留后构建失败的号不会回收（版本号可能跳号）。
             ESCAPED="${PREFIX//./\\.}"
-            LAST="$(git ls-remote --tags --refs "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git" "refs/tags/v${PREFIX}.*" \
-              | sed -E 's#.*refs/tags/v##' \
-              | { grep -E "^${ESCAPED}\.[0-9]+(-.*)?$" || true; } \
-              | sed -E 's/^[0-9]+\.[0-9]+\.([0-9]+).*/\1/' | sort -n | tail -1)"
-            if [ -n "${LAST}" ]; then PATCH=$((LAST + 1)); else PATCH=0; fi
-            MARKETING="${PREFIX}.${PATCH}"
+            MARKETING=""
+            for attempt in $(seq 1 20); do
+              LAST="$(git ls-remote --tags --refs "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git" "refs/tags/v${PREFIX}.*" \
+                | sed -E 's#.*refs/tags/v##' \
+                | { grep -E "^${ESCAPED}\.[0-9]+(-.*)?$" || true; } \
+                | sed -E 's/^[0-9]+\.[0-9]+\.([0-9]+).*/\1/' | sort -n | tail -1)"
+              if [ -n "${LAST}" ]; then PATCH=$((LAST + 1)); else PATCH=0; fi
+              CANDIDATE="${PREFIX}.${PATCH}"
+              if git -C self push -q origin "HEAD:refs/tags/$(tag_for "${CANDIDATE}")" 2>/dev/null; then
+                if git ls-remote --exit-code --tags "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git" "refs/tags/$(other_for "${CANDIDATE}")" >/dev/null 2>&1; then
+                  echo "版本 ${CANDIDATE} 同时被另一个渠道占用，让出后重试"
+                  git -C self push -q origin ":refs/tags/$(tag_for "${CANDIDATE}")" || true
+                else
+                  MARKETING="${CANDIDATE}"
+                  break
+                fi
+              else
+                echo "版本 ${CANDIDATE} 已被其他运行预留，重试（第 ${attempt} 次）"
+              fi
+              sleep $((RANDOM % 5 + 1))
+            done
+            [ -n "${MARKETING}" ] || { echo "预留版本号失败（重试 20 次）" >&2; exit 1; }
           fi
+          RELEASE_TAG="$(tag_for "${MARKETING}")"
           if [ "${CHANNEL}" = "stable" ]; then
-            RELEASE_TAG="v${MARKETING}"
             PRERELEASE=false
             TITLE="Friday ${MARKETING} 正式版"
           else
-            RELEASE_TAG="v${MARKETING}-beta"
             PRERELEASE=true
             TITLE="Friday ${MARKETING} Beta（${REF_NAME}）"
           fi
@@ -689,18 +719,21 @@ jobs:
       - name: Keep only the latest release per channel
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
           PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
         run: |
           set -euo pipefail
-          # 正式版和预发布各只保留刚发布的这一个：旧 Release 连同安装包一起删掉；标签保留，第三位才能接着数
-          gh release list --repo "${GITHUB_REPOSITORY}" --limit 200 --json tagName,isPrerelease,isDraft \
-            --jq ".[] | select(.isDraft | not) | select(.isPrerelease == ${PRERELEASE}) | .tagName" \
-          | while read -r tag; do
-              [ "${tag}" = "${RELEASE_TAG}" ] && continue
-              echo "删除旧发布 ${tag}"
-              gh release delete "${tag}" --repo "${GITHUB_REPOSITORY}" --yes
-            done
+          # 正式版和预发布各只保留版本号最大的一个：旧 Release 连同安装包一起删掉；标签保留，第三位才能接着数。
+          # 并行的运行可能晚于更新的版本完成：这时最大的不是自己，就连自己刚发的也删掉
+          TAGS="$(gh release list --repo "${GITHUB_REPOSITORY}" --limit 200 --json tagName,isPrerelease,isDraft \
+            --jq ".[] | select(.isDraft | not) | select(.isPrerelease == ${PRERELEASE}) | .tagName")"
+          KEEP="$(printf '%s\n' "${TAGS}" | { grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-beta)?$' || true; } \
+            | sed -E 's/^v//; s/-beta$//' | sort -t. -k1,1n -k2,2n -k3,3n | tail -1)"
+          printf '%s\n' "${TAGS}" | while read -r tag; do
+            [ -n "${tag}" ] || continue
+            if [ -n "${KEEP}" ] && { [ "${tag}" = "v${KEEP}" ] || [ "${tag}" = "v${KEEP}-beta" ]; }; then continue; fi
+            echo "删除旧发布 ${tag}"
+            gh release delete "${tag}" --repo "${GITHUB_REPOSITORY}" --yes || true
+          done
 
       - name: Checkout this repository
         uses: actions/checkout@v4
@@ -770,19 +803,40 @@ jobs:
               "branch": os.environ.get("BRANCH", ""),
               "assets": assets,
           }
-          path = pathlib.Path("self/latest.json")
-          manifest = json.loads(path.read_text()) if path.exists() else {}
-          manifest[channel] = entry
-          manifest["updatedAt"] = entry["date"]
-          path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
-          print(path.read_text())
+          pathlib.Path(os.environ["RUNNER_TEMP"], "latest-entry.json").write_text(json.dumps(entry, ensure_ascii=False))
           PY
           cd self
           git config user.name "integemjack"
           git config user.email "jack.wang@integem.com"
-          git add latest.json
-          git commit -m "latest.json：${CHANNEL} → ${RELEASE_TAG}"
-          for _attempt in 1 2 3; do
-            git push origin HEAD:main && break
-            git pull --rebase origin main || true
+          # 只往前更新：渠道里已经是更新的版本（并行的运行先发布了）就不动；推送冲突时基于最新的 main 重来
+          for attempt in 1 2 3 4 5 6; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            UPDATED="$(python3 - <<'PY'
+          import json, os, pathlib, re
+          entry = json.loads(pathlib.Path(os.environ["RUNNER_TEMP"], "latest-entry.json").read_text())
+          def key(version):
+              m = re.match(r"^(\d+)\.(\d+)(?:\.(\d+))?", str(version or ""))
+              return tuple(int(x or 0) for x in m.groups()) if m else (-1,)
+          path = pathlib.Path("latest.json")
+          manifest = json.loads(path.read_text()) if path.exists() else {}
+          current = manifest.get(entry["channel"])
+          if current and current.get("tag") != entry["tag"] and key(current.get("version")) > key(entry["version"]):
+              print("no")
+          else:
+              manifest[entry["channel"]] = entry
+              manifest["updatedAt"] = entry["date"]
+              path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+              print("yes")
+          PY
+          )"
+            if [ "${UPDATED}" != "yes" ]; then
+              echo "latest.json 的 ${CHANNEL} 渠道已经是更新的版本，不更新"
+              break
+            fi
+            cat latest.json
+            git add latest.json
+            git commit -q -m "latest.json：${CHANNEL} → ${RELEASE_TAG}"
+            if git push -q origin HEAD:main; then break; fi
+            echo "推送 latest.json 冲突，重试（第 ${attempt} 次）"
+            sleep $((RANDOM % 5 + 2))
           done
