@@ -15,21 +15,21 @@
     "source": "",
     "branch": "main"
   },
-  "updatedAt": "2026-10-01T04:29:27Z",
+  "updatedAt": "2026-10-01T04:44:46Z",
   "stable": {
-    "tag": "v1.0.5",
-    "version": "1.0.5",
-    "build": 32,
+    "tag": "v1.0.6",
+    "version": "1.0.6",
+    "build": 33,
     "channel": "stable",
-    "date": "2026-10-01T04:29:27Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.5/Friday-v1.0.5-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.5/Friday-v1.0.5-macOS-arm64.dmg",
-    "sha256": "7b626eaf61620768f3157c843bf8690285c2a281929a7475445932966e6457ff",
-    "size": 29831570,
-    "notes": "修复子 Agent 等待确认时任务卡死：等确认的调用不管嵌几层都不折叠，父卡片 / 底栏 / 侧边栏标橙色待确认并让 Dock 图标提醒；并行子任务一完成就各�",
+    "date": "2026-10-01T04:44:46Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.6/Friday-v1.0.6-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.6/Friday-v1.0.6-macOS-arm64.dmg",
+    "sha256": "7603d2e7c9bb89755ec908e6f261f9952a94c279d5644e42312e535350439cd3",
+    "size": 29833724,
+    "notes": "流式输出时正在写的块把最后一段单独成一个 Text：每批 token 只重排最后一段，前面已定型的段落命中缓存（思考块同样处理）；压测文本改为带段落�",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.5",
-    "source": "231ab34115b7ff437d31fd4aaf54d1e268681773",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.6",
+    "source": "d0ab5e4d4072b0090753d5e1da5f7f69bd619f21",
     "branch": "main"
   }
 }
