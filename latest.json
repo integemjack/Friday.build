@@ -1,22 +1,59 @@
 {
   "beta": {
-    "tag": "v1.1.0-beta",
-    "version": "1.1.0",
-    "build": 41,
+    "tag": "v1.2.0-beta",
+    "version": "1.2.0",
+    "build": 51,
     "channel": "beta",
-    "date": "2026-10-01T09:08:19Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.1.0-beta/Friday-v1.1.0-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.1.0-beta/Friday-v1.1.0-beta-macOS-arm64.dmg",
-    "sha256": "6c36ad6ae607ae75d0dcd80c082d74b2391c2fa03db11d5f561ab3ee111972f6",
-    "size": 29890322,
-    "notes": "新增 Qt 6 QML + C++ 版（qt/）：Windows / Linux 图形版与命令行版 friday-cli，本地推理改用 llama.cpp / stable-diffusion.cpp，CI 打包 CUDA 与 Vulkan",
+    "date": "2026-10-01T09:41:30Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.2.0-beta/Friday-v1.2.0-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.2.0-beta/Friday-v1.2.0-beta-macOS-arm64.dmg",
+    "sha256": "ad9bf15dab02f98f9e9123954fe2a436b677db3a73d6e0398ac2279f595dad0f",
+    "size": 35765306,
+    "notes": "设置 › 能力改为按提供方管理：左边列提供方、右边详情，每项能力单独开关并就地显示不可用原因和所用模型，参数按类型给控件（分段 / 步进 / 滑",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.1.0-beta",
-    "source": "5f289eb385109c08c3f7156e650cc9479ffcc861",
-    "branch": "v1.1",
-    "assets": {}
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.2.0-beta",
+    "source": "ef36676975de70213edcaf77b6640cbeea32a62a",
+    "branch": "v1.2",
+    "assets": {
+      "windows-x64-cuda": {
+        "name": "Friday-v1.2.0-beta-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.0-beta/Friday-v1.2.0-beta-windows-x64-cuda.zip",
+        "sha256": "5569a83d520d9f43a28530cbeb85e314a6ed073bc153235fd967dd52b18787c7",
+        "size": 797463417
+      },
+      "linux-x64-cuda": {
+        "name": "Friday-v1.2.0-beta-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.0-beta/Friday-v1.2.0-beta-linux-x64-cuda.AppImage",
+        "sha256": "f9a2b5869832c1d2fc96fc5f2850c0ccd1942c63531fb342995fa4ac9a963fa2",
+        "size": 819988984,
+        "tarball": {
+          "name": "Friday-v1.2.0-beta-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.0-beta/Friday-v1.2.0-beta-linux-x64-cuda.tar.gz",
+          "sha256": "075727543e2a92ef561f4755bd29fc78e6c12054f76590c4ead62b8f0926cd2b",
+          "size": 857987560
+        }
+      },
+      "windows-x64-vulkan": {
+        "name": "Friday-v1.2.0-beta-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.0-beta/Friday-v1.2.0-beta-windows-x64-vulkan.zip",
+        "sha256": "d0b3c5040fb35aca04d2355d00cbbf3b001b84284fb20cf2f6bb278d7326a9ae",
+        "size": 102101825
+      },
+      "linux-x64-vulkan": {
+        "name": "Friday-v1.2.0-beta-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.0-beta/Friday-v1.2.0-beta-linux-x64-vulkan.AppImage",
+        "sha256": "b7dc71c608c0e447cc108ddfba8ed8f0ff3809c0d6a16392cf2f83d7e8834233",
+        "size": 112953848,
+        "tarball": {
+          "name": "Friday-v1.2.0-beta-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.0-beta/Friday-v1.2.0-beta-linux-x64-vulkan.tar.gz",
+          "sha256": "ea997b4cf81f6a9bec18f6ca6853fd9808192d2696a501ee78c2ad1ad80f52c7",
+          "size": 129623196
+        }
+      }
+    }
   },
-  "updatedAt": "2026-10-01T09:08:19Z",
+  "updatedAt": "2026-10-01T09:41:30Z",
   "stable": {
     "tag": "v1.0.10",
     "version": "1.0.10",
