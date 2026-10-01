@@ -15,21 +15,21 @@
     "source": "",
     "branch": "main"
   },
-  "updatedAt": "2026-10-01T05:31:24Z",
+  "updatedAt": "2026-10-01T05:39:00Z",
   "stable": {
-    "tag": "v1.0.8",
-    "version": "1.0.8",
-    "build": 35,
+    "tag": "v1.0.9",
+    "version": "1.0.9",
+    "build": 37,
     "channel": "stable",
-    "date": "2026-10-01T05:31:24Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.8/Friday-v1.0.8-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.8/Friday-v1.0.8-macOS-arm64.dmg",
-    "sha256": "e3c43b32ee79e2b5e2853ce4d940eba253cfa427b7b33102b7081e7047e20a92",
-    "size": 29860887,
-    "notes": "最大输出按模型来：在线引擎不再传 max_tokens，由模型自己的上限决定；设置里的「最大输出」只对本地模型生效（起标题这类小请求单独限长）",
+    "date": "2026-10-01T05:39:00Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.9/Friday-v1.0.9-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.9/Friday-v1.0.9-macOS-arm64.dmg",
+    "sha256": "00a4c84825e83327bee743268a906f4f292ef77e8a0d4ea27999f6495e3580cb",
+    "size": 29862776,
+    "notes": "默认不限制工具调用次数：主 Agent 的单轮工具轮数和子 Agent 的步数默认都不设上限，设置里改为可选开关（开了以后到限仍是交付已有结果、正常结束",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.8",
-    "source": "c10d78f8ce67982bffd52dd42ed6cb243802c7b2",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.9",
+    "source": "7dd8c10052d3db09ad29cac989776de472bba62b",
     "branch": "main"
   }
 }
