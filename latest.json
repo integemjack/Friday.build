@@ -53,21 +53,59 @@
       }
     }
   },
-  "updatedAt": "2026-10-01T10:47:10Z",
+  "updatedAt": "2026-10-01T10:49:06Z",
   "stable": {
-    "tag": "v1.0.10",
-    "version": "1.0.10",
-    "build": 38,
+    "tag": "v1.0.13",
+    "version": "1.0.13",
+    "build": 49,
     "channel": "stable",
-    "date": "2026-10-01T06:20:51Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.10/Friday-v1.0.10-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.10/Friday-v1.0.10-macOS-arm64.dmg",
-    "sha256": "3e20abc1672a7904b2544d5993b72877a02cf731432d1ca2ce16b1f634261c7b",
-    "size": 29890342,
-    "notes": "会话热更新：正在生成的消息单独成一个可观察对象，流式输出只改它、只有那一行重算，会话数组和其余消息在生成期间不动，结束时写回；Markdown �",
+    "date": "2026-10-01T10:49:06Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.13/Friday-v1.0.13-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.13/Friday-v1.0.13-macOS-arm64.dmg",
+    "sha256": "cb7169cc6882620bd6d7c45dd11817e1f5fa14bdb3e79b09a389059555569112",
+    "size": 29970885,
+    "notes": "Windows 上 Python 子进程默认 UTF-8（PYTHONUTF8=1，脚本工具写中文不再抛 UnicodeEncodeError）；MCP 测试用产品同款环境；修正测试里 MSVC 会当成拷贝构造的 QJsonAr",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.10",
-    "source": "711a7fe0240855c5f6ad22ca542a9b9293966914",
-    "branch": "main"
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.13",
+    "source": "55e847866a30280ac4f53690e4c1c6313b1ee3a4",
+    "branch": "main",
+    "assets": {
+      "windows-x64-cuda": {
+        "name": "Friday-v1.0.13-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.0.13/Friday-v1.0.13-windows-x64-cuda.zip",
+        "sha256": "6db69f83364c90dec8fcffb630a68a1933378faec3376fb94ea454c645db2270",
+        "size": 797457158
+      },
+      "linux-x64-cuda": {
+        "name": "Friday-v1.0.13-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.0.13/Friday-v1.0.13-linux-x64-cuda.AppImage",
+        "sha256": "61304ffacc833f298a0721d4695c1aaca5adcb6277c7fbcc089c4ffbc6393579",
+        "size": 819993080,
+        "tarball": {
+          "name": "Friday-v1.0.13-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.0.13/Friday-v1.0.13-linux-x64-cuda.tar.gz",
+          "sha256": "609bbafaa03a59427b5b74b1326d801ef58b4dcd273e6a0116d7e2fe832a6aca",
+          "size": 857987117
+        }
+      },
+      "windows-x64-vulkan": {
+        "name": "Friday-v1.0.13-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.0.13/Friday-v1.0.13-windows-x64-vulkan.zip",
+        "sha256": "10d8a192f902eed1bba7b01f87be2d1774aec12ebd01fe3b01a27ca99d408f97",
+        "size": 102101823
+      },
+      "linux-x64-vulkan": {
+        "name": "Friday-v1.0.13-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.0.13/Friday-v1.0.13-linux-x64-vulkan.AppImage",
+        "sha256": "6d1a0f4a091cc7869101e137c769eb778126688524bacdeb7a3066049cc48d9d",
+        "size": 112957944,
+        "tarball": {
+          "name": "Friday-v1.0.13-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.0.13/Friday-v1.0.13-linux-x64-vulkan.tar.gz",
+          "sha256": "d84dced6ef3030b39e6e7d58fff6040211365178864210df454d6c8b9ae647dd",
+          "size": 129623073
+        }
+      }
+    }
   }
 }
