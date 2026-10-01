@@ -378,7 +378,8 @@ jobs:
           set -euo pipefail
           sudo apt-get update -y
           # g++-12：C++20 支持更完整，且 22.04 自带的 libstdc++ 就是 12，编出来的程序在原版 22.04 上能跑
-          # 其余：Qt 运行 / 部署（xcb、Wayland、朗读、多媒体）、Vulkan 加载器、AppImage 工具需要的库
+          # 其余：Qt 运行 / 部署（xcb、Wayland、朗读、多媒体）、Vulkan 加载器（libvulkan-dev 提供链接用的 libvulkan.so：
+          # LunarG 的 Linux SDK 只带头文件和 glslc，不带加载器）、AppImage 工具需要的库
           sudo apt-get install -y --no-install-recommends \
             g++-12 ninja-build ccache pigz file desktop-file-utils patchelf \
             libgl1-mesa-dev libegl1 libopengl0 libxkbcommon0 libxkbcommon-x11-0 \
@@ -386,7 +387,7 @@ jobs:
             libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 libxcb-xinput0 libfontconfig1 libfreetype6 libdbus-1-3 libglib2.0-0 \
             libwayland-client0 libwayland-cursor0 libwayland-egl1 \
             libspeechd2 libpulse0 libva2 libva-drm2 libva-x11-2 libvdpau1 \
-            libvulkan1
+            libvulkan1 libvulkan-dev
           {
             echo "CC=gcc-12"
             echo "CXX=g++-12"
@@ -512,11 +513,26 @@ jobs:
       - name: Build app (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: pwsh -NoProfile -File src/qt/ci/build_app.ps1 -BuildDir "$env:APP_BUILD" -Prefix "$env:APP_STAGE"
+        run: pwsh -NoProfile -File src/qt/ci/build_app.ps1 -BuildDir "$env:APP_BUILD" -Prefix "$env:APP_STAGE" -NoRunTests
 
       - name: Build app (Linux)
         if: runner.os == 'Linux'
-        run: bash src/qt/ci/build_app.sh --build-dir "${APP_BUILD}" --prefix "${APP_STAGE}"
+        run: bash src/qt/ci/build_app.sh --build-dir "${APP_BUILD}" --prefix "${APP_STAGE}" --no-run-tests
+
+      # 单元测试单独一步、按测试类分进程跑（某个类崩溃也能看出是哪个）；失败不挡打包，
+      # 产物照常上传，最后一步再把这个 job 标成失败
+      - name: Unit tests (Windows)
+        id: tests_win
+        if: runner.os == 'Windows'
+        continue-on-error: true
+        shell: pwsh
+        run: pwsh -NoProfile -File src/qt/ci/run_tests.ps1 -BuildDir "$env:APP_BUILD"
+
+      - name: Unit tests (Linux)
+        id: tests_linux
+        if: runner.os == 'Linux'
+        continue-on-error: true
+        run: bash src/qt/ci/run_tests.sh --build-dir "${APP_BUILD}"
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
@@ -543,6 +559,12 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
+
+      - name: Fail if unit tests failed
+        if: steps.tests_win.outcome == 'failure' || steps.tests_linux.outcome == 'failure'
+        run: |
+          echo "::error title=单元测试失败::产物已上传，但单元测试没有全部通过，详见「Unit tests」一步的输出"
+          exit 1
 
   # ---------------------------------------------------------------------------
   # 发布：一次性上传全部产物，每个渠道只留最新 Release，更新 latest.json
