@@ -3,12 +3,13 @@ name: Build and release Friday
 # 本仓库只负责构建与发布：
 #   1. 由源码仓库（integemjack/Friday）每次提交通过 repository_dispatch 触发，或在 Actions 页面手动运行；
 #   2. 用 SOURCE_TOKEN 拉取私有源码仓库的指定提交；
-#   3. 导入 Developer ID 证书，调用源码里的 Friday/Tools/CI/build.sh 构建、签名、打包；
-#   4. 发布到本仓库 Releases：main 分支的提交发正式版，其他分支发预发布（Beta）；
-#      版本号 X.Y.Z：vX.Y 分支用分支名做前缀，其余用工程 MARKETING_VERSION 的前两位；第三位从 0 起，每次打包自动 +1（按已有标签数）；
-#      正式版标签 vX.Y.Z，预发布标签 vX.Y.Z-beta；
-#   5. 正式版和预发布各只保留最新的一个 Release（旧的连安装包一起删，标签保留以便继续计数）；
-#   6. 发布后更新仓库根目录的 latest.json（每个渠道最新的一次发布），Friday 应用定期读它来自动更新。
+#   3. prepare：定版本号 X.Y.Z：vX.Y 分支用分支名做前缀，其余用工程 MARKETING_VERSION 的前两位；第三位从 0 起，
+#      每次打包自动 +1（按已有标签数）；main 分支的提交发正式版（标签 vX.Y.Z），其他分支发预发布（vX.Y.Z-beta）；
+#   4. macos：导入 Developer ID 证书，调用源码里的 Friday/Tools/CI/build.sh 构建、签名、打包（可选公证）；
+#      qt：Windows / Linux 的 Qt 版，CUDA 与 Vulkan 各一个包（调用源码里的 qt/ci/ 脚本）；
+#   5. release：macOS 成功才发布（Qt 某个组合失败照样发布其余产物，并在说明里注明缺哪些）；
+#      正式版和预发布各只保留最新的一个 Release（旧的连安装包一起删，标签保留以便继续计数）；
+#   6. 发布后更新仓库根目录的 latest.json（每个渠道最新的一次发布，含各平台安装包 assets），Friday 应用定期读它来自动更新。
 on:
   repository_dispatch:
     types: [build]
@@ -26,6 +27,10 @@ on:
         description: "main 也按预发布发"
         type: boolean
         default: false
+      qt:
+        description: "同时构建 Windows / Linux 版（Qt，CUDA + Vulkan）"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -43,10 +48,25 @@ env:
   PACKAGES_DIR: ${{ github.workspace }}/build/SourcePackages
 
 jobs:
-  build:
-    name: Build, sign and release (macOS arm64)
-    runs-on: macos-26
-    timeout-minutes: 180
+  # ---------------------------------------------------------------------------
+  # 源码提交、版本号、渠道、标签（后面所有 job 共用）
+  # ---------------------------------------------------------------------------
+  prepare:
+    name: Resolve source and version
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      ref: ${{ steps.src.outputs.ref }}
+      ref_name: ${{ steps.src.outputs.ref_name }}
+      subject: ${{ steps.src.outputs.subject }}
+      sha: ${{ steps.inspect.outputs.sha }}
+      min_os: ${{ steps.inspect.outputs.min_os }}
+      has_qt: ${{ steps.inspect.outputs.has_qt }}
+      release_tag: ${{ steps.version.outputs.release_tag }}
+      marketing: ${{ steps.version.outputs.marketing }}
+      channel: ${{ steps.version.outputs.channel }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+      title: ${{ steps.version.outputs.title }}
     steps:
       - name: Resolve source revision
         id: src
@@ -59,21 +79,21 @@ jobs:
           INPUT_VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
-          if [ "$GITHUB_EVENT_NAME" = "repository_dispatch" ]; then
-            REF="$DISPATCH_SHA"; REF_NAME="$DISPATCH_REF_NAME"; TAG="$DISPATCH_TAG"; SUBJECT="$DISPATCH_SUBJECT"
+          if [ "${GITHUB_EVENT_NAME}" = "repository_dispatch" ]; then
+            REF="${DISPATCH_SHA}"; REF_NAME="${DISPATCH_REF_NAME}"; TAG="${DISPATCH_TAG}"; SUBJECT="${DISPATCH_SUBJECT}"
           else
-            REF="${INPUT_REF:-main}"; REF_NAME="$REF"; TAG="${INPUT_VERSION:-}"; SUBJECT="手动构建"
-            if [ -n "$TAG" ] && [[ "$TAG" != v* ]]; then TAG="v$TAG"; fi
+            REF="${INPUT_REF:-main}"; REF_NAME="${REF}"; TAG="${INPUT_VERSION:-}"; SUBJECT="手动构建"
+            if [ -n "${TAG}" ] && [[ "${TAG}" != v* ]]; then TAG="v${TAG}"; fi
           fi
           {
-            echo "ref=$REF"
-            echo "ref_name=$REF_NAME"
-            echo "tag=$TAG"
-            echo "subject=$SUBJECT"
-          } >> "$GITHUB_OUTPUT"
-          echo "源码 $SOURCE_REPO @ ${REF}（${REF_NAME}），标签 '$TAG'：$SUBJECT"
+            echo "ref=${REF}"
+            echo "ref_name=${REF_NAME}"
+            echo "tag=${TAG}"
+            echo "subject=${SUBJECT}"
+          } >> "${GITHUB_OUTPUT}"
+          echo "源码 ${SOURCE_REPO} @ ${REF}（${REF_NAME}），标签 '${TAG}'：${SUBJECT}"
 
-      - name: Checkout source
+      - name: Checkout source (version files only)
         uses: actions/checkout@v4
         with:
           repository: ${{ env.SOURCE_REPO }}
@@ -81,71 +101,32 @@ jobs:
           token: ${{ secrets.SOURCE_TOKEN }}
           path: src
           fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /Friday/Friday.xcodeproj/project.pbxproj
+            /qt/CMakeLists.txt
+            /qt/ci/deps.env
 
-      - name: Select Xcode 26
-        run: |
-          XCODE="$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)"
-          [ -n "$XCODE" ] || XCODE="/Applications/Xcode.app"
-          echo "使用 $XCODE"
-          sudo xcode-select -s "$XCODE"
-          xcodebuild -version
-          sw_vers
-
-      - name: Install Metal toolchain
-        run: |
-          # MLX 的 Metal 内核需要 Metal 编译器（Xcode 26 起需单独下载）
-          if xcrun metal --version >/dev/null 2>&1; then
-            echo "Metal 编译器已可用"
-          else
-            xcodebuild -downloadComponent MetalToolchain 2>&1 | tail -3
-          fi
-          xcrun metal --version
-
-      - name: Cache Swift packages
-        uses: actions/cache@v4
-        with:
-          path: build/SourcePackages
-          key: spm-${{ runner.os }}-${{ hashFiles('src/Friday/Friday.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
-          restore-keys: spm-${{ runner.os }}-
-
-      - name: Cache build products
-        uses: actions/cache@v4
-        with:
-          path: |
-            build/DerivedData/Build
-            build/DerivedData/ModuleCache.noindex
-          key: build-${{ runner.os }}-${{ hashFiles('src/Friday/Friday.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-${{ steps.src.outputs.ref }}
-          restore-keys: |
-            build-${{ runner.os }}-${{ hashFiles('src/Friday/Friday.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-
-            build-${{ runner.os }}-
-
-      - name: Import signing certificate
-        id: signing
+      - name: Inspect source
+        id: inspect
         env:
-          MACOS_CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
-          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_QT: ${{ inputs.qt }}
         run: |
           set -euo pipefail
-          if [ -z "${MACOS_CERTIFICATE_P12:-}" ]; then
-            echo "未配置 MACOS_CERTIFICATE_P12，跳过导入（将使用临时签名）"
-            echo "available=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
-          CERT="$RUNNER_TEMP/certificate.p12"
-          echo "$MACOS_CERTIFICATE_P12" | base64 --decode > "$CERT"
-          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
-          security set-keychain-settings -lut 21600 "$KEYCHAIN"
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
-          security import "$CERT" -P "$MACOS_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" >/dev/null
-          security list-keychains -d user -s "$KEYCHAIN" login.keychain
-          rm -f "$CERT"
-          echo "可用签名身份："
-          security find-identity -v -p codesigning "$KEYCHAIN"
-          echo "available=true" >> "$GITHUB_OUTPUT"
-          echo "keychain=$KEYCHAIN" >> "$GITHUB_OUTPUT"
+          # 手动运行时 ref 可能是分支名：解析成具体提交，macOS 与 Qt 各 job 都拉同一个提交
+          SHA="$(git -C src rev-parse HEAD)"
+          MIN_OS="$(grep -m1 -E 'MACOSX_DEPLOYMENT_TARGET = ' src/Friday/Friday.xcodeproj/project.pbxproj | sed -E 's/.*= *([^;]+);.*/\1/' | tr -d '"')"
+          # 老分支还没有 qt/ 目录时不构建 Qt 版；手动运行可以关掉
+          HAS_QT=false
+          if [ -f src/qt/CMakeLists.txt ] && [ -f src/qt/ci/deps.env ]; then HAS_QT=true; fi
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ] && [ "${INPUT_QT}" = "false" ]; then HAS_QT=false; fi
+          {
+            echo "sha=${SHA}"
+            echo "min_os=${MIN_OS:-26.0}"
+            echo "has_qt=${HAS_QT}"
+          } >> "${GITHUB_OUTPUT}"
+          echo "提交 ${SHA}，最低 macOS ${MIN_OS:-26.0}，构建 Qt 版=${HAS_QT}"
 
       - name: Determine version
         id: version
@@ -197,18 +178,101 @@ jobs:
             echo "channel=${CHANNEL}"
             echo "prerelease=${PRERELEASE}"
             echo "title=${TITLE}"
-          } >> "$GITHUB_OUTPUT"
+          } >> "${GITHUB_OUTPUT}"
           echo "分支 ${REF_NAME} → 版本 ${MARKETING}，构建号 ${GITHUB_RUN_NUMBER}，渠道 ${CHANNEL}，Release 标签 ${RELEASE_TAG}，预发布=${PRERELEASE}"
+
+  # ---------------------------------------------------------------------------
+  # macOS（Swift + MLX）：构建、签名、公证，产物上传为 artifact，由 release 统一发布
+  # ---------------------------------------------------------------------------
+  macos:
+    name: Build and sign (macOS arm64)
+    needs: prepare
+    runs-on: macos-26
+    timeout-minutes: 180
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SOURCE_REPO }}
+          ref: ${{ needs.prepare.outputs.sha }}
+          token: ${{ secrets.SOURCE_TOKEN }}
+          path: src
+          fetch-depth: 1
+
+      - name: Select Xcode 26
+        run: |
+          XCODE="$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)"
+          [ -n "${XCODE}" ] || XCODE="/Applications/Xcode.app"
+          echo "使用 ${XCODE}"
+          sudo xcode-select -s "${XCODE}"
+          xcodebuild -version
+          sw_vers
+
+      - name: Install Metal toolchain
+        run: |
+          # MLX 的 Metal 内核需要 Metal 编译器（Xcode 26 起需单独下载）
+          if xcrun metal --version >/dev/null 2>&1; then
+            echo "Metal 编译器已可用"
+          else
+            xcodebuild -downloadComponent MetalToolchain 2>&1 | tail -3
+          fi
+          xcrun metal --version
+
+      - name: Cache Swift packages
+        uses: actions/cache@v4
+        with:
+          path: build/SourcePackages
+          key: spm-${{ runner.os }}-${{ hashFiles('src/Friday/Friday.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      - name: Cache build products
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/DerivedData/Build
+            build/DerivedData/ModuleCache.noindex
+          key: build-${{ runner.os }}-${{ hashFiles('src/Friday/Friday.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-${{ needs.prepare.outputs.ref }}
+          restore-keys: |
+            build-${{ runner.os }}-${{ hashFiles('src/Friday/Friday.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}-
+            build-${{ runner.os }}-
+
+      - name: Import signing certificate
+        id: signing
+        env:
+          MACOS_CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "${MACOS_CERTIFICATE_P12:-}" ]; then
+            echo "未配置 MACOS_CERTIFICATE_P12，跳过导入（将使用临时签名）"
+            echo "available=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+          KEYCHAIN="${RUNNER_TEMP}/signing.keychain-db"
+          CERT="${RUNNER_TEMP}/certificate.p12"
+          echo "${MACOS_CERTIFICATE_P12}" | base64 --decode > "${CERT}"
+          security create-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN}"
+          security set-keychain-settings -lut 21600 "${KEYCHAIN}"
+          security unlock-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN}"
+          security import "${CERT}" -P "${MACOS_CERTIFICATE_PASSWORD}" -A -t cert -f pkcs12 -k "${KEYCHAIN}"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "${KEYCHAIN_PASSWORD}" "${KEYCHAIN}" >/dev/null
+          security list-keychains -d user -s "${KEYCHAIN}" login.keychain
+          rm -f "${CERT}"
+          echo "可用签名身份："
+          security find-identity -v -p codesigning "${KEYCHAIN}"
+          echo "available=true" >> "${GITHUB_OUTPUT}"
+          echo "keychain=${KEYCHAIN}" >> "${GITHUB_OUTPUT}"
 
       - name: Build, sign and package
         env:
           PROJECT_DIR: ${{ github.workspace }}/src/Friday
           OUTPUT_DIR: ${{ github.workspace }}/dist
-          LABEL: ${{ steps.version.outputs.release_tag }}
-          MARKETING_VERSION: ${{ steps.version.outputs.marketing }}
+          LABEL: ${{ needs.prepare.outputs.release_tag }}
+          MARKETING_VERSION: ${{ needs.prepare.outputs.marketing }}
           BUILD_NUMBER: ${{ github.run_number }}
-          RELEASE_TAG: ${{ steps.version.outputs.release_tag }}
-          RELEASE_CHANNEL: ${{ steps.version.outputs.channel }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+          RELEASE_CHANNEL: ${{ needs.prepare.outputs.channel }}
           CODE_SIGN_IDENTITY: ${{ steps.signing.outputs.available == 'true' && vars.CODE_SIGN_IDENTITY || '' }}
           DEVELOPMENT_TEAM: ${{ vars.DEVELOPMENT_TEAM }}
         run: bash src/Friday/Tools/CI/build.sh
@@ -219,7 +283,7 @@ jobs:
           NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
           NOTARY_ISSUER_ID: ${{ secrets.NOTARY_ISSUER_ID }}
           NOTARY_KEY_P8: ${{ secrets.NOTARY_KEY_P8 }}
-          LABEL: ${{ steps.version.outputs.release_tag }}
+          LABEL: ${{ needs.prepare.outputs.release_tag }}
         run: |
           set -euo pipefail
           if [ -z "${NOTARY_KEY_ID:-}" ] || [ -z "${NOTARY_ISSUER_ID:-}" ] || [ -z "${NOTARY_KEY_P8:-}" ]; then
@@ -245,36 +309,366 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Friday-${{ steps.version.outputs.release_tag }}-macOS-arm64
+          name: Friday-${{ needs.prepare.outputs.release_tag }}-macOS-arm64
           path: dist/*
           if-no-files-found: error
+
+      - name: Remove temporary keychain
+        if: ${{ always() && steps.signing.outputs.keychain != '' }}
+        run: security delete-keychain "${{ steps.signing.outputs.keychain }}" || true
+
+  # ---------------------------------------------------------------------------
+  # Windows / Linux（Qt 6 + llama.cpp / stable-diffusion.cpp）：CUDA 与 Vulkan 各一个包
+  # 工具链版本（Qt / CUDA / Vulkan SDK / 依赖标签）都钉在源码的 qt/ci/deps.env 里
+  # ---------------------------------------------------------------------------
+  qt:
+    name: Qt ${{ matrix.platform }} (${{ matrix.backend }})
+    needs: prepare
+    if: ${{ needs.prepare.outputs.has_qt == 'true' }}
+    runs-on: ${{ matrix.os }}
+    # Windows 上 CUDA 版要编两份 ggml-cuda（llama.cpp 和 sd.cpp 各一份），没命中缓存时最慢；GitHub 托管机器上限 6 小时
+    timeout-minutes: ${{ matrix.backend == 'cuda' && 350 || 180 }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, ubuntu-22.04]
+        backend: [cuda, vulkan]
+        include:
+          - os: windows-2022
+            platform: windows-x64
+          # 22.04（glibc 2.35）上构建，包才能在较老的发行版上运行
+          - os: ubuntu-22.04
+            platform: linux-x64
+    env:
+      FRIDAY_DEPS_DIR: ${{ github.workspace }}/deps
+      BACKEND_OUT: ${{ github.workspace }}/build/backend
+      APP_BUILD: ${{ github.workspace }}/build/app
+      APP_STAGE: ${{ github.workspace }}/build/stage
+      DIST: ${{ github.workspace }}/dist
+      FRIDAY_VERSION: ${{ needs.prepare.outputs.marketing }}
+      FRIDAY_BUILD_NUMBER: ${{ github.run_number }}
+      FRIDAY_RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+      FRIDAY_RELEASE_CHANNEL: ${{ needs.prepare.outputs.channel }}
+      FRIDAY_GPU_BACKEND: ${{ matrix.backend }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SOURCE_REPO }}
+          ref: ${{ needs.prepare.outputs.sha }}
+          token: ${{ secrets.SOURCE_TOKEN }}
+          path: src
+          fetch-depth: 1
+
+      - name: Load pinned versions (qt/ci/deps.env)
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -E '^[A-Z0-9_]+=' src/qt/ci/deps.env | tr -d '\r' | tee -a "${GITHUB_ENV}"
+
+      - name: Free disk space (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL || true
+          df -h /
+
+      - name: Install system packages (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y
+          # g++-12：C++20 支持更完整，且 22.04 自带的 libstdc++ 就是 12，编出来的程序在原版 22.04 上能跑
+          # 其余：Qt 运行 / 部署（xcb、Wayland、朗读、多媒体）、Vulkan 加载器、AppImage 工具需要的库
+          sudo apt-get install -y --no-install-recommends \
+            g++-12 ninja-build ccache pigz file desktop-file-utils patchelf \
+            libgl1-mesa-dev libegl1 libopengl0 libxkbcommon0 libxkbcommon-x11-0 \
+            libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 \
+            libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 libxcb-xinput0 libfontconfig1 libfreetype6 libdbus-1-3 libglib2.0-0 \
+            libwayland-client0 libwayland-cursor0 libwayland-egl1 \
+            libspeechd2 libpulse0 libva2 libva-drm2 libva-x11-2 libvdpau1 \
+            libvulkan1
+          {
+            echo "CC=gcc-12"
+            echo "CXX=g++-12"
+            echo "CUDAHOSTCXX=g++-12"
+          } >> "${GITHUB_ENV}"
+
+      - name: Install Qt ${{ env.FRIDAY_QT_VERSION }}
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.FRIDAY_QT_VERSION }}
+          arch: ${{ runner.os == 'Windows' && 'win64_msvc2022_64' || 'linux_gcc_64' }}
+          modules: ${{ env.FRIDAY_QT_MODULES }}
+          aqtsource: ${{ env.FRIDAY_AQT_SOURCE }}
+          cache: true
+          cache-key-prefix: qt-${{ matrix.platform }}
+
+      - name: Install CUDA Toolkit ${{ env.FRIDAY_CUDA_VERSION }} (Windows)
+        if: matrix.backend == 'cuda' && runner.os == 'Windows'
+        uses: Jimver/cuda-toolkit@v0.2.36
+        with:
+          cuda: ${{ env.FRIDAY_CUDA_VERSION }}
+          method: network
+          # 只装编译 ggml-cuda 需要的：nvcc、运行库、cuBLAS、CCCL（thrust / cub 头文件）、VS 集成
+          sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "thrust", "visual_studio_integration"]'
+          use-github-cache: false
+
+      - name: Install CUDA Toolkit ${{ env.FRIDAY_CUDA_VERSION }} (Linux)
+        if: matrix.backend == 'cuda' && runner.os == 'Linux'
+        uses: Jimver/cuda-toolkit@v0.2.36
+        with:
+          cuda: ${{ env.FRIDAY_CUDA_VERSION }}
+          method: network
+          # cuda-driver-dev 提供 libcuda.so 链接桩（构建机没有 NVIDIA 驱动）
+          sub-packages: '["nvcc", "cudart-dev", "cccl", "driver-dev"]'
+          non-cuda-sub-packages: '["libcublas", "libcublas-dev"]'
+          use-github-cache: false
+
+      - name: Cache Vulkan SDK
+        if: matrix.backend == 'vulkan'
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.os == 'Windows' && 'C:\VulkanSDK' || 'vulkan-sdk' }}
+          key: vulkan-sdk-${{ runner.os }}-${{ env.FRIDAY_VULKAN_SDK_VERSION }}
+
+      - name: Install Vulkan SDK ${{ env.FRIDAY_VULKAN_SDK_VERSION }} (Windows)
+        if: matrix.backend == 'vulkan' && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $ver = $env:FRIDAY_VULKAN_SDK_VERSION
+          $root = "C:\VulkanSDK\$ver"
+          if (-not (Test-Path "$root\Bin\glslc.exe")) {
+            $installer = Join-Path $env:RUNNER_TEMP 'VulkanSDK-Installer.exe'
+            curl.exe -fsSL --retry 3 -o $installer "https://sdk.lunarg.com/sdk/download/$ver/windows/vulkansdk-windows-X64-$ver.exe"
+            & $installer --root $root --accept-licenses --default-answer --confirm-command install
+            if ($LASTEXITCODE -ne 0) { throw "Vulkan SDK 安装失败（退出码 $LASTEXITCODE）" }
+          }
+          "VULKAN_SDK=$root" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "$root\Bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          & "$root\Bin\glslc.exe" --version
+
+      - name: Install Vulkan SDK ${{ env.FRIDAY_VULKAN_SDK_VERSION }} (Linux)
+        if: matrix.backend == 'vulkan' && runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          SDK="${GITHUB_WORKSPACE}/vulkan-sdk"
+          if [ ! -x "${SDK}/x86_64/bin/glslc" ]; then
+            rm -rf "${SDK}" && mkdir -p "${SDK}"
+            curl -fsSL --retry 3 "https://sdk.lunarg.com/sdk/download/${FRIDAY_VULKAN_SDK_VERSION}/linux/vulkan_sdk.tar.xz" \
+              | tar -xJ -C "${SDK}" --strip-components=1
+          fi
+          echo "VULKAN_SDK=${SDK}/x86_64" >> "${GITHUB_ENV}"
+          echo "${SDK}/x86_64/bin" >> "${GITHUB_PATH}"
+          "${SDK}/x86_64/bin/glslc" --version
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.24
+        with:
+          key: qt-${{ matrix.platform }}-${{ matrix.backend }}
+          variant: ccache
+          max-size: 2G
+          create-symlink: false
+
+      # 后端按组件分别缓存（stage/llama、stage/sd，里面有构建戳）：依赖版本、工具链、构建脚本不变就不重编
+      - name: Restore llama-server cache
+        id: cache-llama
+        uses: actions/cache/restore@v4
+        with:
+          path: build/backend/stage/llama
+          key: backend-llama-${{ matrix.platform }}-${{ matrix.backend }}-${{ env.LLAMA_CPP_TAG }}-${{ matrix.backend == 'cuda' && format('{0}-{1}', env.FRIDAY_CUDA_VERSION, env.FRIDAY_CUDA_ARCHITECTURES) || env.FRIDAY_VULKAN_SDK_VERSION }}-${{ hashFiles('src/qt/ci/build_backends.sh', 'src/qt/ci/build_backends.ps1') }}
+
+      - name: Restore sd-cli cache
+        id: cache-sd
+        uses: actions/cache/restore@v4
+        with:
+          path: build/backend/stage/sd
+          key: backend-sd-${{ matrix.platform }}-${{ matrix.backend }}-${{ env.SD_CPP_TAG }}-${{ env.SD_GGML_COMMIT }}-${{ matrix.backend == 'cuda' && format('{0}-{1}', env.FRIDAY_CUDA_VERSION, env.FRIDAY_CUDA_ARCHITECTURES) || env.FRIDAY_VULKAN_SDK_VERSION }}-${{ hashFiles('src/qt/ci/build_backends.sh', 'src/qt/ci/build_backends.ps1') }}
+
+      - name: Build backends (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: pwsh -NoProfile -File src/qt/ci/build_backends.ps1 -Backend ${{ matrix.backend }} -Out "$env:BACKEND_OUT"
+
+      - name: Build backends (Linux)
+        if: runner.os == 'Linux'
+        run: bash src/qt/ci/build_backends.sh --backend ${{ matrix.backend }} --out "${BACKEND_OUT}"
+
+      # 后端一编好就存缓存（不等整个 job 成功），后面应用或打包失败也不用重编 CUDA
+      - name: Save llama-server cache
+        if: steps.cache-llama.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: build/backend/stage/llama
+          key: ${{ steps.cache-llama.outputs.cache-primary-key }}
+
+      - name: Save sd-cli cache
+        if: steps.cache-sd.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: build/backend/stage/sd
+          key: ${{ steps.cache-sd.outputs.cache-primary-key }}
+
+      - name: Build app (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: pwsh -NoProfile -File src/qt/ci/build_app.ps1 -BuildDir "$env:APP_BUILD" -Prefix "$env:APP_STAGE"
+
+      - name: Build app (Linux)
+        if: runner.os == 'Linux'
+        run: bash src/qt/ci/build_app.sh --build-dir "${APP_BUILD}" --prefix "${APP_STAGE}"
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: >-
+          pwsh -NoProfile -File src/qt/ci/package_windows.ps1 -Backend ${{ matrix.backend }}
+          -Stage "$env:APP_STAGE" -BackendDir "$env:BACKEND_OUT/backend" -Tag "$env:FRIDAY_RELEASE_TAG" -OutDir "$env:DIST"
+
+      - name: Package (Linux)
+        if: runner.os == 'Linux'
+        run: >-
+          bash src/qt/ci/package_linux.sh --backend ${{ matrix.backend }}
+          --stage "${APP_STAGE}" --backend-dir "${BACKEND_OUT}/backend" --tag "${FRIDAY_RELEASE_TAG}" --out "${DIST}"
+          --tools-dir "${RUNNER_TEMP}/appimage-tools"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Friday-${{ needs.prepare.outputs.release_tag }}-${{ matrix.platform }}-${{ matrix.backend }}
+          path: |
+            dist/*.zip
+            dist/*.AppImage
+            dist/*.tar.gz
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  # ---------------------------------------------------------------------------
+  # 发布：一次性上传全部产物，每个渠道只留最新 Release，更新 latest.json
+  # ---------------------------------------------------------------------------
+  release:
+    name: Publish release
+    needs: [prepare, macos, qt]
+    # macOS 成功才发布；Qt 某个组合失败（或整个跳过）不挡发布
+    if: ${{ !cancelled() && needs.prepare.result == 'success' && needs.macos.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: Friday-${{ needs.prepare.outputs.release_tag }}-*
+          merge-multiple: true
+          path: dist
+
+      - name: Checksums and release notes
+        id: notes
+        env:
+          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+          MARKETING: ${{ needs.prepare.outputs.marketing }}
+          CHANNEL: ${{ needs.prepare.outputs.channel }}
+          REF: ${{ needs.prepare.outputs.ref }}
+          REF_NAME: ${{ needs.prepare.outputs.ref_name }}
+          SUBJECT: ${{ needs.prepare.outputs.subject }}
+          HAS_QT: ${{ needs.prepare.outputs.has_qt }}
+          QT_RESULT: ${{ needs.qt.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          export NOTES="${RUNNER_TEMP}/release-notes.md" RUN_NUMBER="${GITHUB_RUN_NUMBER}"
+          python3 - <<'PY'
+          import hashlib, os, pathlib
+          env = os.environ
+          tag, marketing, channel = env["RELEASE_TAG"], env["MARKETING"], env["CHANNEL"]
+          dist = pathlib.Path("dist")
+          # 所有产物重新算一遍 SHA-256（macOS 的 artifact 里自带的那份只覆盖 zip / dmg）
+          files = sorted(p for p in dist.iterdir() if p.is_file() and p.name != "SHA256SUMS.txt")
+          lines = []
+          for p in files:
+              h = hashlib.sha256()
+              with p.open("rb") as f:
+                  for chunk in iter(lambda: f.read(1 << 20), b""):
+                      h.update(chunk)
+              lines.append(f"{h.hexdigest()}  {p.name}")
+          (dist / "SHA256SUMS.txt").write_text("\n".join(lines) + "\n")
+          print("\n".join(lines))
+
+          qt_assets = {
+              "windows-x64-cuda": [f"Friday-{tag}-windows-x64-cuda.zip"],
+              "windows-x64-vulkan": [f"Friday-{tag}-windows-x64-vulkan.zip"],
+              "linux-x64-cuda": [f"Friday-{tag}-linux-x64-cuda.AppImage", f"Friday-{tag}-linux-x64-cuda.tar.gz"],
+              "linux-x64-vulkan": [f"Friday-{tag}-linux-x64-vulkan.AppImage", f"Friday-{tag}-linux-x64-vulkan.tar.gz"],
+          }
+          missing = [key for key, names in qt_assets.items() if not all((dist / n).exists() for n in names)]
+          stable = channel == "stable"
+          lines = [
+              f"Friday {marketing} {'正式版' if stable else 'Beta'}",
+              "",
+              f"- 渠道：{'正式版（main 分支）' if stable else 'Beta（分支 ' + env['REF_NAME'] + '）'}，构建号 {env['RUN_NUMBER']}",
+              f"- 源码：{env['SOURCE_REPO']} @ `{env['REF']}`（{env['REF_NAME']}）",
+              f"- 提交：{env.get('SUBJECT', '')}",
+              f"- 构建：{env['RUN_URL']}",
+              "",
+              "### macOS（26+，Apple Silicon）",
+              "",
+              "- 安装：打开 dmg，双击图标即可运行（也可拖到「应用程序」）；zip 为纯 app 包",
+              "- 自动更新：Friday 会定期读取本仓库的 latest.json，发现新版本后自动下载、验签、换包重启（设置 › 通用 里可关，也可选只收正式版）",
+              "- 签名：Developer ID，未公证时首次打开需在「系统设置 → 隐私与安全性」中点“仍要打开”",
+          ]
+          if env["HAS_QT"] == "true":
+              lines += [
+                  "",
+                  "### Windows（10 / 11，x64）",
+                  "",
+                  f"- `Friday-{tag}-windows-x64-cuda.zip`：NVIDIA 显卡（GTX 10 系列及更新，建议驱动 570 以上），本地模型、生图、生视频用 CUDA 加速",
+                  f"- `Friday-{tag}-windows-x64-vulkan.zip`：AMD / Intel / NVIDIA 显卡通用（需要支持 Vulkan 1.2 的显卡驱动），拿不准就选这个",
+                  "- 安装：解压到任意位置（例如 `D:\\Friday`），运行 `Friday\\friday.exe`，不需要另装 VC++ 运行库；安装包没有代码签名，首次运行时 SmartScreen 提示请点「更多信息 → 仍要运行」",
+                  "- 数据在 `%APPDATA%\\Friday`，和程序目录分开；覆盖或删除程序目录不影响会话和设置",
+                  "",
+                  "### Linux（x64，glibc 2.35 以上：Ubuntu 22.04 / Debian 12 / Fedora 36 及更新）",
+                  "",
+                  f"- `Friday-{tag}-linux-x64-cuda.AppImage` / `.tar.gz`：NVIDIA 显卡（专有驱动 570 以上）",
+                  f"- `Friday-{tag}-linux-x64-vulkan.AppImage` / `.tar.gz`：AMD / Intel / NVIDIA 通用（Mesa 或厂商的 Vulkan 驱动，需要 libvulkan1）",
+                  "- AppImage：`chmod +x Friday-*.AppImage` 后直接运行；系统没有 FUSE 时加 `--appimage-extract-and-run` 参数，或改用 tar.gz",
+                  "- tar.gz：解压后运行 `Friday/AppRun`；朗读功能需要系统装有 speech-dispatcher",
+                  "- 数据在 `~/.local/share/Friday`（或 `$XDG_DATA_HOME/Friday`）",
+                  "",
+                  "Windows / Linux 版同样读取 latest.json 按「系统-架构-后端」取对应的安装包更新。",
+              ]
+              if missing:
+                  lines += ["", f"> ⚠️ 本次缺少以下 Windows / Linux 安装包（构建失败，详见构建日志）：{'、'.join(missing)}"]
+          else:
+              lines += ["", "> 本次只发布 macOS 版（源码里还没有 qt/ 目录，或手动运行时关闭了 Qt 版构建）。"]
+          lines += ["", "全部文件的 SHA-256 见 SHA256SUMS.txt。"]
+          pathlib.Path(env["NOTES"]).write_text("\n".join(lines) + "\n")
+          with open(env["GITHUB_OUTPUT"], "a") as out:
+              out.write(f"notes={env['NOTES']}\n")
+              out.write(f"missing={','.join(missing) if env['HAS_QT'] == 'true' else ''}\n")
+          PY
+          cat "${NOTES}"
+          echo "Qt job 结果：${QT_RESULT}"
+          ls -la dist
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.release_tag }}
-          name: ${{ steps.version.outputs.title }}
-          prerelease: ${{ steps.version.outputs.prerelease == 'true' }}
+          tag_name: ${{ needs.prepare.outputs.release_tag }}
+          name: ${{ needs.prepare.outputs.title }}
+          prerelease: ${{ needs.prepare.outputs.prerelease == 'true' }}
+          body_path: ${{ steps.notes.outputs.notes }}
           files: |
             dist/*.dmg
             dist/*.zip
+            dist/*.AppImage
+            dist/*.tar.gz
             dist/SHA256SUMS.txt
-          body: |
-            Friday ${{ steps.version.outputs.marketing }} ${{ steps.version.outputs.channel == 'stable' && '正式版' || 'Beta' }}（macOS 26+，Apple Silicon）
-
-            - 渠道：${{ steps.version.outputs.channel == 'stable' && '正式版（main 分支）' || format('Beta（分支 {0}）', steps.src.outputs.ref_name) }}，构建号 ${{ github.run_number }}
-            - 源码：${{ env.SOURCE_REPO }} @ `${{ steps.src.outputs.ref }}`（${{ steps.src.outputs.ref_name }}）
-            - 提交：${{ steps.src.outputs.subject }}
-            - 构建：${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            - 安装：打开 dmg，双击图标即可运行（也可拖到「应用程序」）；zip 为纯 app 包
-            - 自动更新：Friday 会定期读取本仓库的 latest.json，发现新版本后自动下载、验签、换包重启（设置 › 通用 里可关，也可选只收正式版）
-            - 签名：Developer ID，未公证时首次打开需在「系统设置 → 隐私与安全性」中点“仍要打开”
 
       - name: Keep only the latest release per channel
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ steps.version.outputs.release_tag }}
-          PRERELEASE: ${{ steps.version.outputs.prerelease }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+          PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
         run: |
           set -euo pipefail
           # 正式版和预发布各只保留刚发布的这一个：旧 Release 连同安装包一起删掉；标签保留，第三位才能接着数
@@ -295,22 +689,48 @@ jobs:
 
       - name: Update latest.json
         env:
-          RELEASE_TAG: ${{ steps.version.outputs.release_tag }}
-          MARKETING: ${{ steps.version.outputs.marketing }}
-          CHANNEL: ${{ steps.version.outputs.channel }}
-          SUBJECT: ${{ steps.src.outputs.subject }}
-          SOURCE_REF: ${{ steps.src.outputs.ref }}
-          BRANCH: ${{ steps.src.outputs.ref_name }}
+          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+          MARKETING: ${{ needs.prepare.outputs.marketing }}
+          CHANNEL: ${{ needs.prepare.outputs.channel }}
+          SUBJECT: ${{ needs.prepare.outputs.subject }}
+          SOURCE_REF: ${{ needs.prepare.outputs.ref }}
+          BRANCH: ${{ needs.prepare.outputs.ref_name }}
+          MIN_OS: ${{ needs.prepare.outputs.min_os }}
         run: |
           set -euo pipefail
           # 每个渠道只记录最新的一次发布；应用按渠道读取并与自己的版本比较
-          MIN_OS="$(grep -m1 -E 'MACOSX_DEPLOYMENT_TARGET = ' src/Friday/Friday.xcodeproj/project.pbxproj | sed -E 's/.*= *([^;]+);.*/\1/' | tr -d '"')"
           export MIN_OS="${MIN_OS:-26.0}" BASENAME="Friday-${RELEASE_TAG}-macOS-arm64" REPO="${GITHUB_REPOSITORY}" RUN_NUMBER="${GITHUB_RUN_NUMBER}"
           python3 - <<'PY'
           import datetime, json, os, pathlib
           tag, channel, basename, repo = os.environ["RELEASE_TAG"], os.environ["CHANNEL"], os.environ["BASENAME"], os.environ["REPO"]
           sums = {line.split()[1].lstrip("*"): line.split()[0] for line in pathlib.Path("dist/SHA256SUMS.txt").read_text().splitlines() if line.strip()}
           zip_name, dmg_name = f"{basename}.zip", f"{basename}.dmg"
+
+          def asset(name):
+              path = pathlib.Path("dist") / name
+              if not path.exists():
+                  return None
+              return {
+                  "name": name,
+                  "url": f"https://github.com/{repo}/releases/download/{tag}/{name}",
+                  "sha256": sums[name],
+                  "size": path.stat().st_size,
+              }
+
+          # Qt 版按 "<系统>-<架构>-<后端>" 取自己的包；Linux 条目是 AppImage，tar.gz 挂在 tarball 下
+          # （macOS 版的 ReleaseEntry 是编译器合成的 Codable，解码时忽略这个多出来的键）
+          assets = {}
+          for backend in ("cuda", "vulkan"):
+              win = asset(f"Friday-{tag}-windows-x64-{backend}.zip")
+              if win:
+                  assets[f"windows-x64-{backend}"] = win
+              appimage = asset(f"Friday-{tag}-linux-x64-{backend}.AppImage")
+              if appimage:
+                  tarball = asset(f"Friday-{tag}-linux-x64-{backend}.tar.gz")
+                  if tarball:
+                      appimage["tarball"] = tarball
+                  assets[f"linux-x64-{backend}"] = appimage
+
           entry = {
               "tag": tag,
               "version": os.environ["MARKETING"],
@@ -326,6 +746,7 @@ jobs:
               "release": f"https://github.com/{repo}/releases/tag/{tag}",
               "source": os.environ.get("SOURCE_REF", ""),
               "branch": os.environ.get("BRANCH", ""),
+              "assets": assets,
           }
           path = pathlib.Path("self/latest.json")
           manifest = json.loads(path.read_text()) if path.exists() else {}
@@ -339,11 +760,7 @@ jobs:
           git config user.email "jack.wang@integem.com"
           git add latest.json
           git commit -m "latest.json：${CHANNEL} → ${RELEASE_TAG}"
-          for attempt in 1 2 3; do
+          for _attempt in 1 2 3; do
             git push origin HEAD:main && break
             git pull --rebase origin main || true
           done
-
-      - name: Remove temporary keychain
-        if: ${{ always() && steps.signing.outputs.keychain != '' }}
-        run: security delete-keychain "${{ steps.signing.outputs.keychain }}" || true
