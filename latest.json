@@ -15,21 +15,21 @@
     "source": "",
     "branch": "main"
   },
-  "updatedAt": "2026-09-30T20:14:30Z",
+  "updatedAt": "2026-10-01T04:29:27Z",
   "stable": {
-    "tag": "v1.0.4",
-    "version": "1.0.4",
-    "build": 31,
+    "tag": "v1.0.5",
+    "version": "1.0.5",
+    "build": 32,
     "channel": "stable",
-    "date": "2026-09-30T20:14:30Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.4/Friday-v1.0.4-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.4/Friday-v1.0.4-macOS-arm64.dmg",
-    "sha256": "cc63b353aa5c7440ef7f669eabe9bb51f2b2dd9f71e636572e42900ebc45c853",
-    "size": 29810078,
-    "notes": "流式输出时输入栏、侧边栏不再跟着重算：会话元信息单独放 summaries 供它们读取，ComposerView 改 Equatable；修正 token 统计：在线引擎首 token 延迟与生成�",
+    "date": "2026-10-01T04:29:27Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.5/Friday-v1.0.5-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.5/Friday-v1.0.5-macOS-arm64.dmg",
+    "sha256": "7b626eaf61620768f3157c843bf8690285c2a281929a7475445932966e6457ff",
+    "size": 29831570,
+    "notes": "修复子 Agent 等待确认时任务卡死：等确认的调用不管嵌几层都不折叠，父卡片 / 底栏 / 侧边栏标橙色待确认并让 Dock 图标提醒；并行子任务一完成就各�",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.4",
-    "source": "e1029004d88c1792c7a9ccaeb0325f4ca7018e71",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.5",
+    "source": "231ab34115b7ff437d31fd4aaf54d1e268681773",
     "branch": "main"
   }
 }
