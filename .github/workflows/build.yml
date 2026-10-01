@@ -297,6 +297,8 @@ jobs:
           # 证书过期 / 导错证书时在这里停下，而不是到构建时才发现
           grep -qF "\"${CODE_SIGN_IDENTITY}\"" "${RUNNER_TEMP}/identities.txt" || { echo "::error::钥匙串里没有有效的「${CODE_SIGN_IDENTITY}」"; exit 1; }
 
+      # `xcodebuild build`（不是 archive）默认往签名里注入调试用的 get-task-allow，带着它 Apple 不给公证。
+      # 用 XCODE_XCCONFIG_FILE 关掉注入：优先级高于工程设置，不依赖各分支源码里的 build.sh 版本
       - name: Build, sign and package
         env:
           PROJECT_DIR: ${{ github.workspace }}/src/Friday
@@ -308,7 +310,10 @@ jobs:
           RELEASE_CHANNEL: ${{ needs.prepare.outputs.channel }}
           CODE_SIGN_IDENTITY: ${{ vars.CODE_SIGN_IDENTITY }}
           DEVELOPMENT_TEAM: ${{ vars.DEVELOPMENT_TEAM }}
-        run: bash src/Friday/Tools/CI/build.sh
+          XCODE_XCCONFIG_FILE: ${{ runner.temp }}/distribution.xcconfig
+        run: |
+          printf 'CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO\n' > "${XCODE_XCCONFIG_FILE}"
+          bash src/Friday/Tools/CI/build.sh
 
       # build.sh 只签 app，dmg 在这里补 Developer ID 签名；公证 dmg（Apple 会一并登记里面 app 的票据），
       # 把票据钉到 dmg 和 app 上，用钉过票据的 app 重打 zip（自动更新用 zip），最后用 Gatekeeper 的判定确认已公证。
@@ -334,6 +339,12 @@ jobs:
           printf '%s\n' "${NOTARY_KEY_P8}" > "${KEY}"
           trap 'rm -f "${KEY}"' EXIT
           NOTARY=(--key "${KEY}" --key-id "${NOTARY_KEY_ID}" --issuer "${NOTARY_ISSUER_ID}")
+
+          # 带调试权限的包公证必然被拒，在本地先拦下，省一轮提交
+          if codesign -d --entitlements - --xml "${APP}" 2>/dev/null | grep -q "com.apple.security.get-task-allow"; then
+            echo "::error::app 的签名里带着 com.apple.security.get-task-allow（调试权限），公证会被拒"
+            exit 1
+          fi
 
           # notarytool 在结果为 Invalid 时不一定返回非零，按 JSON 里的 status 判；没拿到提交号（网络抖动）时重试
           notarize() {
