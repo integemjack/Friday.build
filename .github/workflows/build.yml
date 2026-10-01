@@ -336,12 +336,28 @@ jobs:
           ditto -c -k --sequesterRsrc --keepParent "${APP}" "dist/${BASENAME}.zip"
           (cd dist && shasum -a 256 *.zip *.dmg > SHA256SUMS.txt && cat SHA256SUMS.txt)
 
+      # GitHub 的产物服务偶尔整段超时（CreateArtifact 重试 5 次都失败）：等一分钟再传一次，免得一次抖动挡住整轮发布
       - name: Upload artifact
+        id: upload
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: Friday-${{ needs.prepare.outputs.release_tag }}-macOS-arm64
           path: dist/*
           if-no-files-found: error
+
+      - name: Wait before retrying upload
+        if: steps.upload.outcome == 'failure'
+        run: sleep 60
+
+      - name: Upload artifact (retry)
+        if: steps.upload.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Friday-${{ needs.prepare.outputs.release_tag }}-macOS-arm64
+          path: dist/*
+          if-no-files-found: error
+          overwrite: true
 
       - name: Remove temporary keychain
         if: ${{ always() && steps.signing.outputs.keychain != '' }}
@@ -579,6 +595,8 @@ jobs:
           --tools-dir "${RUNNER_TEMP}/appimage-tools"
 
       - name: Upload artifact
+        id: upload
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: Friday-${{ needs.prepare.outputs.release_tag }}-${{ matrix.platform }}-${{ matrix.backend }}
@@ -589,6 +607,25 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
+
+      - name: Wait before retrying upload
+        if: steps.upload.outcome == 'failure'
+        shell: bash
+        run: sleep 60
+
+      - name: Upload artifact (retry)
+        if: steps.upload.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Friday-${{ needs.prepare.outputs.release_tag }}-${{ matrix.platform }}-${{ matrix.backend }}
+          path: |
+            dist/*.zip
+            dist/*.AppImage
+            dist/*.tar.gz
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+          overwrite: true
 
       - name: Fail if unit tests failed
         if: steps.tests_win.outcome == 'failure' || steps.tests_linux.outcome == 'failure'
