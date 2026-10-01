@@ -15,21 +15,21 @@
     "source": "",
     "branch": "main"
   },
-  "updatedAt": "2026-10-01T04:44:46Z",
+  "updatedAt": "2026-10-01T05:17:37Z",
   "stable": {
-    "tag": "v1.0.6",
-    "version": "1.0.6",
-    "build": 33,
+    "tag": "v1.0.7",
+    "version": "1.0.7",
+    "build": 34,
     "channel": "stable",
-    "date": "2026-10-01T04:44:46Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.6/Friday-v1.0.6-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.6/Friday-v1.0.6-macOS-arm64.dmg",
-    "sha256": "7603d2e7c9bb89755ec908e6f261f9952a94c279d5644e42312e535350439cd3",
-    "size": 29833724,
-    "notes": "流式输出时正在写的块把最后一段单独成一个 Text：每批 token 只重排最后一段，前面已定型的段落命中缓存（思考块同样处理）；压测文本改为带段落�",
+    "date": "2026-10-01T05:17:37Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.0.7/Friday-v1.0.7-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.0.7/Friday-v1.0.7-macOS-arm64.dmg",
+    "sha256": "244f0565f50bafe741b2a62ef3531aacfea1f0c156403728632ec5caeb10ca60",
+    "size": 29859518,
+    "notes": "长任务不再无故中断：在线引擎的工具轮次上限改为可配置（默认 200），到限后让模型交付目前的结果并正常结束，子 Agent 用完步数交出已完成的部分",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.6",
-    "source": "d0ab5e4d4072b0090753d5e1da5f7f69bd619f21",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.0.7",
+    "source": "f06253950557bbd4f65ba7eb839af617ef396f85",
     "branch": "main"
   }
 }
