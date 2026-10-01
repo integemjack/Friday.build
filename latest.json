@@ -1,59 +1,59 @@
 {
   "beta": {
-    "tag": "v1.2.5-beta",
-    "version": "1.2.5",
-    "build": 56,
+    "tag": "v1.2.7-beta",
+    "version": "1.2.7",
+    "build": 58,
     "channel": "beta",
-    "date": "2026-10-01T12:14:28Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.2.5-beta/Friday-v1.2.5-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.2.5-beta/Friday-v1.2.5-beta-macOS-arm64.dmg",
-    "sha256": "3b65f78a6117370af05e9d2cf3563d1c3db1e888b61b9f40caa50a82b1ae4055",
-    "size": 36371518,
-    "notes": "设置 › MCP 改为按服务管理：左边服务列表（状态 + 开关），右边详情（连接状态与输出、工具逐个开关、信任、表单编辑命令 / 参数 / 环境变量或 URL ",
+    "date": "2026-10-01T12:44:50Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.2.7-beta/Friday-v1.2.7-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.2.7-beta/Friday-v1.2.7-beta-macOS-arm64.dmg",
+    "sha256": "a5b7f397027a7778c523e463ea8499c0d83af754a5e7a060be19e019ff762db6",
+    "size": 36377750,
+    "notes": "本地模型不在本机时默认不自动下载：启动、切换对话只加载已下载的模型，缺的标为「未下载」，在模型菜单里点「下载」或选模型时才下载；设置�",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.2.5-beta",
-    "source": "8065517bd62309227aa78d19c8289d8f07591897",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.2.7-beta",
+    "source": "720a515788bf453b91b201d0594a7cac5a0c0390",
     "branch": "v1.2",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.2.5-beta-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.5-beta/Friday-v1.2.5-beta-windows-x64-cuda.zip",
-        "sha256": "fb8572456b6194fb81849091e5c956813cfea846cc6440518d8b8ca1243accda",
-        "size": 797755063
+        "name": "Friday-v1.2.7-beta-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.7-beta/Friday-v1.2.7-beta-windows-x64-cuda.zip",
+        "sha256": "a06bbfb032ab2e102a462b6b6e52ae382e1e4759940593047e043fffce062a07",
+        "size": 797830046
       },
       "linux-x64-cuda": {
-        "name": "Friday-v1.2.5-beta-linux-x64-cuda.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.5-beta/Friday-v1.2.5-beta-linux-x64-cuda.AppImage",
-        "sha256": "fe116b75289c68d5101e563f55eace110d9e0cb3aaab469fce915676d2183518",
-        "size": 820378104,
+        "name": "Friday-v1.2.7-beta-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.7-beta/Friday-v1.2.7-beta-linux-x64-cuda.AppImage",
+        "sha256": "20c3be076c618cd80cced7a1357cb2a968a4fd7e7015fc2e9599f8848c90e710",
+        "size": 820468216,
         "tarball": {
-          "name": "Friday-v1.2.5-beta-linux-x64-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.5-beta/Friday-v1.2.5-beta-linux-x64-cuda.tar.gz",
-          "sha256": "b0a03546d52687060bc42aa06344c27a9004ca859a42bfe9260bba4ddb00b158",
-          "size": 858402762
+          "name": "Friday-v1.2.7-beta-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.7-beta/Friday-v1.2.7-beta-linux-x64-cuda.tar.gz",
+          "sha256": "6d26c13890609f38202b0623cb6ac867c1467f716677e9ed99f663cbad9a3ace",
+          "size": 858519830
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.2.5-beta-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.5-beta/Friday-v1.2.5-beta-windows-x64-vulkan.zip",
-        "sha256": "7dfa8a85d73e947a1da16f6b01f48bed820a369e5ed25fc25ddbe4b12205cee1",
-        "size": 102393696
+        "name": "Friday-v1.2.7-beta-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.7-beta/Friday-v1.2.7-beta-windows-x64-vulkan.zip",
+        "sha256": "ac7f6d9f9fd152ce04ceb2fcc933196e0f02032ae5c88b5dc14354ce86712d9e",
+        "size": 102468204
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v1.2.5-beta-linux-x64-vulkan.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.5-beta/Friday-v1.2.5-beta-linux-x64-vulkan.AppImage",
-        "sha256": "80a5f697f3190d32803785dd53f035a0e811eccf9d999c1631b9f21203b3335b",
-        "size": 113342968,
+        "name": "Friday-v1.2.7-beta-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.7-beta/Friday-v1.2.7-beta-linux-x64-vulkan.AppImage",
+        "sha256": "c7db8e2a27c22049ed6190ddedbf950895d8b265140a6ac691dc7f0950dd5292",
+        "size": 113433080,
         "tarball": {
-          "name": "Friday-v1.2.5-beta-linux-x64-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.5-beta/Friday-v1.2.5-beta-linux-x64-vulkan.tar.gz",
-          "sha256": "6aea69ce9917d87049fd1c912d9bb458a9edd5de536d50ecb23869c2076e5af7",
-          "size": 130058625
+          "name": "Friday-v1.2.7-beta-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.2.7-beta/Friday-v1.2.7-beta-linux-x64-vulkan.tar.gz",
+          "sha256": "4d2639f9de635721c6e4680b0b0e8aa19befbb469abd5c28099b2746308f32e6",
+          "size": 130152843
         }
       }
     }
   },
-  "updatedAt": "2026-10-01T12:14:28Z",
+  "updatedAt": "2026-10-01T12:44:50Z",
   "stable": {
     "tag": "v1.0.14",
     "version": "1.0.14",
