@@ -53,57 +53,57 @@
       }
     }
   },
-  "updatedAt": "2026-10-02T14:55:16Z",
+  "updatedAt": "2026-10-02T15:07:38Z",
   "stable": {
-    "tag": "v1.9.1",
-    "version": "1.9.1",
-    "build": 81,
+    "tag": "v1.10.3",
+    "version": "1.10.3",
+    "build": 85,
     "channel": "stable",
-    "date": "2026-10-02T10:44:53Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.9.1/Friday-v1.9.1-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.9.1/Friday-v1.9.1-macOS-arm64.dmg",
-    "sha256": "1645d308a498dfb388bf555d31328e9ebf3d1a84503d10eba4f4b9270c37ce41",
-    "size": 37548988,
-    "notes": "合并 v1.9：菜单栏图标右边常驻两行——第一行正在工作的 AI 个数（主 Agent + 运行中的子 Agent），第二行它们的速度合计（t/s，大了用 K/M/T），没有就�",
+    "date": "2026-10-02T15:07:38Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.10.3/Friday-v1.10.3-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.10.3/Friday-v1.10.3-macOS-arm64.dmg",
+    "sha256": "984eed8d2e6156a01fba68e28ee5fa0eb180e3bf065316c843c8796ea7e331b6",
+    "size": 38724090,
+    "notes": "合并 v1.10：主 Agent 只派活和验收（不是成品就打回重做，打回不行换提示词重派，不设子 Agent 总数上限），交付检查（没要方案就直接交付）；自我学",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.9.1",
-    "source": "e2f8f41b75a1788de2a1442a400e60c6dec21104",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.10.3",
+    "source": "53e5343819564a60ccc230c9128a34b8af34833f",
     "branch": "main",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.9.1-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.9.1/Friday-v1.9.1-windows-x64-cuda.zip",
-        "sha256": "3c2ff92863e6043c9c32a9c7468d7d751c92cefec9cc297a6581fc04e20ff4df",
-        "size": 796753894
+        "name": "Friday-v1.10.3-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.3/Friday-v1.10.3-windows-x64-cuda.zip",
+        "sha256": "976a4b263bdd2fdaccdb464de5bbf8a773bfdfd62f8630b269d8f69da39cbe21",
+        "size": 796754063
       },
       "linux-x64-cuda": {
-        "name": "Friday-v1.9.1-linux-x64-cuda.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.9.1/Friday-v1.9.1-linux-x64-cuda.AppImage",
-        "sha256": "59fb9f3c9dee5fdd6a4ece9524d21d815c3623168b270c40644641525354f4b2",
+        "name": "Friday-v1.10.3-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.3/Friday-v1.10.3-linux-x64-cuda.AppImage",
+        "sha256": "08cd834453bf591e68d96aedcd91ee0dd65deb7f96a0bed2148b3f4c594eb669",
         "size": 819304952,
         "tarball": {
-          "name": "Friday-v1.9.1-linux-x64-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.9.1/Friday-v1.9.1-linux-x64-cuda.tar.gz",
-          "sha256": "a463c4b2764a26bece88d5e0aa0c3eb14e03cec8296dee00ff583f2f11fc7b4e",
-          "size": 857187514
+          "name": "Friday-v1.10.3-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.3/Friday-v1.10.3-linux-x64-cuda.tar.gz",
+          "sha256": "bf05f5a0a74efac949c1aabdb2d72cb158468a859b572bf5c78de6002a1c7043",
+          "size": 857187411
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.9.1-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.9.1/Friday-v1.9.1-windows-x64-vulkan.zip",
-        "sha256": "947a27889334c92f735a6fe98d5d1e026bdf97a066661d059e4f449a3532507c",
-        "size": 101392135
+        "name": "Friday-v1.10.3-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.3/Friday-v1.10.3-windows-x64-vulkan.zip",
+        "sha256": "ae2d88cea051a32911c1137a859d40a92ceb035d47c42288ab9e7f8cc47f62ae",
+        "size": 101392206
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v1.9.1-linux-x64-vulkan.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.9.1/Friday-v1.9.1-linux-x64-vulkan.AppImage",
-        "sha256": "929efaa41991ad26125a8c372a1a05eedf2d594da27c6c8f63d4110b2b7b6523",
+        "name": "Friday-v1.10.3-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.3/Friday-v1.10.3-linux-x64-vulkan.AppImage",
+        "sha256": "e591f05c24e584aa5b764e5084ad39ddb030660f63b64b23121769186080dc83",
         "size": 112269816,
         "tarball": {
-          "name": "Friday-v1.9.1-linux-x64-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.9.1/Friday-v1.9.1-linux-x64-vulkan.tar.gz",
-          "sha256": "e1a166ef66398d808851c4b5e4620c053bec8222a85453c215455dac444e9b3e",
-          "size": 128820333
+          "name": "Friday-v1.10.3-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.3/Friday-v1.10.3-linux-x64-vulkan.tar.gz",
+          "sha256": "701b0464bcac079fd019fda80fb156656a7de7f2b0b13353981e2e8bf099fbec",
+          "size": 128820255
         }
       }
     }
