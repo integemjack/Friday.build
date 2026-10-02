@@ -3,7 +3,8 @@ name: Build and release Friday
 # 本仓库只负责构建与发布：
 #   1. 由源码仓库（integemjack/Friday）每次提交通过 repository_dispatch 触发，或在 Actions 页面手动运行；
 #   2. 用 SOURCE_TOKEN 拉取私有源码仓库的指定提交；
-#   3. prepare：定版本号 X.Y.Z：vX.Y 分支用分支名做前缀，其余用工程 MARKETING_VERSION 的前两位；第三位从 0 起，
+#   3. prepare：定版本号 X.Y.Z：vX.Y 分支用分支名做前缀；main 等其余分支取「工程 MARKETING_VERSION 的前两位、
+#      已合并进来的 vX.Y 分支、已发布正式版」中最大的 X.Y（合并 vX.Y 进 main 就自动发 X.Y.Z，不用改工程版本号）；第三位从 0 起，
 #      每次打包自动 +1（按已有标签数）；main 分支的提交发正式版（标签 vX.Y.Z），其他分支发预发布（vX.Y.Z-beta）；
 #   4. macos：导入 Developer ID 证书，调用源码里的 Friday/Tools/CI/build.sh 构建、签名、打包，再签 dmg、公证并钉票据
 #      （缺证书或公证密钥、公证不通过都直接失败，不发未公证的包）；
@@ -102,7 +103,9 @@ jobs:
           ref: ${{ steps.src.outputs.ref }}
           token: ${{ secrets.SOURCE_TOKEN }}
           path: src
-          fetch-depth: 1
+          # 完整提交历史（稀疏检出自带 --filter=blob:none，只拉提交和目录树，不拉文件内容）：
+          # 定版本号时要看已合并进来的 vX.Y 分支
+          fetch-depth: 0
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /Friday/Friday.xcodeproj/project.pbxproj
@@ -147,11 +150,29 @@ jobs:
           set -euo pipefail
           PROJECT_VERSION="$(grep -m1 -E 'MARKETING_VERSION = ' src/Friday/Friday.xcodeproj/project.pbxproj | sed -E 's/.*= *([^;]+);.*/\1/' | tr -d '"')"
           PROJECT_VERSION="${PROJECT_VERSION:-1.0}"
-          # 版本前缀 X.Y：vX.Y 分支用分支名，其余用工程 MARKETING_VERSION 的前两位
+          # 版本前缀 X.Y：vX.Y 分支用分支名；main 等其余分支取下面三者中最大的：
+          #   1. 工程 MARKETING_VERSION 的前两位；
+          #   2. 已合并进这个提交的 vX.Y 分支：主线历史上的合并提交标题（「合并 vX.Y：…」、git 默认的
+          #      「Merge branch 'vX.Y'」、GitHub 的「Merge pull request #N from 用户/vX.Y」），以及远程仍在、
+          #      已完全合并进来的 vX.Y 分支（合并完分支常被删掉，所以两种都看）；
+          #   3. 已发布正式版的最大 X.Y：正式版号只升不降（否则已装新版本的用户永远等不到更新）。
+          # 以前 main 只看 MARKETING_VERSION：合并 v1.1 / v1.2 / v1.3 后仍发 v1.0.x，要手动改工程版本号才会变。
           if [[ "${REF_NAME}" =~ ^v[0-9]+\.[0-9]+$ ]]; then
             PREFIX="${REF_NAME#v}"
           else
-            PREFIX="$(printf '%s' "${PROJECT_VERSION}" | awk -F. '{ printf "%d.%d", $1, ($2 == "" ? 0 : $2) }')"
+            PROJECT_PREFIX="$(printf '%s' "${PROJECT_VERSION}" | awk -F. '{ printf "%d.%d", $1, ($2 == "" ? 0 : $2) }')"
+            MERGED="$( {
+              git -C src log --first-parent --merges --format=%s HEAD \
+                | { grep -oE "^(合并 |Merge branch '|Merge pull request #[0-9]+ from [^ ]+/)v[0-9]+\.[0-9]+" || true; } \
+                | grep -oE '[0-9]+\.[0-9]+$' || true
+              git -C src for-each-ref --merged HEAD --format='%(refname:short)' 'refs/remotes/origin/v*' \
+                | sed 's#^origin/v##' | { grep -E '^[0-9]+\.[0-9]+$' || true; }
+            } | sort -V | uniq | tr '\n' ' ')"
+            STABLE="$(git ls-remote --tags --refs "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git" 'refs/tags/v*' \
+              | sed -E 's#.*refs/tags/v##' | { grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' || true; } \
+              | sed -E 's/^([0-9]+\.[0-9]+)\..*/\1/' | sort -V | tail -1)"
+            PREFIX="$(printf '%s\n' "${PROJECT_PREFIX}" ${MERGED} ${STABLE} | { grep -E '^[0-9]+\.[0-9]+$' || true; } | sort -V | tail -1)"
+            echo "版本前缀 ${PREFIX}：工程 ${PROJECT_PREFIX}，已合并的 vX.Y 分支 [${MERGED% }]，已发布正式版最大 ${STABLE:-无}"
           fi
           # 渠道：main 发正式版，其他分支发预发布（手动运行可以强制预发布）
           if [ "${REF_NAME}" = "main" ] && [ "${FORCE_PRERELEASE:-false}" != "true" ]; then
