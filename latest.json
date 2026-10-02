@@ -1,59 +1,59 @@
 {
   "beta": {
-    "tag": "v1.4.2-beta",
-    "version": "1.4.2",
-    "build": 66,
+    "tag": "v1.4.3-beta",
+    "version": "1.4.3",
+    "build": 67,
     "channel": "beta",
-    "date": "2026-10-01T20:36:27Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.4.2-beta/Friday-v1.4.2-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.4.2-beta/Friday-v1.4.2-beta-macOS-arm64.dmg",
-    "sha256": "263dc989aeddd617d8c918751e4d651214f4f3a94b8fb0ac7ca776938f8e4cb5",
-    "size": 36584809,
-    "notes": "验证检查点：用户这一轮明确说了不用运行、不用测试时不再提醒",
+    "date": "2026-10-02T02:39:33Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.4.3-beta/Friday-v1.4.3-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.4.3-beta/Friday-v1.4.3-beta-macOS-arm64.dmg",
+    "sha256": "f00475613d53c3245db31127429023bb0b2dcb63fde89fcebb5d9a8590130515",
+    "size": 36645834,
+    "notes": "本地模型缓存常驻系统提示边界的前缀检查点：折叠后换掉会话历史、从前缀接着预填而不是从 0 开始；前缀按模型和指纹另存一份所有对话共用，新�",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.4.2-beta",
-    "source": "2ea5de38cca0aed0924357e2c5c03fd0592b1822",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.4.3-beta",
+    "source": "12d0450d6d84d7b9688e3c2d6739385cda552945",
     "branch": "v1.4",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.4.2-beta-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.4.2-beta/Friday-v1.4.2-beta-windows-x64-cuda.zip",
-        "sha256": "552ede3ab8a3eeae3e7ec779e096852d3dcb4237d236e2f8df4597baccc5356b",
-        "size": 797836065
+        "name": "Friday-v1.4.3-beta-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.4.3-beta/Friday-v1.4.3-beta-windows-x64-cuda.zip",
+        "sha256": "034bc86666ce642b8b14066882dcc3185d18d97c6a2c1da9ca28122dbce655ee",
+        "size": 797836824
       },
       "linux-x64-cuda": {
-        "name": "Friday-v1.4.2-beta-linux-x64-cuda.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.4.2-beta/Friday-v1.4.2-beta-linux-x64-cuda.AppImage",
-        "sha256": "f0642223c9a1a839b7e4a809ed7ca7d94951ecdd7d1a472f1086605d8f0cc58a",
+        "name": "Friday-v1.4.3-beta-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.4.3-beta/Friday-v1.4.3-beta-linux-x64-cuda.AppImage",
+        "sha256": "e876e8756e271977222163a1278bb098efe2fba969ad898c8b604860e8bb9415",
         "size": 820480504,
         "tarball": {
-          "name": "Friday-v1.4.2-beta-linux-x64-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.4.2-beta/Friday-v1.4.2-beta-linux-x64-cuda.tar.gz",
-          "sha256": "f11f6f17622f1727543402e04bc5cfbe0a8d74e025716d4f65c91e5d10a81608",
-          "size": 858511447
+          "name": "Friday-v1.4.3-beta-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.4.3-beta/Friday-v1.4.3-beta-linux-x64-cuda.tar.gz",
+          "sha256": "928ea00c01b0eed7dc5f8a50c5a40b5148adfd4f32f0eabe95ce04ecffb48491",
+          "size": 858511302
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.4.2-beta-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.4.2-beta/Friday-v1.4.2-beta-windows-x64-vulkan.zip",
-        "sha256": "9cc5de8980dab193e482160c05b74d50a425ee52605710b857d1a27230aa3130",
-        "size": 102474866
+        "name": "Friday-v1.4.3-beta-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.4.3-beta/Friday-v1.4.3-beta-windows-x64-vulkan.zip",
+        "sha256": "50a69cb8fc9b60e68d8b27f7333cb4023a201965b268766690aa01fcd28e6b4e",
+        "size": 102474813
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v1.4.2-beta-linux-x64-vulkan.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.4.2-beta/Friday-v1.4.2-beta-linux-x64-vulkan.AppImage",
-        "sha256": "df27a91ecfa71603ad79b740b74b16373e49853c7518db2fbf3e97dc1063a93c",
+        "name": "Friday-v1.4.3-beta-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.4.3-beta/Friday-v1.4.3-beta-linux-x64-vulkan.AppImage",
+        "sha256": "9027cb2c68cc2bbb669f87e4967aa133cac1c1c895f03277feac83d38fe5c7c5",
         "size": 113445368,
         "tarball": {
-          "name": "Friday-v1.4.2-beta-linux-x64-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.4.2-beta/Friday-v1.4.2-beta-linux-x64-vulkan.tar.gz",
-          "sha256": "93ecdb703200c75637ed03bd35ee093a983c10ed9323d71ef84d199c97ead186",
-          "size": 130158027
+          "name": "Friday-v1.4.3-beta-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.4.3-beta/Friday-v1.4.3-beta-linux-x64-vulkan.tar.gz",
+          "sha256": "bc50dd205cfdbdc7d7576d402dfb85ee5b86970cbcc71f21b538eeb8a689e85a",
+          "size": 130158018
         }
       }
     }
   },
-  "updatedAt": "2026-10-01T20:36:27Z",
+  "updatedAt": "2026-10-02T02:39:33Z",
   "stable": {
     "tag": "v1.0.18",
     "version": "1.0.18",
