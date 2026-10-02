@@ -1,59 +1,59 @@
 {
   "beta": {
-    "tag": "v1.11.0-beta",
-    "version": "1.11.0",
-    "build": 86,
+    "tag": "v1.12.0-beta",
+    "version": "1.12.0",
+    "build": 88,
     "channel": "beta",
-    "date": "2026-10-02T15:37:59Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.11.0-beta/Friday-v1.11.0-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.11.0-beta/Friday-v1.11.0-beta-macOS-arm64.dmg",
-    "sha256": "07c353f6a4aec48bb1dda6ee6b7e24f212ef93b2275ca793e823351634b0c73e",
-    "size": 38797241,
-    "notes": "自我学习加上「学什么靠意外」和「慢慢归纳」：框架记每类调用平时成败几次、用户平时多常追问，按 −log₂P 算这次结果有多意外，够意外才自动�",
+    "date": "2026-10-02T17:27:56Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.12.0-beta/Friday-v1.12.0-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.12.0-beta/Friday-v1.12.0-beta-macOS-arm64.dmg",
+    "sha256": "8dbf296f5d8071ffe43cbf9497dcb584d0e07e54e222cd762db40373c3fc2773",
+    "size": 39028648,
+    "notes": "自我学习加上「学会创造」：复盘记下每条为什么有效（原理）；空闲时做梦，把不相干领域的经验两两组合成新点子进想法库；没做过的任务、老办�",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.11.0-beta",
-    "source": "1561ccee3508f02789c38f27f7660db84e93c498",
-    "branch": "v1.11",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.12.0-beta",
+    "source": "ef6ce33f81d5ccdacd8a5dca4dab4cc8975dd337",
+    "branch": "v1.12",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.11.0-beta-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.11.0-beta/Friday-v1.11.0-beta-windows-x64-cuda.zip",
-        "sha256": "57d1f99826879a4baa2c9fe3aa18f3f37cde7a7624a05c0f060d49b24fc8c6c9",
-        "size": 796754052
+        "name": "Friday-v1.12.0-beta-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.12.0-beta/Friday-v1.12.0-beta-windows-x64-cuda.zip",
+        "sha256": "99e87e6470ee405da00952aa97d31547404b2c4b7108b7c51be974f37ea216cf",
+        "size": 796754028
       },
       "linux-x64-cuda": {
-        "name": "Friday-v1.11.0-beta-linux-x64-cuda.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.11.0-beta/Friday-v1.11.0-beta-linux-x64-cuda.AppImage",
-        "sha256": "cd0e6ccf00471945edbae106cd1f5a27710f933dd5a939917673f6601d47b37c",
+        "name": "Friday-v1.12.0-beta-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.12.0-beta/Friday-v1.12.0-beta-linux-x64-cuda.AppImage",
+        "sha256": "88ce6a544b768667558f418097f8e3338bb653d56a5dcccf1fe08a8e6162efb0",
         "size": 819304952,
         "tarball": {
-          "name": "Friday-v1.11.0-beta-linux-x64-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.11.0-beta/Friday-v1.11.0-beta-linux-x64-cuda.tar.gz",
-          "sha256": "c5e6c77c11e927cfa1e1ccad74de5f8c90901c82a554fc9755b1760a240f5f4e",
-          "size": 857187342
+          "name": "Friday-v1.12.0-beta-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.12.0-beta/Friday-v1.12.0-beta-linux-x64-cuda.tar.gz",
+          "sha256": "d320ac3da0362be990b2900e48609d51d88c0c388faf79fc263dea108eaf434b",
+          "size": 857187253
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.11.0-beta-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.11.0-beta/Friday-v1.11.0-beta-windows-x64-vulkan.zip",
-        "sha256": "a513ab11c233c1321b756db2ebe3f7d845ebd294e70df65d0e068ac1ccbbd5da",
-        "size": 101392782
+        "name": "Friday-v1.12.0-beta-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.12.0-beta/Friday-v1.12.0-beta-windows-x64-vulkan.zip",
+        "sha256": "d8119b93476974790f06ffa1ca7759c671ec06031323345b1470d0764c28b76f",
+        "size": 101392201
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v1.11.0-beta-linux-x64-vulkan.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.11.0-beta/Friday-v1.11.0-beta-linux-x64-vulkan.AppImage",
-        "sha256": "4268495ca50ba92e9d735d619467751ba226c058b7b90b0ed2dbae809fb24129",
+        "name": "Friday-v1.12.0-beta-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.12.0-beta/Friday-v1.12.0-beta-linux-x64-vulkan.AppImage",
+        "sha256": "e49451fd998d2daa22bd92b04bcc8e9d747fe2f1a7e33657cbdc64b416caead1",
         "size": 112269816,
         "tarball": {
-          "name": "Friday-v1.11.0-beta-linux-x64-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.11.0-beta/Friday-v1.11.0-beta-linux-x64-vulkan.tar.gz",
-          "sha256": "d4e4fdbab52ed91ae7ba17ce2210ff351e31c05034715c3f8fbaef44f1b8d7e1",
-          "size": 128820433
+          "name": "Friday-v1.12.0-beta-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.12.0-beta/Friday-v1.12.0-beta-linux-x64-vulkan.tar.gz",
+          "sha256": "75670ea5abe1fbec3c3dc9b29ee579cab4c7392bc67241fcbf50af27c548a57a",
+          "size": 128820330
         }
       }
     }
   },
-  "updatedAt": "2026-10-02T15:39:28Z",
+  "updatedAt": "2026-10-02T17:27:56Z",
   "stable": {
     "tag": "v1.11.1",
     "version": "1.11.1",
