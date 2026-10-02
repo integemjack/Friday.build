@@ -1,59 +1,59 @@
 {
   "beta": {
-    "tag": "v1.10.1-beta",
-    "version": "1.10.1",
-    "build": 83,
+    "tag": "v1.10.2-beta",
+    "version": "1.10.2",
+    "build": 84,
     "channel": "beta",
-    "date": "2026-10-02T14:38:28Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.10.1-beta/Friday-v1.10.1-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.10.1-beta/Friday-v1.10.1-beta-macOS-arm64.dmg",
-    "sha256": "6c7096a834a078c6112b56bc93e48e1d6ab361bedace8b5b9f92e642b56b784c",
-    "size": 38276035,
-    "notes": "自我学习加上遗忘：每条学到的东西有强度，帮上忙加强、照做反而出错或没用就减弱并随时间衰减（被附上不算帮上忙，明说的和钉住的不衰减），�",
+    "date": "2026-10-02T14:55:16Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.10.2-beta/Friday-v1.10.2-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.10.2-beta/Friday-v1.10.2-beta-macOS-arm64.dmg",
+    "sha256": "f85cd6a42ef3ce2e42916ee04fd0cc6925af4b5c8b8c5fb2729adca6be034039",
+    "size": 38723252,
+    "notes": "自我学习加上「想起来」：按字面、学到它时的情境和意思想起学到的东西（本地 Qwen3-Embedding 0.6B，减掉每条的底线再比，字面不重合但意思相近的也�",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.10.1-beta",
-    "source": "e972032f4dcbe94478dd06695e42e4f55f43206a",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.10.2-beta",
+    "source": "cb7777d3b759c59c1671c9d123c911d312830bc0",
     "branch": "v1.10",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.10.1-beta-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.1-beta/Friday-v1.10.1-beta-windows-x64-cuda.zip",
-        "sha256": "2861cd294b8670843b4f1159236bfe11a70ab1c01a10948529150ac6f3c5019c",
-        "size": 796754187
+        "name": "Friday-v1.10.2-beta-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.2-beta/Friday-v1.10.2-beta-windows-x64-cuda.zip",
+        "sha256": "17178bc398b7ed66090c30034a0f335ef7a7f78df4e8322e66638103f9cbd62f",
+        "size": 796754210
       },
       "linux-x64-cuda": {
-        "name": "Friday-v1.10.1-beta-linux-x64-cuda.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.1-beta/Friday-v1.10.1-beta-linux-x64-cuda.AppImage",
-        "sha256": "d5f21992a450ebd153beb3bc65c362c576ece3bb7281088b9dd1a3c51683ad8c",
+        "name": "Friday-v1.10.2-beta-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.2-beta/Friday-v1.10.2-beta-linux-x64-cuda.AppImage",
+        "sha256": "c5b6fd31ec871d7cf5e62c9ba9ee0734ff82ef089a46f1492b1948c140df50ed",
         "size": 819304952,
         "tarball": {
-          "name": "Friday-v1.10.1-beta-linux-x64-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.1-beta/Friday-v1.10.1-beta-linux-x64-cuda.tar.gz",
-          "sha256": "5f90386f4aaac2b351e437408473e1273f722ab9dc133b110ede24946464e089",
-          "size": 857187391
+          "name": "Friday-v1.10.2-beta-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.2-beta/Friday-v1.10.2-beta-linux-x64-cuda.tar.gz",
+          "sha256": "0631159275a0aa6add99ca0a6076b85efb5e291fec14071f72732b4cbaff52e2",
+          "size": 857187423
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.10.1-beta-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.1-beta/Friday-v1.10.1-beta-windows-x64-vulkan.zip",
-        "sha256": "ac8727ccc30c1b642a042eb1a9557c8ae279225e68ca943cd91374dacb3c34f9",
-        "size": 101392337
+        "name": "Friday-v1.10.2-beta-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.2-beta/Friday-v1.10.2-beta-windows-x64-vulkan.zip",
+        "sha256": "4fcc015969abd82f81ae71c0a2dddb83b70af4dbc510d8a900c61a2da4562221",
+        "size": 101392103
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v1.10.1-beta-linux-x64-vulkan.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.1-beta/Friday-v1.10.1-beta-linux-x64-vulkan.AppImage",
-        "sha256": "e723bd85f55ecb07f8d735c11041b424aa54ef5d24521e37482a5aca933597b0",
+        "name": "Friday-v1.10.2-beta-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.2-beta/Friday-v1.10.2-beta-linux-x64-vulkan.AppImage",
+        "sha256": "8b01294e41a3ad371b3728d51fd63cd3de1aacc5130fe37e9137f488f7c1c82e",
         "size": 112269816,
         "tarball": {
-          "name": "Friday-v1.10.1-beta-linux-x64-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.1-beta/Friday-v1.10.1-beta-linux-x64-vulkan.tar.gz",
-          "sha256": "5338624dc27c13cee7ce74b807faf326bca87806810c1b2a8379d9581f3fb02d",
-          "size": 128820479
+          "name": "Friday-v1.10.2-beta-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.10.2-beta/Friday-v1.10.2-beta-linux-x64-vulkan.tar.gz",
+          "sha256": "2a26cadeccc30b3343d0e757facc2df98e6d75590d61304e5935ebf7c56ed743",
+          "size": 128820466
         }
       }
     }
   },
-  "updatedAt": "2026-10-02T14:38:28Z",
+  "updatedAt": "2026-10-02T14:55:16Z",
   "stable": {
     "tag": "v1.9.1",
     "version": "1.9.1",
