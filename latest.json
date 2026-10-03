@@ -1,35 +1,35 @@
 {
   "beta": {
-    "tag": "v1.13.0-beta",
-    "version": "1.13.0",
-    "build": 91,
+    "tag": "v1.13.1-beta",
+    "version": "1.13.1",
+    "build": 92,
     "channel": "beta",
-    "date": "2026-10-02T22:11:30Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.13.0-beta/Friday-v1.13.0-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.13.0-beta/Friday-v1.13.0-beta-macOS-arm64.dmg",
-    "sha256": "91c7af1db5dab1554e1becd0b231c784a1868eb4d958b0818c7227e4ca49a700",
-    "size": 39355118,
-    "notes": "合并 main：带入 v1.12 的 Swift 改动（自我学习学会创造：原理、做梦与想法库、老办法保底新办法同时试、自己造工具；LUCA 幻觉线、遗传与自然选择、LU",
+    "date": "2026-10-03T06:08:45Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.13.1-beta/Friday-v1.13.1-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.13.1-beta/Friday-v1.13.1-beta-macOS-arm64.dmg",
+    "sha256": "0c74c129b4f53474d7364b26a60f74bdc65454546e306921ea55985e6e17fc11",
+    "size": 39355303,
+    "notes": "修复启动时那段空白对话被复用成新会话时权限还是写死的「自动」：复用时按这次的或新会话默认的权限来；调试钩子 FRIDAY_CONTINUE 往最近那段对话里",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.13.0-beta",
-    "source": "f3d0cd7aa89a7d0f0d1429755e8345f14a36b481",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.13.1-beta",
+    "source": "e8351a2f96b5a50d63443863e67d3456efa59d48",
     "branch": "v1.13",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.13.0-beta-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.0-beta/Friday-v1.13.0-beta-windows-x64-cuda.zip",
-        "sha256": "0708c80c69c4e6588cd854e85e1c0e352da73ccfcbe5984cd47a4585f36ff267",
-        "size": 797964557
+        "name": "Friday-v1.13.1-beta-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.1-beta/Friday-v1.13.1-beta-windows-x64-cuda.zip",
+        "sha256": "8f6725bf36a02ce4d0d6d096dbdf59a472cf09e3f957f4508edd0f6782075ece",
+        "size": 798396781
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.13.0-beta-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.0-beta/Friday-v1.13.0-beta-windows-x64-vulkan.zip",
-        "sha256": "bda110bc2e4ab09e1609ec4996382c730c59ad5005d2c665328ce0a96ed17f84",
-        "size": 102620313
+        "name": "Friday-v1.13.1-beta-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.1-beta/Friday-v1.13.1-beta-windows-x64-vulkan.zip",
+        "sha256": "a758e52ed5ade4ecbd478297a623163bd7f3aa3715688dde0bb7c5576de89bff",
+        "size": 103052371
       }
     }
   },
-  "updatedAt": "2026-10-02T22:11:30Z",
+  "updatedAt": "2026-10-03T06:08:45Z",
   "stable": {
     "tag": "v1.12.2",
     "version": "1.12.2",
