@@ -1,59 +1,59 @@
 {
   "beta": {
-    "tag": "v1.16.3-beta",
-    "version": "1.16.3",
-    "build": 104,
+    "tag": "v1.17.0-beta",
+    "version": "1.17.0",
+    "build": 105,
     "channel": "beta",
-    "date": "2026-10-03T13:55:09Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.16.3-beta/Friday-v1.16.3-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.16.3-beta/Friday-v1.16.3-beta-macOS-arm64.dmg",
-    "sha256": "94a7c6f15f1b8f55120bfb23a24a33e0a14943b1e427799731ec6f70cc787cb9",
-    "size": 39552322,
-    "notes": "Agent 树详情顶部精简：返回、状态、名字、模型一行，运行中一行在做什么和停止键，速度 / 生成 / 输入 / 工具调用一行，第 2 层起才显示上级一串；�",
+    "date": "2026-10-03T18:36:34Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.17.0-beta/Friday-v1.17.0-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.17.0-beta/Friday-v1.17.0-beta-macOS-arm64.dmg",
+    "sha256": "305234f3ec1bd408da20a533eefdc5cb73111bac537fd181c9e480ecf36a7206",
+    "size": 39652067,
+    "notes": "切会话、打开子 Agent 详情先占位、后台加载：块先画占位条，Markdown 在后台解析，按离视口远近换成内容；收起的思考、工具参数和结果、详情的任务�",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.16.3-beta",
-    "source": "2453371385b59b638ff6a3731df175467ac53c3a",
-    "branch": "v1.16",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.17.0-beta",
+    "source": "6972c9d10f0eefdedff94b31c0f8e22197adad67",
+    "branch": "v1.17",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.16.3-beta-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.16.3-beta/Friday-v1.16.3-beta-windows-x64-cuda.zip",
-        "sha256": "803efb419f86501616e0ade9aef671c1c3b75d869438475c919273210c257cce",
-        "size": 798528413
+        "name": "Friday-v1.17.0-beta-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.17.0-beta/Friday-v1.17.0-beta-windows-x64-cuda.zip",
+        "sha256": "d0b3dff7b17b16f95e8588b05050bdf3483455d1dc8022a23dd56478660c060b",
+        "size": 798580316
       },
       "linux-x64-cuda": {
-        "name": "Friday-v1.16.3-beta-linux-x64-cuda.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.16.3-beta/Friday-v1.16.3-beta-linux-x64-cuda.AppImage",
-        "sha256": "edf0be12afc526a5e452596d8a060c4641c9c70d6dd041057fec9a30f139b320",
-        "size": 821983736,
+        "name": "Friday-v1.17.0-beta-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.17.0-beta/Friday-v1.17.0-beta-linux-x64-cuda.AppImage",
+        "sha256": "31189ae3e5515fe08c97e57dd445ce8471f548df20a2e6d3484583eb6d2a24bd",
+        "size": 822045176,
         "tarball": {
-          "name": "Friday-v1.16.3-beta-linux-x64-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.16.3-beta/Friday-v1.16.3-beta-linux-x64-cuda.tar.gz",
-          "sha256": "9fe2b64fbcf9d6daefc274229758f4e9fbc86e874b4db28b49c03888d622eaac",
-          "size": 860102905
+          "name": "Friday-v1.17.0-beta-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.17.0-beta/Friday-v1.17.0-beta-linux-x64-cuda.tar.gz",
+          "sha256": "ea04bee129fc7d8fb3bd7e74169ac0c247bb224e1c73ff0e8b21e465c70c3df5",
+          "size": 860162652
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.16.3-beta-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.16.3-beta/Friday-v1.16.3-beta-windows-x64-vulkan.zip",
-        "sha256": "f3a8ca5c0f172eb0c83f200b80d2772b5a641c1deae2a4542ba17fa2ceb41771",
-        "size": 103183729
+        "name": "Friday-v1.17.0-beta-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.17.0-beta/Friday-v1.17.0-beta-windows-x64-vulkan.zip",
+        "sha256": "2ee4f775a0adcd83aa3428ad0c2accee2dceaade6bd39e7e1f9cb560ac97a11c",
+        "size": 103236151
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v1.16.3-beta-linux-x64-vulkan.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.16.3-beta/Friday-v1.16.3-beta-linux-x64-vulkan.AppImage",
-        "sha256": "9adb3a664f7020aba1e8914a3eee9a9078b1fae9abbeb8670c0a196742d41bd1",
-        "size": 114924024,
+        "name": "Friday-v1.17.0-beta-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.17.0-beta/Friday-v1.17.0-beta-linux-x64-vulkan.AppImage",
+        "sha256": "b19381e3a284324c5a4598dca0abd6355cd85cec8f2348e5c5d3212729b02232",
+        "size": 114985464,
         "tarball": {
-          "name": "Friday-v1.16.3-beta-linux-x64-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.16.3-beta/Friday-v1.16.3-beta-linux-x64-vulkan.tar.gz",
-          "sha256": "5e7d1424e549bc2941400220f0961fe65e66da82529cb31b78f5ea7694185419",
-          "size": 131742050
+          "name": "Friday-v1.17.0-beta-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.17.0-beta/Friday-v1.17.0-beta-linux-x64-vulkan.tar.gz",
+          "sha256": "fa6a139ec241989e053a32f8e13452a7b33547f414d2fbb281cdcd6d9f177b13",
+          "size": 131805243
         }
       }
     }
   },
-  "updatedAt": "2026-10-03T13:55:09Z",
+  "updatedAt": "2026-10-03T18:36:34Z",
   "stable": {
     "tag": "v1.16.2",
     "version": "1.16.2",
