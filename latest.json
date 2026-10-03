@@ -1,59 +1,59 @@
 {
   "beta": {
-    "tag": "v1.13.4-beta",
-    "version": "1.13.4",
-    "build": 95,
+    "tag": "v1.14.0-beta",
+    "version": "1.14.0",
+    "build": 96,
     "channel": "beta",
-    "date": "2026-10-03T08:26:09Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.13.4-beta/Friday-v1.13.4-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.13.4-beta/Friday-v1.13.4-beta-macOS-arm64.dmg",
-    "sha256": "cc36d17a8986938630942676e1795701314302d3538ff993a6c8d5f53e67e137",
-    "size": 39367274,
-    "notes": "合并 origin/v1.13：值守自修与 README 更新",
+    "date": "2026-10-03T09:46:48Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.14.0-beta/Friday-v1.14.0-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.14.0-beta/Friday-v1.14.0-beta-macOS-arm64.dmg",
+    "sha256": "b7239a5949f06a3a699a5cbcd11365ea4d9d616bf3629e337899ba851cd27f15",
+    "size": 39384288,
+    "notes": "Qt 版几段对话可以同时跑：一轮的状态收进 TurnContext 按对话登记，Worker 起任务时继承任务局部值把这一轮带到回合线程和子 Agent 线程；停止、排队、�",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.13.4-beta",
-    "source": "4c79adf13d0880e25c3a012e5142ae0b48cf525d",
-    "branch": "v1.13",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.14.0-beta",
+    "source": "b9cc905efd6c2f020281493b44348c14bbbe6c88",
+    "branch": "v1.14",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.13.4-beta-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.4-beta/Friday-v1.13.4-beta-windows-x64-cuda.zip",
-        "sha256": "14817e1cb67e5d8a23a101c348bc4fd10f8a1a20d9ea4953d8e9368826784827",
-        "size": 798407678
+        "name": "Friday-v1.14.0-beta-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.14.0-beta/Friday-v1.14.0-beta-windows-x64-cuda.zip",
+        "sha256": "5c78a5bd0a4da42c9707e33ec256e3f585d152492e6105b9ce0bfbeb921afc92",
+        "size": 798433712
       },
       "linux-x64-cuda": {
-        "name": "Friday-v1.13.4-beta-linux-x64-cuda.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.4-beta/Friday-v1.13.4-beta-linux-x64-cuda.AppImage",
-        "sha256": "886546c5d78c150f3e7ec0239ec832a2b022f73f6f66c8780276d72684a320a7",
-        "size": 821840376,
+        "name": "Friday-v1.14.0-beta-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.14.0-beta/Friday-v1.14.0-beta-linux-x64-cuda.AppImage",
+        "sha256": "0406ec608ff7cb2e60699610053b9d4b99a0cc4a1c20b416c70b8ba43eab164a",
+        "size": 821860856,
         "tarball": {
-          "name": "Friday-v1.13.4-beta-linux-x64-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.4-beta/Friday-v1.13.4-beta-linux-x64-cuda.tar.gz",
-          "sha256": "640239af44ec86e30118f418c3fe92eba84fef5b765c67760d9745914cc8a91c",
-          "size": 859927997
+          "name": "Friday-v1.14.0-beta-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.14.0-beta/Friday-v1.14.0-beta-linux-x64-cuda.tar.gz",
+          "sha256": "d0013257475e6526b85114a7699760584b34da76c00244aee6898fb0429e3351",
+          "size": 859974758
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.13.4-beta-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.4-beta/Friday-v1.13.4-beta-windows-x64-vulkan.zip",
-        "sha256": "a3b07563b3915df9e5af50bc23d3c3f11cc2289d5b3c9f1b3b4ea86efee39469",
-        "size": 103063407
+        "name": "Friday-v1.14.0-beta-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.14.0-beta/Friday-v1.14.0-beta-windows-x64-vulkan.zip",
+        "sha256": "80ae0a6844612308f0e12947b25a8e5653835fd2b8c431922d11e35c9187fd5b",
+        "size": 103090087
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v1.13.4-beta-linux-x64-vulkan.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.4-beta/Friday-v1.13.4-beta-linux-x64-vulkan.AppImage",
-        "sha256": "1f3715c926f59e049110485cac1190a18726fc0e2855aa752aea60929ba561da",
-        "size": 114776568,
+        "name": "Friday-v1.14.0-beta-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.14.0-beta/Friday-v1.14.0-beta-linux-x64-vulkan.AppImage",
+        "sha256": "72e16dcf50da1671259f5115ab2066ffde50ac82e2fd33d73d22da5e26a50b4a",
+        "size": 114797048,
         "tarball": {
-          "name": "Friday-v1.13.4-beta-linux-x64-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.4-beta/Friday-v1.13.4-beta-linux-x64-vulkan.tar.gz",
-          "sha256": "ac508d031ebd962b04e09fea01cf2af1846f9aa28d8ad9b07884a417da38ee3b",
-          "size": 131575929
+          "name": "Friday-v1.14.0-beta-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.14.0-beta/Friday-v1.14.0-beta-linux-x64-vulkan.tar.gz",
+          "sha256": "7e0d5e022f6dd40d5671f6c04583ab4f07109fe3582fbd25222518eebc0f7c49",
+          "size": 131600938
         }
       }
     }
   },
-  "updatedAt": "2026-10-03T08:26:09Z",
+  "updatedAt": "2026-10-03T09:46:48Z",
   "stable": {
     "tag": "v1.12.2",
     "version": "1.12.2",
