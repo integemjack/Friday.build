@@ -53,57 +53,57 @@
       }
     }
   },
-  "updatedAt": "2026-10-03T18:59:42Z",
+  "updatedAt": "2026-10-03T19:16:11Z",
   "stable": {
-    "tag": "v1.16.2",
-    "version": "1.16.2",
-    "build": 103,
+    "tag": "v1.17.2",
+    "version": "1.17.2",
+    "build": 107,
     "channel": "stable",
-    "date": "2026-10-03T13:38:50Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.16.2/Friday-v1.16.2-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.16.2/Friday-v1.16.2-macOS-arm64.dmg",
-    "sha256": "d8123b385f32ae45ee9d2cb3132d5fd982cf19b8c5045b50e81e1ac3d3e6c667",
-    "size": 39552836,
-    "notes": "合并 v1.16：密钥只以名字流转——明文只在密钥库和执行那一刻，用户发的、工具输出和报错里的密钥认出来就收进库换成名字，执行时换回、发给模�",
+    "date": "2026-10-03T19:16:11Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.17.2/Friday-v1.17.2-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.17.2/Friday-v1.17.2-macOS-arm64.dmg",
+    "sha256": "ba77702d548c81944ac71794413e032d6d53f1835a8b2e3972967dbfb918ffa0",
+    "size": 39666327,
+    "notes": "合并 v1.17：Agent 树分隔条拖动不再抖动、跟手——位移按窗口坐标算，拖动中对话区先不重排、松手再排（Swift 与 Qt）",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.16.2",
-    "source": "22e7d55355b352a1d0cd5a61cee1eee9a16da654",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.17.2",
+    "source": "4ca97dcfac96a1b5f29e9f3b29b3b5973689b492",
     "branch": "main",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.16.2-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.16.2/Friday-v1.16.2-windows-x64-cuda.zip",
-        "sha256": "6c30f58d219fa937f216afec1d40e39ab5194b8a89b04c6342fe6b9d52aada18",
-        "size": 798528488
+        "name": "Friday-v1.17.2-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.17.2/Friday-v1.17.2-windows-x64-cuda.zip",
+        "sha256": "67cef6e7d18666de1c8a11679da5ffacb423ae6131e7bb8379659760602dd0fa",
+        "size": 798583356
       },
       "linux-x64-cuda": {
-        "name": "Friday-v1.16.2-linux-x64-cuda.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.16.2/Friday-v1.16.2-linux-x64-cuda.AppImage",
-        "sha256": "dfd4a960e50c74e13c687db261fca732836d55c39f99facb5998d406697f5dbe",
-        "size": 821983736,
+        "name": "Friday-v1.17.2-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.17.2/Friday-v1.17.2-linux-x64-cuda.AppImage",
+        "sha256": "9e77679ffbc9eee35cc57358b3265c48e6961323a37d419746fe40baf8d51600",
+        "size": 822053368,
         "tarball": {
-          "name": "Friday-v1.16.2-linux-x64-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.16.2/Friday-v1.16.2-linux-x64-cuda.tar.gz",
-          "sha256": "e9acb118c6db44d2920d2ab02a4048ac17b565203dce972fc96294521a66bd9c",
-          "size": 860102540
+          "name": "Friday-v1.17.2-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.17.2/Friday-v1.17.2-linux-x64-cuda.tar.gz",
+          "sha256": "98df0263a33ad8b8ba63db3e7e6daa3568bc203ad36290fe3cf5f12a6b34a1a8",
+          "size": 860166189
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.16.2-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.16.2/Friday-v1.16.2-windows-x64-vulkan.zip",
-        "sha256": "b44e373ee4a1de294ac2fa5393e4289f861252d2cdef1388725d6783dbb8dbd4",
-        "size": 103184215
+        "name": "Friday-v1.17.2-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.17.2/Friday-v1.17.2-windows-x64-vulkan.zip",
+        "sha256": "d8bcc0d329d2576129fcebc603af64648b1e8793272a1a4070358368a4105156",
+        "size": 103239042
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v1.16.2-linux-x64-vulkan.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.16.2/Friday-v1.16.2-linux-x64-vulkan.AppImage",
-        "sha256": "9f68fcabe4da3a24709ecea6b1e9207a501d4946103b8214b8b0d9c99ce48293",
-        "size": 114924024,
+        "name": "Friday-v1.17.2-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.17.2/Friday-v1.17.2-linux-x64-vulkan.AppImage",
+        "sha256": "09eb9a404fdb0defe0e1b5eeab9d1d5b3a35dc1c025a6c4577fbddbfa49e4646",
+        "size": 114993656,
         "tarball": {
-          "name": "Friday-v1.16.2-linux-x64-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.16.2/Friday-v1.16.2-linux-x64-vulkan.tar.gz",
-          "sha256": "4652f3e77e53f8ee1bb90ab818adf383c62bc5eb272ba9ce6700f286aae02689",
-          "size": 131742103
+          "name": "Friday-v1.17.2-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.17.2/Friday-v1.17.2-linux-x64-vulkan.tar.gz",
+          "sha256": "88c12042942a46a0d40ccc044ee31db5e93b25f1dc45a172e6ab45fec7411ef9",
+          "size": 131809980
         }
       }
     }
