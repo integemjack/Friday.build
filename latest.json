@@ -1,35 +1,59 @@
 {
   "beta": {
-    "tag": "v1.13.1-beta",
-    "version": "1.13.1",
-    "build": 92,
+    "tag": "v1.13.2-beta",
+    "version": "1.13.2",
+    "build": 93,
     "channel": "beta",
-    "date": "2026-10-03T06:08:45Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.13.1-beta/Friday-v1.13.1-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.13.1-beta/Friday-v1.13.1-beta-macOS-arm64.dmg",
-    "sha256": "0c74c129b4f53474d7364b26a60f74bdc65454546e306921ea55985e6e17fc11",
-    "size": 39355303,
-    "notes": "修复启动时那段空白对话被复用成新会话时权限还是写死的「自动」：复用时按这次的或新会话默认的权限来；调试钩子 FRIDAY_CONTINUE 往最近那段对话里",
+    "date": "2026-10-03T07:26:21Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.13.2-beta/Friday-v1.13.2-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.13.2-beta/Friday-v1.13.2-beta-macOS-arm64.dmg",
+    "sha256": "ab7828fe9a84d25725b89932580d7cd311e3ddeed395e5ca158bca541f6902b7",
+    "size": 39355291,
+    "notes": "测试：造工具、共生用例注入「有沙盒」跑主路径；实验室与本地视频用例按无沙盒/缺编码器环境分支断言",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.13.1-beta",
-    "source": "e8351a2f96b5a50d63443863e67d3456efa59d48",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.13.2-beta",
+    "source": "419f64375ffdefa10c4e954908808b7b76790bed",
     "branch": "v1.13",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.13.1-beta-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.1-beta/Friday-v1.13.1-beta-windows-x64-cuda.zip",
-        "sha256": "8f6725bf36a02ce4d0d6d096dbdf59a472cf09e3f957f4508edd0f6782075ece",
-        "size": 798396781
+        "name": "Friday-v1.13.2-beta-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.2-beta/Friday-v1.13.2-beta-windows-x64-cuda.zip",
+        "sha256": "992ae22426717153c8895bea3acaee4efaf94390b999160d5c546f124b9bd217",
+        "size": 798396808
+      },
+      "linux-x64-cuda": {
+        "name": "Friday-v1.13.2-beta-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.2-beta/Friday-v1.13.2-beta-linux-x64-cuda.AppImage",
+        "sha256": "a50710826bd8bb112aa19c85e79099f110570292126337fbe407c122e770b349",
+        "size": 821807608,
+        "tarball": {
+          "name": "Friday-v1.13.2-beta-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.2-beta/Friday-v1.13.2-beta-linux-x64-cuda.tar.gz",
+          "sha256": "afd8b9a5c7504c257fb6bb42d1912d73562b4efd7979ffc45f3db402e7c50b3d",
+          "size": 859918923
+        }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.13.1-beta-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.1-beta/Friday-v1.13.1-beta-windows-x64-vulkan.zip",
-        "sha256": "a758e52ed5ade4ecbd478297a623163bd7f3aa3715688dde0bb7c5576de89bff",
-        "size": 103052371
+        "name": "Friday-v1.13.2-beta-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.2-beta/Friday-v1.13.2-beta-windows-x64-vulkan.zip",
+        "sha256": "974f8dbd226c7b5554fb1affc35fe396a4fde92bd7eb977494f8703b7dde36da",
+        "size": 103052320
+      },
+      "linux-x64-vulkan": {
+        "name": "Friday-v1.13.2-beta-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.2-beta/Friday-v1.13.2-beta-linux-x64-vulkan.AppImage",
+        "sha256": "c2b4a93f1a323391850c25ecc3106ca2ce2952fef00668733bc1753b19bbbbd2",
+        "size": 114747896,
+        "tarball": {
+          "name": "Friday-v1.13.2-beta-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.13.2-beta/Friday-v1.13.2-beta-linux-x64-vulkan.tar.gz",
+          "sha256": "6401b6aa45c6bf85ef5b6fb244c4ecde6bf5a76c8e5cd50675ea37be9463747e",
+          "size": 131544184
+        }
       }
     }
   },
-  "updatedAt": "2026-10-03T06:08:45Z",
+  "updatedAt": "2026-10-03T07:26:21Z",
   "stable": {
     "tag": "v1.12.2",
     "version": "1.12.2",
