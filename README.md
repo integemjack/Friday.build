@@ -1,7 +1,8 @@
 # Friday.build
 
 Friday 的构建产物与发布页。二进制由 GitHub Actions 从源码仓库自动构建后发布到本仓库的 Releases：macOS 版用
-Developer ID 证书签名并经 Apple 公证，Windows / Linux 版（Qt）为 CUDA 与 Vulkan 各打一个包。
+Developer ID 证书签名并经 Apple 公证，Windows / Linux 版（Qt）为 CUDA 与 Vulkan 各打一套包（Windows：安装程序 + 便携版 zip；
+Linux：deb + AppImage + tar.gz）。
 
 ## 产物
 
@@ -9,14 +10,15 @@ Developer ID 证书签名并经 Apple 公证，Windows / Linux 版（Qt）为 CU
 | --- | --- | --- |
 | `Friday-<标签>-macOS-arm64.dmg` | macOS 26+，Apple Silicon | 打开后双击图标运行（也可拖到「应用程序」） |
 | `Friday-<标签>-macOS-arm64.zip` | 同上 | 纯 app 包，自动更新用它 |
-| `Friday-<标签>-windows-x64-cuda.zip` | Windows 10 / 11 x64 | NVIDIA 显卡（CUDA 12.8，建议驱动 570+） |
-| `Friday-<标签>-windows-x64-vulkan.zip` | Windows 10 / 11 x64 | AMD / Intel / NVIDIA 通用（Vulkan 1.2+ 驱动） |
-| `Friday-<标签>-linux-x64-cuda.AppImage` / `.tar.gz` | Linux x64，glibc 2.35+ | NVIDIA 显卡 |
-| `Friday-<标签>-linux-x64-vulkan.AppImage` / `.tar.gz` | Linux x64，glibc 2.35+ | AMD / Intel / NVIDIA 通用 |
+| `Friday-<标签>-windows-x64-cuda-setup.exe` / `.zip` | Windows 10 / 11 x64 | NVIDIA 显卡（CUDA 12.8，建议驱动 570+）；安装程序 / 便携版 |
+| `Friday-<标签>-windows-x64-vulkan-setup.exe` / `.zip` | Windows 10 / 11 x64 | AMD / Intel / NVIDIA 通用（Vulkan 1.2+ 驱动） |
+| `Friday-<标签>-linux-x64-cuda.deb` / `.AppImage` / `.tar.gz` | Linux x64，glibc 2.35+ | NVIDIA 显卡；deb 给 Debian / Ubuntu 系 |
+| `Friday-<标签>-linux-x64-vulkan.deb` / `.AppImage` / `.tar.gz` | Linux x64，glibc 2.35+ | AMD / Intel / NVIDIA 通用 |
 | `SHA256SUMS.txt` | — | 全部文件的 SHA-256 |
 
-Windows 包解压后运行 `Friday\friday.exe`（便携版，自带 VC++ 运行库，未做代码签名）；Linux 的 AppImage `chmod +x` 后直接
-运行，tar.gz 解压后运行 `Friday/AppRun`。CUDA 版与 Vulkan 版只有 `backend/` 里的本地推理后端（llama.cpp 的
+Windows 安装程序双击装到 `C:\Program Files\Friday`（建快捷方式，「设置 › 应用」里可卸载）；zip 便携版解压后运行
+`Friday\friday.exe`（两者都自带 VC++ 运行库，未做代码签名）。Linux 的 deb 用 `sudo apt install ./Friday-…deb` 装到 `/opt/friday`；
+AppImage `chmod +x` 后直接运行，tar.gz 解压后运行 `Friday/AppRun`。CUDA 版与 Vulkan 版只有 `backend/` 里的本地推理后端（llama.cpp 的
 llama-server、stable-diffusion.cpp 的 sd-cli）不同。包的目录布局与更新方式见源码仓库的 `qt/docs/PACKAGING.md`。
 
 ## 版本与渠道
@@ -33,7 +35,8 @@ llama-server、stable-diffusion.cpp 的 sd-cli）不同。包的目录布局与�
 
 1. **prepare**：解析源码提交，算版本号、渠道和 Release 标签；
 2. **macos**：Xcode 构建、Developer ID 签名，dmg 也签名，公证 dmg 后把票据钉到 dmg 和 app 上、用钉过的 app 重打 zip，并用 Gatekeeper（`spctl`）确认是「Notarized Developer ID」，产物上传为 artifact；缺证书或公证密钥、公证不通过都直接失败，不发布未公证的包；
-3. **qt**：`{windows-2022, ubuntu-22.04} × {cuda, vulkan}` 四个组合并行，互不影响（`fail-fast: false`）。调用源码 `qt/ci/` 下的脚本：取依赖 → 构建推理后端 → 构建应用并跑单元测试 → 打包。Qt、CUDA、Vulkan SDK 与依赖的版本都钉在源码的 `qt/ci/deps.env` 里；推理后端按组件分别缓存（CUDA 编译很慢，依赖和工具链不变就不重编），另有 ccache；
+3. **qt**：`{windows-2022, ubuntu-22.04} × {cuda, vulkan}` 四个组合并行，互不影响（`fail-fast: false`）。调用源码 `qt/ci/` 下的脚本：取依赖 → 构建推理后端 → 构建应用并跑单元测试 → 打包（Windows：zip + 安装程序，安装程序在运行器上
+静默装一遍、卸一遍核对；Linux：AppImage + tar.gz + deb，deb 用 apt 装一遍核对；源码还没有 `qt/installer/` 的老分支只出 zip / AppImage / tar.gz）。Qt、CUDA、Vulkan SDK 与依赖的版本都钉在源码的 `qt/ci/deps.env` 里；推理后端按组件分别缓存（CUDA 编译很慢，依赖和工具链不变就不重编），另有 ccache；
 4. **release**：macOS 成功才发布；某个 Qt 组合失败时照样发布其余产物，并在 Release 说明里注明缺哪些。一次性上传全部文件与重新计算的 `SHA256SUMS.txt`，然后删掉同渠道的旧 Release、更新 `latest.json`。
 
 ## 自动更新
@@ -42,14 +45,15 @@ llama-server、stable-diffusion.cpp 的 sd-cli）不同。包的目录布局与�
 
 ```json
 "assets": {
-  "windows-x64-cuda":   { "name": "…zip", "url": "…", "sha256": "…", "size": 0 },
-  "windows-x64-vulkan": { "name": "…zip", "url": "…", "sha256": "…", "size": 0 },
-  "linux-x64-cuda":     { "name": "…AppImage", "url": "…", "sha256": "…", "size": 0, "tarball": { "name": "…tar.gz", "url": "…", "sha256": "…", "size": 0 } },
+  "windows-x64-cuda":   { "name": "…zip", "url": "…", "sha256": "…", "size": 0, "installer": { "name": "…-setup.exe", "url": "…", "sha256": "…", "size": 0 } },
+  "windows-x64-vulkan": { "…": "…" },
+  "linux-x64-cuda":     { "name": "…AppImage", "url": "…", "sha256": "…", "size": 0, "tarball": { "name": "…tar.gz", "…": "…" }, "deb": { "name": "…deb", "…": "…" } },
   "linux-x64-vulkan":   { "…": "…" }
 }
 ```
 
-macOS 版 Friday 每小时读一次这个文件，比自己新就下载 zip、校验 SHA-256 和 Developer ID 签名，Agent 空闲时自动换包重启，正在工作时在侧边栏底部提示「点击更新到 …」；设置 › 通用 里可以关掉自动更新或只接收正式版。Windows / Linux 版按「系统-架构-后端」（如 `windows-x64-cuda`）取 `assets` 里自己的包，校验 SHA-256 后换包；这次构建缺某个组合时对应的键不存在，那个平台就保持原版本。
+macOS 版 Friday 每小时读一次这个文件，比自己新就下载 zip、校验 SHA-256 和 Developer ID 签名，Agent 空闲时自动换包重启，正在工作时在侧边栏底部提示「点击更新到 …」；设置 › 通用 里可以关掉自动更新或只接收正式版。Windows / Linux 版按「系统-架构-后端」（如 `windows-x64-cuda`）取 `assets` 里自己的包、再按安装方式取文件（便携版 zip / 安装程序 /
+AppImage / deb / tar.gz），校验 SHA-256 后换包（安装程序和 deb 装的要管理员确认，只在用户点了时装）；这次构建缺某个组合时对应的键不存在，那个平台就保持原版本。
 
 ## 签名与公证
 

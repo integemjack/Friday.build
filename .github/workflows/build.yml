@@ -8,7 +8,9 @@ name: Build and release Friday
 #      每次打包自动 +1（按已有标签数）；main 分支的提交发正式版（标签 vX.Y.Z），其他分支发预发布（vX.Y.Z-beta）；
 #   4. macos：导入 Developer ID 证书，调用源码里的 Friday/Tools/CI/build.sh 构建、签名、打包，再签 dmg、公证并钉票据
 #      （缺证书或公证密钥、公证不通过都直接失败，不发未公证的包）；
-#      qt：Windows / Linux 的 Qt 版，CUDA 与 Vulkan 各一个包（调用源码里的 qt/ci/ 脚本）；
+#      qt：Windows / Linux 的 Qt 版，CUDA 与 Vulkan 各一套包（调用源码里的 qt/ci/ 脚本）：Windows 出 zip 便携版 + 安装程序
+#      （-setup.exe，源码 qt/installer/ 的自制安装器；在运行器上静默装一遍、卸一遍核对），Linux 出 AppImage + tar.gz + deb
+#      （deb 在运行器上 apt 装一遍核对）；老源码没有安装程序时只出 zip；
 #   5. release：macOS 成功才发布（Qt 某个组合失败照样发布其余产物，并在说明里注明缺哪些）；
 #      正式版和预发布各只保留最新的一个 Release（旧的连安装包一起删，标签保留以便继续计数）；
 #   6. 发布后更新仓库根目录的 latest.json（每个渠道最新的一次发布，含各平台安装包 assets），Friday 应用定期读它来自动更新。
@@ -65,6 +67,7 @@ jobs:
       sha: ${{ steps.inspect.outputs.sha }}
       min_os: ${{ steps.inspect.outputs.min_os }}
       has_qt: ${{ steps.inspect.outputs.has_qt }}
+      has_installer: ${{ steps.inspect.outputs.has_installer }}
       release_tag: ${{ steps.version.outputs.release_tag }}
       marketing: ${{ steps.version.outputs.marketing }}
       channel: ${{ steps.version.outputs.channel }}
@@ -111,6 +114,7 @@ jobs:
             /Friday/Friday.xcodeproj/project.pbxproj
             /qt/CMakeLists.txt
             /qt/ci/deps.env
+            /qt/installer/CMakeLists.txt
 
       - name: Inspect source
         id: inspect
@@ -126,12 +130,16 @@ jobs:
           HAS_QT=false
           if [ -f src/qt/CMakeLists.txt ] && [ -f src/qt/ci/deps.env ]; then HAS_QT=true; fi
           if [ "${EVENT_NAME}" = "workflow_dispatch" ] && [ "${INPUT_QT}" = "false" ]; then HAS_QT=false; fi
+          # 源码有 qt/installer/（自制 Windows 安装程序）时 Windows 另出 -setup.exe、Linux 另出 deb；老分支只出 zip / AppImage / tar.gz
+          HAS_INSTALLER=false
+          if [ "${HAS_QT}" = "true" ] && [ -f src/qt/installer/CMakeLists.txt ]; then HAS_INSTALLER=true; fi
           {
             echo "sha=${SHA}"
             echo "min_os=${MIN_OS:-26.0}"
             echo "has_qt=${HAS_QT}"
+            echo "has_installer=${HAS_INSTALLER}"
           } >> "${GITHUB_OUTPUT}"
-          echo "提交 ${SHA}，最低 macOS ${MIN_OS:-26.0}，构建 Qt 版=${HAS_QT}"
+          echo "提交 ${SHA}，最低 macOS ${MIN_OS:-26.0}，构建 Qt 版=${HAS_QT}，安装程序 / deb=${HAS_INSTALLER}"
 
       - name: Checkout this repository (for tag reservation)
         uses: actions/checkout@v4
@@ -666,12 +674,19 @@ jobs:
         continue-on-error: true
         run: bash src/qt/ci/run_tests.sh --build-dir "${APP_BUILD}"
 
+      # 源码有 qt/installer/ 时另出安装程序：部件由 build_app 一起编好，在 <构建目录>/installer 下（老源码的打包脚本不认 -InstallerDir，不传）
       - name: Package (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: >-
-          pwsh -NoProfile -File src/qt/ci/package_windows.ps1 -Backend ${{ matrix.backend }}
-          -Stage "$env:APP_STAGE" -BackendDir "$env:BACKEND_OUT/backend" -Tag "$env:FRIDAY_RELEASE_TAG" -OutDir "$env:DIST"
+        env:
+          HAS_INSTALLER: ${{ needs.prepare.outputs.has_installer }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $pkgArgs = @('-Backend', '${{ matrix.backend }}', '-Stage', "$env:APP_STAGE", '-BackendDir', "$env:BACKEND_OUT/backend",
+                       '-Tag', "$env:FRIDAY_RELEASE_TAG", '-OutDir', "$env:DIST")
+          if ($env:HAS_INSTALLER -eq 'true') { $pkgArgs += @('-InstallerDir', "$env:APP_BUILD/installer") }
+          pwsh -NoProfile -File src/qt/ci/package_windows.ps1 @pkgArgs
+          if ($LASTEXITCODE -ne 0) { throw "package_windows.ps1 失败（退出码 $LASTEXITCODE）" }
 
       - name: Package (Linux)
         if: runner.os == 'Linux'
@@ -688,8 +703,10 @@ jobs:
           name: Friday-${{ needs.prepare.outputs.release_tag }}-${{ matrix.platform }}-${{ matrix.backend }}
           path: |
             dist/*.zip
+            dist/*-setup.exe
             dist/*.AppImage
             dist/*.tar.gz
+            dist/*.deb
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
@@ -706,17 +723,75 @@ jobs:
           name: Friday-${{ needs.prepare.outputs.release_tag }}-${{ matrix.platform }}-${{ matrix.backend }}
           path: |
             dist/*.zip
+            dist/*-setup.exe
             dist/*.AppImage
             dist/*.tar.gz
+            dist/*.deb
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
           overwrite: true
 
-      - name: Fail if unit tests failed
-        if: steps.tests_win.outcome == 'failure' || steps.tests_linux.outcome == 'failure'
+      # 安装程序真装一遍：运行器上是管理员（没有 UAC 确认框），静默装到临时目录 → 核对文件、friday-cli 能起、「应用和功能」的注册信息
+      # → 静默卸载 → 目录（收尾进程异步删）和注册信息都没了。失败不挡发布，最后一步把 job 标红
+      - name: Verify installer (Windows)
+        id: verify_installer
+        if: runner.os == 'Windows' && needs.prepare.outputs.has_installer == 'true'
+        continue-on-error: true
+        shell: pwsh
         run: |
-          echo "::error title=单元测试失败::产物已上传，但单元测试没有全部通过，详见「Unit tests」一步的输出"
+          $ErrorActionPreference = 'Stop'
+          $setup = Get-ChildItem -LiteralPath $env:DIST -Filter '*-setup.exe' | Select-Object -First 1
+          if (-not $setup) { throw 'dist 里没有安装程序' }
+          $dir = 'C:\FridayInstallTest'
+          $arpKey = 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Friday'
+          $log = Join-Path $env:TEMP 'friday-setup.log'
+          try {
+            $p = Start-Process -FilePath $setup.FullName -ArgumentList "/S /D=$dir" -Wait -PassThru
+            if ($p.ExitCode -ne 0) { throw "静默安装失败（退出码 $($p.ExitCode)）" }
+            foreach ($f in 'friday.exe', 'friday-cli.exe', 'uninstall.exe', 'FridaySetupUI.exe', 'package.json') {
+              if (-not (Test-Path -LiteralPath (Join-Path $dir $f))) { throw "装完缺 $f" }
+            }
+            & (Join-Path $dir 'friday-cli.exe') --version
+            if ($LASTEXITCODE -ne 0) { throw "装好的 friday-cli --version 退出码 $LASTEXITCODE" }
+            $arp = Get-ItemProperty -LiteralPath $arpKey
+            if ($arp.InstallLocation -ne $dir) { throw "注册表里的 InstallLocation 是 '$($arp.InstallLocation)'，不是 $dir" }
+            Write-Host "应用和功能：$($arp.DisplayName) $($arp.DisplayVersion)（$($arp.EstimatedSize) KB），卸载：$($arp.QuietUninstallString)"
+            $u = Start-Process -FilePath (Join-Path $dir 'uninstall.exe') -ArgumentList '/S' -Wait -PassThru
+            if ($u.ExitCode -ne 0) { throw "静默卸载失败（退出码 $($u.ExitCode)）" }
+            for ($i = 0; $i -lt 60 -and (Test-Path -LiteralPath $dir); $i++) { Start-Sleep -Seconds 1 }
+            if (Test-Path -LiteralPath $dir) { throw "卸载后程序目录还在：$dir" }
+            if (Test-Path -LiteralPath $arpKey) { throw '卸载后「应用和功能」的注册信息还在' }
+            Write-Host '安装程序核对通过：静默安装、启动、静默卸载'
+          } finally {
+            if (Test-Path -LiteralPath $log) { Write-Host '--- friday-setup.log ---'; Get-Content -LiteralPath $log -Encoding utf8 | Select-Object -Last 40 }
+          }
+
+      # deb 真装一遍：apt 补依赖 → /usr/bin/friday-cli 能起 → 卸掉
+      - name: Verify deb (Linux)
+        id: verify_deb
+        if: runner.os == 'Linux' && needs.prepare.outputs.has_installer == 'true'
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          DEB="$(ls "${DIST}"/*.deb | head -1)"
+          dpkg-deb --info "${DEB}"
+          sudo apt-get install -y "${DEB}"
+          test -x /opt/friday/AppRun
+          test -f /usr/share/applications/friday.desktop
+          env -u LD_LIBRARY_PATH QT_QPA_PLATFORM=offscreen /usr/bin/friday-cli --version
+          sudo apt-get remove -y friday
+          test ! -e /opt/friday/usr/bin/friday
+          echo "deb 核对通过：apt 安装、启动、卸载"
+
+      - name: Fail if unit tests or package checks failed
+        if: steps.tests_win.outcome == 'failure' || steps.tests_linux.outcome == 'failure' || steps.verify_installer.outcome == 'failure' || steps.verify_deb.outcome == 'failure'
+        env:
+          TESTS: ${{ steps.tests_win.outcome }}${{ steps.tests_linux.outcome }}
+          INSTALLER: ${{ steps.verify_installer.outcome }}${{ steps.verify_deb.outcome }}
+        run: |
+          case "${TESTS}" in *failure*) echo "::error title=单元测试失败::产物已上传，但单元测试没有全部通过，详见「Unit tests」一步的输出" ;; esac
+          case "${INSTALLER}" in *failure*) echo "::error title=安装包核对失败::产物已上传，但安装程序 / deb 没能装上、启动或卸掉，详见「Verify installer / deb」一步的输出" ;; esac
           exit 1
 
   # ---------------------------------------------------------------------------
@@ -747,6 +822,7 @@ jobs:
           REF_NAME: ${{ needs.prepare.outputs.ref_name }}
           SUBJECT: ${{ needs.prepare.outputs.subject }}
           HAS_QT: ${{ needs.prepare.outputs.has_qt }}
+          HAS_INSTALLER: ${{ needs.prepare.outputs.has_installer }}
           QT_RESULT: ${{ needs.qt.result }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
@@ -769,12 +845,13 @@ jobs:
           (dist / "SHA256SUMS.txt").write_text("\n".join(lines) + "\n")
           print("\n".join(lines))
 
-          qt_assets = {
-              "windows-x64-cuda": [f"Friday-{tag}-windows-x64-cuda.zip"],
-              "windows-x64-vulkan": [f"Friday-{tag}-windows-x64-vulkan.zip"],
-              "linux-x64-cuda": [f"Friday-{tag}-linux-x64-cuda.AppImage", f"Friday-{tag}-linux-x64-cuda.tar.gz"],
-              "linux-x64-vulkan": [f"Friday-{tag}-linux-x64-vulkan.AppImage", f"Friday-{tag}-linux-x64-vulkan.tar.gz"],
-          }
+          installers = env.get("HAS_INSTALLER") == "true"
+          qt_assets = {}
+          for backend in ("cuda", "vulkan"):
+              qt_assets[f"windows-x64-{backend}"] = [f"Friday-{tag}-windows-x64-{backend}.zip"] + (
+                  [f"Friday-{tag}-windows-x64-{backend}-setup.exe"] if installers else [])
+              qt_assets[f"linux-x64-{backend}"] = [f"Friday-{tag}-linux-x64-{backend}.AppImage", f"Friday-{tag}-linux-x64-{backend}.tar.gz"] + (
+                  [f"Friday-{tag}-linux-x64-{backend}.deb"] if installers else [])
           missing = [key for key, names in qt_assets.items() if not all((dist / n).exists() for n in names)]
           stable = channel == "stable"
           lines = [
@@ -792,24 +869,41 @@ jobs:
               "- 签名：Developer ID 签名并经 Apple 公证（dmg 与 app 都钉了公证票据），下载后直接打开",
           ]
           if env["HAS_QT"] == "true":
+              win_ext = "-setup.exe` / `.zip" if installers else ".zip"
+              linux_ext = ".deb` / `.AppImage` / `.tar.gz" if installers else ".AppImage` / `.tar.gz"
               lines += [
                   "",
                   "### Windows（10 / 11，x64）",
                   "",
-                  f"- `Friday-{tag}-windows-x64-cuda.zip`：NVIDIA 显卡（GTX 10 系列及更新，建议驱动 570 以上），本地模型、生图、生视频用 CUDA 加速",
-                  f"- `Friday-{tag}-windows-x64-vulkan.zip`：AMD / Intel / NVIDIA 显卡通用（需要支持 Vulkan 1.2 的显卡驱动），拿不准就选这个",
-                  "- 安装：解压到任意位置（例如 `D:\\Friday`），运行 `Friday\\friday.exe`，不需要另装 VC++ 运行库；安装包没有代码签名，首次运行时 SmartScreen 提示请点「更多信息 → 仍要运行」",
-                  "- 数据在 `%APPDATA%\\Friday`，和程序目录分开；覆盖或删除程序目录不影响会话和设置",
+                  f"- `Friday-{tag}-windows-x64-cuda{win_ext}`：NVIDIA 显卡（GTX 10 系列及更新，建议驱动 570 以上），本地模型、生图、生视频用 CUDA 加速",
+                  f"- `Friday-{tag}-windows-x64-vulkan{win_ext}`：AMD / Intel / NVIDIA 显卡通用（需要支持 Vulkan 1.2 的显卡驱动），拿不准就选这个",
+              ]
+              if installers:
+                  lines += [
+                      "- 安装程序（`-setup.exe`）：双击安装到 `C:\\Program Files\\Friday`（可改位置），建桌面和开始菜单快捷方式，在「设置 › 应用」里可以卸载；"
+                      "更新时弹一次管理员确认（UAC）",
+                      "- 便携版（`.zip`）：解压到任意位置（例如 `D:\\Friday`），运行 `Friday\\friday.exe`；放在用户可写的目录时自动更新不需要管理员确认",
+                  ]
+              else:
+                  lines += ["- 安装：解压到任意位置（例如 `D:\\Friday`），运行 `Friday\\friday.exe`"]
+              lines += [
+                  "- 不需要另装 VC++ 运行库；没有代码签名，首次运行时 SmartScreen 提示请点「更多信息 → 仍要运行」",
+                  "- 数据在 `%APPDATA%\\Friday`，和程序目录分开；覆盖、删除或卸载程序都不影响会话和设置",
                   "",
                   "### Linux（x64，glibc 2.35 以上：Ubuntu 22.04 / Debian 12 / Fedora 36 及更新）",
                   "",
-                  f"- `Friday-{tag}-linux-x64-cuda.AppImage` / `.tar.gz`：NVIDIA 显卡（专有驱动 570 以上）",
-                  f"- `Friday-{tag}-linux-x64-vulkan.AppImage` / `.tar.gz`：AMD / Intel / NVIDIA 通用（Mesa 或厂商的 Vulkan 驱动，需要 libvulkan1）",
+                  f"- `Friday-{tag}-linux-x64-cuda{linux_ext}`：NVIDIA 显卡（专有驱动 570 以上）",
+                  f"- `Friday-{tag}-linux-x64-vulkan{linux_ext}`：AMD / Intel / NVIDIA 通用（Mesa 或厂商的 Vulkan 驱动，需要 libvulkan1）",
+              ]
+              if installers:
+                  lines += ["- deb（Debian / Ubuntu 系）：`sudo apt install ./Friday-*.deb`，装到 `/opt/friday`，应用菜单里有 Friday，"
+                            "命令行 `friday` / `friday-cli`；`sudo apt remove friday` 卸载；更新时弹一次密码确认"]
+              lines += [
                   "- AppImage：`chmod +x Friday-*.AppImage` 后直接运行；系统没有 FUSE 时加 `--appimage-extract-and-run` 参数，或改用 tar.gz",
                   "- tar.gz：解压后运行 `Friday/AppRun`；朗读功能需要系统装有 speech-dispatcher",
                   "- 数据在 `~/.local/share/Friday`（或 `$XDG_DATA_HOME/Friday`）",
                   "",
-                  "Windows / Linux 版同样读取 latest.json 按「系统-架构-后端」取对应的安装包更新。",
+                  "Windows / Linux 版同样读取 latest.json 按「系统-架构-后端」和安装方式（便携版 / 安装程序 / AppImage / deb / tar.gz）取对应的包更新。",
               ]
               if missing:
                   lines += ["", f"> ⚠️ 本次缺少以下 Windows / Linux 安装包（构建失败，详见构建日志）：{'、'.join(missing)}"]
@@ -835,8 +929,10 @@ jobs:
           files: |
             dist/*.dmg
             dist/*.zip
+            dist/*-setup.exe
             dist/*.AppImage
             dist/*.tar.gz
+            dist/*.deb
             dist/SHA256SUMS.txt
 
       - name: Keep only the latest release per channel
@@ -895,18 +991,25 @@ jobs:
                   "size": path.stat().st_size,
               }
 
-          # Qt 版按 "<系统>-<架构>-<后端>" 取自己的包；Linux 条目是 AppImage，tar.gz 挂在 tarball 下
+          # Qt 版按 "<系统>-<架构>-<后端>" 取自己的包；Windows 条目是 zip，安装程序挂在 installer 下；Linux 条目是 AppImage，
+          # tar.gz 挂在 tarball 下、deb 挂在 deb 下（应用按自己的安装方式取，见源码 qt/docs/PACKAGING.md §4）
           # （macOS 版的 ReleaseEntry 是编译器合成的 Codable，解码时忽略这个多出来的键）
           assets = {}
           for backend in ("cuda", "vulkan"):
               win = asset(f"Friday-{tag}-windows-x64-{backend}.zip")
               if win:
+                  installer = asset(f"Friday-{tag}-windows-x64-{backend}-setup.exe")
+                  if installer:
+                      win["installer"] = installer
                   assets[f"windows-x64-{backend}"] = win
               appimage = asset(f"Friday-{tag}-linux-x64-{backend}.AppImage")
               if appimage:
                   tarball = asset(f"Friday-{tag}-linux-x64-{backend}.tar.gz")
                   if tarball:
                       appimage["tarball"] = tarball
+                  deb = asset(f"Friday-{tag}-linux-x64-{backend}.deb")
+                  if deb:
+                      appimage["deb"] = deb
                   assets[f"linux-x64-{backend}"] = appimage
 
           entry = {
