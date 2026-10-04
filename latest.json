@@ -1,59 +1,59 @@
 {
   "beta": {
-    "tag": "v1.19.2-beta",
-    "version": "1.19.2",
-    "build": 112,
+    "tag": "v1.19.4-beta",
+    "version": "1.19.4",
+    "build": 114,
     "channel": "beta",
-    "date": "2026-10-04T08:17:27Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.19.2-beta/Friday-v1.19.2-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.19.2-beta/Friday-v1.19.2-beta-macOS-arm64.dmg",
-    "sha256": "791afc5524cddec46fd564a32fb11d0b9a07efdb645d70b6012d6e648b01212f",
-    "size": 39864297,
-    "notes": "额度用完时等它恢复：各家在线服务通用地认限流、周期额度和余额不足，读出服务端说的恢复时间，这一轮先停下、到点自动接着做（重启、睡眠唤�",
+    "date": "2026-10-04T08:36:36Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.19.4-beta/Friday-v1.19.4-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.19.4-beta/Friday-v1.19.4-beta-macOS-arm64.dmg",
+    "sha256": "23aea1dc644f13753a24827691047c1c958755102eff5e20500a58b540d72296",
+    "size": 39864527,
+    "notes": "整理 LUCA：新增 docs/LUCA.md（触发时机与条件总表、幻觉线与实验室流程、计数与死亡规则、参数、Swift / Qt 对照、待定问题），README 的 LUCA 段落精简并�",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.19.2-beta",
-    "source": "12b5669ba9040aa86b79d5890015a8a1137ad9fb",
-    "branch": "ccr-cc0ac676-bnciv7",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.19.4-beta",
+    "source": "759d664f10424c91ab5ecb37da847dd4ccc0a57c",
+    "branch": "ccr-451fa374-l94uze",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.19.2-beta-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.19.2-beta/Friday-v1.19.2-beta-windows-x64-cuda.zip",
-        "sha256": "fcf1519fd4ee76d49511669333c4330e216fb65a448ee5b6cc4a9b38e1d320a1",
-        "size": 798686284
+        "name": "Friday-v1.19.4-beta-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.19.4-beta/Friday-v1.19.4-beta-windows-x64-cuda.zip",
+        "sha256": "b2d526542e2d33ba1400194757ff698ff781a7291c81b6da67b722cdde9ee474",
+        "size": 798686188
       },
       "linux-x64-cuda": {
-        "name": "Friday-v1.19.2-beta-linux-x64-cuda.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.19.2-beta/Friday-v1.19.2-beta-linux-x64-cuda.AppImage",
-        "sha256": "bf84d943f4886356c31afd57479c1d6a0ccbfcf4c8fd2284beda4d8cd7634bf3",
+        "name": "Friday-v1.19.4-beta-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.19.4-beta/Friday-v1.19.4-beta-linux-x64-cuda.AppImage",
+        "sha256": "f2f9d37de930643fdbe425de7766b0884ee4fdd08ddbb7309502133c58536412",
         "size": 822172152,
         "tarball": {
-          "name": "Friday-v1.19.2-beta-linux-x64-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.19.2-beta/Friday-v1.19.2-beta-linux-x64-cuda.tar.gz",
-          "sha256": "8c68527d2ebabc94d188a2996418a508dc4ce8975a062b7c49cae1622ce9ba84",
-          "size": 860306918
+          "name": "Friday-v1.19.4-beta-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.19.4-beta/Friday-v1.19.4-beta-linux-x64-cuda.tar.gz",
+          "sha256": "50faf53de26460acf75e5ba808d2fe2fefdaad3586563190f848327a49801268",
+          "size": 860307427
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.19.2-beta-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.19.2-beta/Friday-v1.19.2-beta-windows-x64-vulkan.zip",
-        "sha256": "f0688b1c36cae73aeeee87af5d9d9b169d820137f33d489839044665b67136b6",
-        "size": 103342024
+        "name": "Friday-v1.19.4-beta-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.19.4-beta/Friday-v1.19.4-beta-windows-x64-vulkan.zip",
+        "sha256": "ea1a54a47577a13a3b889bd948fda39439a1fe4e1767ccba7c57120e3207719f",
+        "size": 103341999
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v1.19.2-beta-linux-x64-vulkan.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.19.2-beta/Friday-v1.19.2-beta-linux-x64-vulkan.AppImage",
-        "sha256": "f0addade77667317b5ab4060acddbc229f854027fe760b61d0f50bf0f4b07890",
+        "name": "Friday-v1.19.4-beta-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.19.4-beta/Friday-v1.19.4-beta-linux-x64-vulkan.AppImage",
+        "sha256": "f56a0f722cc8f68cb132a590c3cec3be6ecb8b8e8cb589341ca4cd7182d33f71",
         "size": 115112440,
         "tarball": {
-          "name": "Friday-v1.19.2-beta-linux-x64-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.19.2-beta/Friday-v1.19.2-beta-linux-x64-vulkan.tar.gz",
-          "sha256": "5f16183cc731f93a93cdbfa9043412816824746c2b279cc253310f0a26750a83",
-          "size": 131951540
+          "name": "Friday-v1.19.4-beta-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.19.4-beta/Friday-v1.19.4-beta-linux-x64-vulkan.tar.gz",
+          "sha256": "9f47bc4b5ef89caff7f70c8794f5cdb1e73ceb53e4194047e317e682b278eacd",
+          "size": 131951943
         }
       }
     }
   },
-  "updatedAt": "2026-10-04T08:23:01Z",
+  "updatedAt": "2026-10-04T08:36:36Z",
   "stable": {
     "tag": "v1.19.3",
     "version": "1.19.3",
