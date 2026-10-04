@@ -1,59 +1,59 @@
 {
   "beta": {
-    "tag": "v1.20.3-beta",
-    "version": "1.20.3",
-    "build": 121,
+    "tag": "v1.20.4-beta",
+    "version": "1.20.4",
+    "build": 122,
     "channel": "beta",
-    "date": "2026-10-04T15:43:13Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.20.3-beta/Friday-v1.20.3-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.20.3-beta/Friday-v1.20.3-beta-macOS-arm64.dmg",
-    "sha256": "ea845d2deeb204a146db1666a2ce37243416409ea70f1264c4faafd1d4ca1778",
-    "size": 39982729,
-    "notes": "不再误导主 Agent：应用退出时中断的子 Agent 卡片写明不会再交回结果、要接着做就重新派发，Qt 退出途中被取消的后台子 Agent 不再记成「被用户停止」",
+    "date": "2026-10-04T16:53:12Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.20.4-beta/Friday-v1.20.4-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.20.4-beta/Friday-v1.20.4-beta-macOS-arm64.dmg",
+    "sha256": "7c8ca2eea1696227c9325fca2dda7ce75ea4d6e5d4e7f35281517b99e2dbd74f",
+    "size": 39998935,
+    "notes": "run_shell 拦下会结束 Friday 自己的命令；在线请求遇到模型不接受的可选参数（如 temperature）去掉重发并按引擎记住；Qt 的 HTTP/2 断线算网络临时故障；大",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.20.3-beta",
-    "source": "9246d1af6f08bd25f571e5445313a9c0ef82c390",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.20.4-beta",
+    "source": "3dab57ab66febd1c6744d2dab06c0a7cc9f4b0ad",
     "branch": "v1.20",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.20.3-beta-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.3-beta/Friday-v1.20.3-beta-windows-x64-cuda.zip",
-        "sha256": "2539d09ae7a27ad9c71be6ded5ca68d392439cbbe3170a96aa51d8eaf501bba8",
-        "size": 798831430
+        "name": "Friday-v1.20.4-beta-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.4-beta/Friday-v1.20.4-beta-windows-x64-cuda.zip",
+        "sha256": "7e555c6d99c19b2aef81eb02f3bc516cf67eb2c5867347060a1630c9dae267b3",
+        "size": 798842163
       },
       "linux-x64-cuda": {
-        "name": "Friday-v1.20.3-beta-linux-x64-cuda.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.3-beta/Friday-v1.20.3-beta-linux-x64-cuda.AppImage",
-        "sha256": "a2b0d816a2a8810798a3cac88028d365859968b54d1d6854b38f03395342a561",
-        "size": 822372856,
+        "name": "Friday-v1.20.4-beta-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.4-beta/Friday-v1.20.4-beta-linux-x64-cuda.AppImage",
+        "sha256": "3263d4c179e457f78d2dcf530c5f3f1d12bc88c09f88453e7a7eb328dcd9a0f3",
+        "size": 822393336,
         "tarball": {
-          "name": "Friday-v1.20.3-beta-linux-x64-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.3-beta/Friday-v1.20.3-beta-linux-x64-cuda.tar.gz",
-          "sha256": "dd742a92f4ec8d85dce3ea1242b1ce3fdbaa98559b384b20ba27910cb711d7cf",
-          "size": 860526595
+          "name": "Friday-v1.20.4-beta-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.4-beta/Friday-v1.20.4-beta-linux-x64-cuda.tar.gz",
+          "sha256": "71bc1a99300bd24a868198769e17e66493a730ea7619477ebc25a548dd5dccd4",
+          "size": 860534394
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.20.3-beta-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.3-beta/Friday-v1.20.3-beta-windows-x64-vulkan.zip",
-        "sha256": "3942a8337c3b50a8bcd1ac53996a90776a88ee062e9e3f31a5b5498802c17508",
-        "size": 103486981
+        "name": "Friday-v1.20.4-beta-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.4-beta/Friday-v1.20.4-beta-windows-x64-vulkan.zip",
+        "sha256": "af49d387ec7705ddda1906a9e293ba4ee3300d4368fb723693e9943e1fd39891",
+        "size": 103497798
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v1.20.3-beta-linux-x64-vulkan.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.3-beta/Friday-v1.20.3-beta-linux-x64-vulkan.AppImage",
-        "sha256": "3a757f42d2cedcec2a9829e82b3b223a1e86785aa1e86e79b859fba19ebfc9df",
-        "size": 115313144,
+        "name": "Friday-v1.20.4-beta-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.4-beta/Friday-v1.20.4-beta-linux-x64-vulkan.AppImage",
+        "sha256": "b7029971a577df1be6fa4834a48e3c8c62edbb7da74f1e3c24daf2fde92361f7",
+        "size": 115333624,
         "tarball": {
-          "name": "Friday-v1.20.3-beta-linux-x64-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.3-beta/Friday-v1.20.3-beta-linux-x64-vulkan.tar.gz",
-          "sha256": "f49c0b7c2b16a77f2d3107443116d01882ab8a632ddcc2cfe61d14c91b917da7",
-          "size": 132167203
+          "name": "Friday-v1.20.4-beta-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.4-beta/Friday-v1.20.4-beta-linux-x64-vulkan.tar.gz",
+          "sha256": "9683b664dd45dffe8ed75e81fa913d21213c320c8cc6f4ed520754b2559e0dec",
+          "size": 132176068
         }
       }
     }
   },
-  "updatedAt": "2026-10-04T15:43:13Z",
+  "updatedAt": "2026-10-04T16:53:12Z",
   "stable": {
     "tag": "v1.19.6",
     "version": "1.19.6",
