@@ -77,57 +77,81 @@
       }
     }
   },
-  "updatedAt": "2026-10-05T04:29:51Z",
+  "updatedAt": "2026-10-05T04:56:45Z",
   "stable": {
-    "tag": "v1.20.7",
-    "version": "1.20.7",
-    "build": 125,
+    "tag": "v1.21.2",
+    "version": "1.21.2",
+    "build": 129,
     "channel": "stable",
-    "date": "2026-10-04T19:02:46Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.20.7/Friday-v1.20.7-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.20.7/Friday-v1.20.7-macOS-arm64.dmg",
-    "sha256": "06b838b73e06ee4609d12ff31ce28f1fc43ce42e1ec2513c01abcc14359857f2",
-    "size": 40048801,
-    "notes": "合并 v1.20：深度思考加 Ultra 档（只有 Ultra 才多层派发）；web_search 改用内置多引擎搜索；friday-cli 等后台子 Agent 做完再退出；设置 › Agent 可选哪些事�",
+    "date": "2026-10-05T04:56:45Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v1.21.2/Friday-v1.21.2-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v1.21.2/Friday-v1.21.2-macOS-arm64.dmg",
+    "sha256": "8f016bba79835bcdf6b3487cd2964ae95a4659213611fd39425adfc51126e881",
+    "size": 40048935,
+    "notes": "合并 v1.21：Windows 出安装程序（移植 Secret-Chat 的自制安装器，装到 Program Files、快捷方式与「应用和功能」卸载入口）、Linux 出 deb（装到 /opt/friday）；�",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.20.7",
-    "source": "1a78fa68070ea7058b5bf2e4bc3914a7249a286b",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v1.21.2",
+    "source": "68d840eb90ed1cb6926239429fdac6bb0d144173",
     "branch": "main",
     "assets": {
       "windows-x64-cuda": {
-        "name": "Friday-v1.20.7-windows-x64-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.7/Friday-v1.20.7-windows-x64-cuda.zip",
-        "sha256": "e03def44cebea698f5706802699daa1e3eff65536ca5561a55137e25df3db00b",
-        "size": 798871174
+        "name": "Friday-v1.21.2-windows-x64-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.21.2/Friday-v1.21.2-windows-x64-cuda.zip",
+        "sha256": "1f6b4a212765bd8045fdb96bee8d2bfd7c2d09150c0397d9a8ec2a818ca83627",
+        "size": 798877238,
+        "installer": {
+          "name": "Friday-v1.21.2-windows-x64-cuda-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.21.2/Friday-v1.21.2-windows-x64-cuda-setup.exe",
+          "sha256": "0133a17f501f67dbb4a05050608effc906da28b33e25abf303c1e1999fceaae0",
+          "size": 641419137
+        }
       },
       "linux-x64-cuda": {
-        "name": "Friday-v1.20.7-linux-x64-cuda.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.7/Friday-v1.20.7-linux-x64-cuda.AppImage",
-        "sha256": "7c6afa347da80a409be9b55c4d3d08d6a53ed505eee3bb08b14352d35a4ee5d0",
-        "size": 822426104,
+        "name": "Friday-v1.21.2-linux-x64-cuda.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.21.2/Friday-v1.21.2-linux-x64-cuda.AppImage",
+        "sha256": "fb319df0ecf8c8b76cc988fa2575150e4b168838e7a57cfcaff2bb458bf33fdd",
+        "size": 822450680,
         "tarball": {
-          "name": "Friday-v1.20.7-linux-x64-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.7/Friday-v1.20.7-linux-x64-cuda.tar.gz",
-          "sha256": "add536c2de74323433c44e589f26c950484c86ebc29a3a4345703f09bf81e066",
-          "size": 860574266
+          "name": "Friday-v1.21.2-linux-x64-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.21.2/Friday-v1.21.2-linux-x64-cuda.tar.gz",
+          "sha256": "f9f19487718aa1bd6f248102c74a424103f9d8727dd7fc45d875fd92180fbc52",
+          "size": 860584010
+        },
+        "deb": {
+          "name": "Friday-v1.21.2-linux-x64-cuda.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.21.2/Friday-v1.21.2-linux-x64-cuda.deb",
+          "sha256": "51f3fa1f3b7ed418c0e4d55c388d96dd5d15a58d535f42c2447492ed0a293ded",
+          "size": 688691840
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v1.20.7-windows-x64-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.7/Friday-v1.20.7-windows-x64-vulkan.zip",
-        "sha256": "cb2485540ee71eaccf74d3b1643c09fa55d20af0195f0b9eea79adf7bf4d178f",
-        "size": 103526776
+        "name": "Friday-v1.21.2-windows-x64-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.21.2/Friday-v1.21.2-windows-x64-vulkan.zip",
+        "sha256": "9b2e1a3534c2ca020bd134e44905126b0e779e7231576f252f8f51e9078b4311",
+        "size": 103532967,
+        "installer": {
+          "name": "Friday-v1.21.2-windows-x64-vulkan-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.21.2/Friday-v1.21.2-windows-x64-vulkan-setup.exe",
+          "sha256": "6a410c8dcc89623594323644e5f8802ebf9feb741ca8aca06ac4fe274197f26a",
+          "size": 60738732
+        }
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v1.20.7-linux-x64-vulkan.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.7/Friday-v1.20.7-linux-x64-vulkan.AppImage",
-        "sha256": "78e88bed874eac41e9c30b45f85045659222121ae80d1d75ed099402ffbde30b",
-        "size": 115366392,
+        "name": "Friday-v1.21.2-linux-x64-vulkan.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v1.21.2/Friday-v1.21.2-linux-x64-vulkan.AppImage",
+        "sha256": "c3d6e55288761f8382b445582924e37e0a6428633547399b2cbab89252c00510",
+        "size": 115386872,
         "tarball": {
-          "name": "Friday-v1.20.7-linux-x64-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.20.7/Friday-v1.20.7-linux-x64-vulkan.tar.gz",
-          "sha256": "74945c8bc17988bd0353928a451d06cd6ce35ae7d71fa322191bad6c5776bd73",
-          "size": 132230282
+          "name": "Friday-v1.21.2-linux-x64-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.21.2/Friday-v1.21.2-linux-x64-vulkan.tar.gz",
+          "sha256": "bcc5a9ffdc2a72056004e2e0a8828689e1fb1650dbf32abf67afce9aec52fd23",
+          "size": 132228609
+        },
+        "deb": {
+          "name": "Friday-v1.21.2-linux-x64-vulkan.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v1.21.2/Friday-v1.21.2-linux-x64-vulkan.deb",
+          "sha256": "8d54a4548aa4fe3d54358ffce4cc923ab9ffcda4ea3aa407e662ed74398cdde9",
+          "size": 77955752
         }
       }
     }
