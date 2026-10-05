@@ -8,9 +8,10 @@ name: Build and release Friday
 #      每次打包自动 +1（按已有标签数）；main 分支的提交发正式版（标签 vX.Y.Z），其他分支发预发布（vX.Y.Z-beta）；
 #   4. macos：导入 Developer ID 证书，调用源码里的 Friday/Tools/CI/build.sh 构建、签名、打包，再签 dmg、公证并钉票据
 #      （缺证书或公证密钥、公证不通过都直接失败，不发未公证的包）；
-#      qt：Windows / Linux 的 Qt 版，CUDA 与 Vulkan 各一套包（调用源码里的 qt/ci/ 脚本）：Windows 出 zip 便携版 + 安装程序
+#      qt：Windows / Linux 的 Qt 版（调用源码里的 qt/ci/ 脚本）：Windows 出 zip 便携版 + 安装程序
 #      （-setup.exe，源码 qt/installer/ 的自制安装器；在运行器上静默装一遍、卸一遍核对），Linux 出 AppImage + tar.gz + deb
-#      （deb 在运行器上 apt 装一遍核对）；老源码没有安装程序时只出 zip；
+#      （deb 在运行器上 apt 装一遍核对）；老源码没有安装程序时只出 zip。
+#      v2.0 起源码不带本地推理：每个平台一套包；老源码（还有 qt/ci/build_backends.sh）照旧 CUDA 与 Vulkan 各一套；
 #   5. release：macOS 成功才发布（Qt 某个组合失败照样发布其余产物，并在说明里注明缺哪些）；
 #      正式版和预发布各只保留最新的一个 Release（旧的连安装包一起删，标签保留以便继续计数）；
 #   6. 发布后更新仓库根目录的 latest.json（每个渠道最新的一次发布，含各平台安装包 assets），Friday 应用定期读它来自动更新。
@@ -32,7 +33,7 @@ on:
         type: boolean
         default: false
       qt:
-        description: "同时构建 Windows / Linux 版（Qt，CUDA + Vulkan）"
+        description: "同时构建 Windows / Linux 版（Qt）"
         type: boolean
         default: true
 
@@ -68,6 +69,8 @@ jobs:
       min_os: ${{ steps.inspect.outputs.min_os }}
       has_qt: ${{ steps.inspect.outputs.has_qt }}
       has_installer: ${{ steps.inspect.outputs.has_installer }}
+      qt_backends: ${{ steps.inspect.outputs.qt_backends }}
+      has_mlx: ${{ steps.inspect.outputs.has_mlx }}
       release_tag: ${{ steps.version.outputs.release_tag }}
       marketing: ${{ steps.version.outputs.marketing }}
       channel: ${{ steps.version.outputs.channel }}
@@ -114,6 +117,7 @@ jobs:
             /Friday/Friday.xcodeproj/project.pbxproj
             /qt/CMakeLists.txt
             /qt/ci/deps.env
+            /qt/ci/build_backends.sh
             /qt/installer/CMakeLists.txt
 
       - name: Inspect source
@@ -133,13 +137,22 @@ jobs:
           # 源码有 qt/installer/（自制 Windows 安装程序）时 Windows 另出 -setup.exe、Linux 另出 deb；老分支只出 zip / AppImage / tar.gz
           HAS_INSTALLER=false
           if [ "${HAS_QT}" = "true" ] && [ -f src/qt/installer/CMakeLists.txt ]; then HAS_INSTALLER=true; fi
+          # Qt 版有几套包：源码还带本地推理（有 qt/ci/build_backends.sh，v2.0 之前）时 CUDA 与 Vulkan 各一套；
+          # v2.0 起不带，每个平台一套（矩阵里记作 none，包名、latest.json 的键都不带后端）
+          QT_BACKENDS='["none"]'
+          if [ -f src/qt/ci/build_backends.sh ]; then QT_BACKENDS='["cuda","vulkan"]'; fi
+          # macOS 版还用 MLX（本地模型跑在 Metal 上）时才要装 Metal 编译器
+          HAS_MLX=false
+          if grep -q 'mlx-swift' src/Friday/Friday.xcodeproj/project.pbxproj; then HAS_MLX=true; fi
           {
             echo "sha=${SHA}"
             echo "min_os=${MIN_OS:-26.0}"
             echo "has_qt=${HAS_QT}"
             echo "has_installer=${HAS_INSTALLER}"
+            echo "qt_backends=${QT_BACKENDS}"
+            echo "has_mlx=${HAS_MLX}"
           } >> "${GITHUB_OUTPUT}"
-          echo "提交 ${SHA}，最低 macOS ${MIN_OS:-26.0}，构建 Qt 版=${HAS_QT}，安装程序 / deb=${HAS_INSTALLER}"
+          echo "提交 ${SHA}，最低 macOS ${MIN_OS:-26.0}，构建 Qt 版=${HAS_QT}（${QT_BACKENDS}），安装程序 / deb=${HAS_INSTALLER}，MLX=${HAS_MLX}"
 
       - name: Checkout this repository (for tag reservation)
         uses: actions/checkout@v4
@@ -242,7 +255,7 @@ jobs:
           echo "分支 ${REF_NAME} → 版本 ${MARKETING}，构建号 ${GITHUB_RUN_NUMBER}，渠道 ${CHANNEL}，Release 标签 ${RELEASE_TAG}，预发布=${PRERELEASE}"
 
   # ---------------------------------------------------------------------------
-  # macOS（Swift + MLX）：构建、签名、公证，产物上传为 artifact，由 release 统一发布
+  # macOS（Swift）：构建、签名、公证，产物上传为 artifact，由 release 统一发布
   # ---------------------------------------------------------------------------
   macos:
     name: Build and sign (macOS arm64)
@@ -269,6 +282,7 @@ jobs:
           sw_vers
 
       - name: Install Metal toolchain
+        if: needs.prepare.outputs.has_mlx == 'true'
         run: |
           # MLX 的 Metal 内核需要 Metal 编译器（Xcode 26 起需单独下载）
           if xcrun metal --version >/dev/null 2>&1; then
@@ -458,11 +472,12 @@ jobs:
         run: security delete-keychain "${{ steps.signing.outputs.keychain }}" || true
 
   # ---------------------------------------------------------------------------
-  # Windows / Linux（Qt 6 + llama.cpp / stable-diffusion.cpp）：CUDA 与 Vulkan 各一个包
-  # 工具链版本（Qt / CUDA / Vulkan SDK / 依赖标签）都钉在源码的 qt/ci/deps.env 里
+  # Windows / Linux（Qt 6）：v2.0 起每个平台一个包（矩阵的 backend 是 none）；
+  # v2.0 之前的源码带本地推理（llama.cpp / stable-diffusion.cpp），CUDA 与 Vulkan 各一个包
+  # 工具链版本（Qt，老源码还有 CUDA / Vulkan SDK / 依赖标签）都钉在源码的 qt/ci/deps.env 里
   # ---------------------------------------------------------------------------
   qt:
-    name: Qt ${{ matrix.platform }} (${{ matrix.backend }})
+    name: Qt ${{ matrix.platform }}${{ matrix.backend != 'none' && format(' ({0})', matrix.backend) || '' }}
     needs: prepare
     if: ${{ needs.prepare.outputs.has_qt == 'true' }}
     runs-on: ${{ matrix.os }}
@@ -472,7 +487,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2022, ubuntu-22.04]
-        backend: [cuda, vulkan]
+        backend: ${{ fromJSON(needs.prepare.outputs.qt_backends) }}
         include:
           - os: windows-2022
             platform: windows-x64
@@ -489,7 +504,9 @@ jobs:
       FRIDAY_BUILD_NUMBER: ${{ github.run_number }}
       FRIDAY_RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
       FRIDAY_RELEASE_CHANNEL: ${{ needs.prepare.outputs.channel }}
-      FRIDAY_GPU_BACKEND: ${{ matrix.backend }}
+      FRIDAY_GPU_BACKEND: ${{ matrix.backend != 'none' && matrix.backend || '' }}
+      # 产物名：Friday-<标签>-<平台>，老源码再加 -<后端>
+      ARTIFACT: Friday-${{ needs.prepare.outputs.release_tag }}-${{ matrix.platform }}${{ matrix.backend != 'none' && format('-{0}', matrix.backend) || '' }}
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -518,8 +535,10 @@ jobs:
           set -euo pipefail
           sudo apt-get update -y
           # g++-12：C++20 支持更完整，且 22.04 自带的 libstdc++ 就是 12，编出来的程序在原版 22.04 上能跑
-          # 其余：Qt 运行 / 部署（xcb、Wayland、朗读、多媒体）、Vulkan 加载器（libvulkan-dev 提供链接用的 libvulkan.so：
-          # LunarG 的 Linux SDK 只带头文件和 glslc，不带加载器）、AppImage 工具需要的库
+          # 其余：Qt 运行 / 部署（xcb、Wayland、朗读、多媒体）、AppImage 工具需要的库；
+          # 老源码（带本地推理）另要 Vulkan 加载器（libvulkan-dev 提供链接用的 libvulkan.so：LunarG 的 Linux SDK 只带头文件和 glslc，不带加载器）
+          VULKAN=()
+          if [ "${{ matrix.backend }}" != "none" ]; then VULKAN=(libvulkan1 libvulkan-dev); fi
           sudo apt-get install -y --no-install-recommends \
             g++-12 ninja-build ccache pigz file desktop-file-utils patchelf \
             libgl1-mesa-dev libegl1 libopengl0 libxkbcommon0 libxkbcommon-x11-0 \
@@ -527,7 +546,7 @@ jobs:
             libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 libxcb-xinput0 libfontconfig1 libfreetype6 libdbus-1-3 libglib2.0-0 \
             libwayland-client0 libwayland-cursor0 libwayland-egl1 \
             libspeechd2 libpulse0 libva2 libva-drm2 libva-x11-2 libvdpau1 \
-            libvulkan1 libvulkan-dev
+            "${VULKAN[@]}"
           {
             echo "CC=gcc-12"
             echo "CXX=g++-12"
@@ -611,9 +630,10 @@ jobs:
           max-size: 2G
           create-symlink: false
 
-      # 后端按组件分别缓存（stage/llama、stage/sd，里面有构建戳）：依赖版本、工具链、构建脚本不变就不重编
+      # 后端按组件分别缓存（stage/llama、stage/sd，里面有构建戳）：依赖版本、工具链、构建脚本不变就不重编（只有老源码有后端）
       - name: Restore llama-server cache
         id: cache-llama
+        if: matrix.backend != 'none'
         uses: actions/cache/restore@v4
         with:
           path: build/backend/stage/llama
@@ -621,30 +641,31 @@ jobs:
 
       - name: Restore sd-cli cache
         id: cache-sd
+        if: matrix.backend != 'none'
         uses: actions/cache/restore@v4
         with:
           path: build/backend/stage/sd
           key: backend-sd-${{ matrix.platform }}-${{ matrix.backend }}-${{ env.SD_CPP_TAG }}-${{ env.SD_GGML_COMMIT }}-${{ matrix.backend == 'cuda' && format('{0}-{1}', env.FRIDAY_CUDA_VERSION, env.FRIDAY_CUDA_ARCHITECTURES) || env.FRIDAY_VULKAN_SDK_VERSION }}-${{ hashFiles('src/qt/ci/build_backends.sh', 'src/qt/ci/build_backends.ps1') }}
 
       - name: Build backends (Windows)
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && matrix.backend != 'none'
         shell: pwsh
         run: pwsh -NoProfile -File src/qt/ci/build_backends.ps1 -Backend ${{ matrix.backend }} -Out "$env:BACKEND_OUT"
 
       - name: Build backends (Linux)
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && matrix.backend != 'none'
         run: bash src/qt/ci/build_backends.sh --backend ${{ matrix.backend }} --out "${BACKEND_OUT}"
 
       # 后端一编好就存缓存（不等整个 job 成功），后面应用或打包失败也不用重编 CUDA
       - name: Save llama-server cache
-        if: steps.cache-llama.outputs.cache-hit != 'true'
+        if: matrix.backend != 'none' && steps.cache-llama.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: build/backend/stage/llama
           key: ${{ steps.cache-llama.outputs.cache-primary-key }}
 
       - name: Save sd-cli cache
-        if: steps.cache-sd.outputs.cache-hit != 'true'
+        if: matrix.backend != 'none' && steps.cache-sd.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: build/backend/stage/sd
@@ -674,33 +695,38 @@ jobs:
         continue-on-error: true
         run: bash src/qt/ci/run_tests.sh --build-dir "${APP_BUILD}"
 
-      # 源码有 qt/installer/ 时另出安装程序：部件由 build_app 一起编好，在 <构建目录>/installer 下（老源码的打包脚本不认 -InstallerDir，不传）
+      # 源码有 qt/installer/ 时另出安装程序：部件由 build_app 一起编好，在 <构建目录>/installer 下（老源码的打包脚本不认 -InstallerDir，不传）；
+      # 老源码（带本地推理）的打包脚本要 -Backend 和过渡期的 backend 目录
       - name: Package (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         env:
           HAS_INSTALLER: ${{ needs.prepare.outputs.has_installer }}
+          BACKEND: ${{ matrix.backend }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $pkgArgs = @('-Backend', '${{ matrix.backend }}', '-Stage', "$env:APP_STAGE", '-BackendDir', "$env:BACKEND_OUT/backend",
-                       '-Tag', "$env:FRIDAY_RELEASE_TAG", '-OutDir', "$env:DIST")
+          $pkgArgs = @('-Stage', "$env:APP_STAGE", '-Tag', "$env:FRIDAY_RELEASE_TAG", '-OutDir', "$env:DIST")
+          if ($env:BACKEND -ne 'none') { $pkgArgs += @('-Backend', $env:BACKEND, '-BackendDir', "$env:BACKEND_OUT/backend") }
           if ($env:HAS_INSTALLER -eq 'true') { $pkgArgs += @('-InstallerDir', "$env:APP_BUILD/installer") }
           pwsh -NoProfile -File src/qt/ci/package_windows.ps1 @pkgArgs
           if ($LASTEXITCODE -ne 0) { throw "package_windows.ps1 失败（退出码 $LASTEXITCODE）" }
 
       - name: Package (Linux)
         if: runner.os == 'Linux'
-        run: >-
-          bash src/qt/ci/package_linux.sh --backend ${{ matrix.backend }}
-          --stage "${APP_STAGE}" --backend-dir "${BACKEND_OUT}/backend" --tag "${FRIDAY_RELEASE_TAG}" --out "${DIST}"
-          --tools-dir "${RUNNER_TEMP}/appimage-tools"
+        env:
+          BACKEND: ${{ matrix.backend }}
+        run: |
+          set -euo pipefail
+          ARGS=(--stage "${APP_STAGE}" --tag "${FRIDAY_RELEASE_TAG}" --out "${DIST}" --tools-dir "${RUNNER_TEMP}/appimage-tools")
+          if [ "${BACKEND}" != "none" ]; then ARGS+=(--backend "${BACKEND}" --backend-dir "${BACKEND_OUT}/backend"); fi
+          bash src/qt/ci/package_linux.sh "${ARGS[@]}"
 
       - name: Upload artifact
         id: upload
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: Friday-${{ needs.prepare.outputs.release_tag }}-${{ matrix.platform }}-${{ matrix.backend }}
+          name: ${{ env.ARTIFACT }}
           path: |
             dist/*.zip
             dist/*-setup.exe
@@ -720,7 +746,7 @@ jobs:
         if: steps.upload.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
-          name: Friday-${{ needs.prepare.outputs.release_tag }}-${{ matrix.platform }}-${{ matrix.backend }}
+          name: ${{ env.ARTIFACT }}
           path: |
             dist/*.zip
             dist/*-setup.exe
@@ -812,6 +838,56 @@ jobs:
           merge-multiple: true
           path: dist
 
+      # v2.0 起一个平台只有一套包，1.x 的 Qt 版还按 "<系统>-<架构>-<后端>"（cuda / vulkan）找包，便携 zip 和 tar.gz 解开后还核对
+      # package.json 的 asset 要和自己一致：给它们各做一份只改了 package.json 的同内容包（-upgrade-<后端>），latest.json 里挂在老键下；
+      # 安装程序、AppImage、deb 不核对，老键直接指向新包
+      - name: Upgrade packages for 1.x (Qt)
+        if: needs.prepare.outputs.has_qt == 'true' && needs.prepare.outputs.qt_backends == '["none"]'
+        env:
+          RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import io, json, os, pathlib, re, tarfile, zipfile
+          tag = os.environ["RELEASE_TAG"]
+          dist = pathlib.Path("dist")
+
+          def patched(data, key):
+              info = json.loads(data)
+              info["asset"] = key
+              return (json.dumps(info, ensure_ascii=False, indent=2) + "\n").encode()
+
+          for backend in ("cuda", "vulkan"):
+              src = dist / f"Friday-{tag}-windows-x64.zip"
+              if src.exists():
+                  dst = dist / f"Friday-{tag}-windows-x64-upgrade-{backend}.zip"
+                  done = False
+                  with zipfile.ZipFile(src) as zin, zipfile.ZipFile(dst, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as zout:
+                      for item in zin.infolist():
+                          data = zin.read(item)
+                          if re.fullmatch(r"[^/]+/package\.json", item.filename):
+                              data, done = patched(data, f"windows-x64-{backend}"), True
+                          zout.writestr(item, data)
+                  if not done:
+                      raise SystemExit(f"{src.name} 里没有 <顶层目录>/package.json")
+                  print(f"{dst.name}（{dst.stat().st_size // 1048576} MB）")
+              src = dist / f"Friday-{tag}-linux-x64.tar.gz"
+              if src.exists():
+                  dst = dist / f"Friday-{tag}-linux-x64-upgrade-{backend}.tar.gz"
+                  done = False
+                  with tarfile.open(src, "r:gz") as tin, tarfile.open(dst, "w:gz", compresslevel=6) as tout:
+                      for member in tin:
+                          if member.isfile() and re.fullmatch(r"[^/]+/usr/bin/package\.json", member.name):
+                              data, done = patched(tin.extractfile(member).read(), f"linux-x64-{backend}"), True
+                              member.size = len(data)
+                              tout.addfile(member, io.BytesIO(data))
+                          else:
+                              tout.addfile(member, tin.extractfile(member) if member.isfile() else None)
+                  if not done:
+                      raise SystemExit(f"{src.name} 里没有 <顶层目录>/usr/bin/package.json")
+                  print(f"{dst.name}（{dst.stat().st_size // 1048576} MB）")
+          PY
+
       - name: Checksums and release notes
         id: notes
         env:
@@ -823,13 +899,14 @@ jobs:
           SUBJECT: ${{ needs.prepare.outputs.subject }}
           HAS_QT: ${{ needs.prepare.outputs.has_qt }}
           HAS_INSTALLER: ${{ needs.prepare.outputs.has_installer }}
+          QT_BACKENDS: ${{ needs.prepare.outputs.qt_backends }}
           QT_RESULT: ${{ needs.qt.result }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
           export NOTES="${RUNNER_TEMP}/release-notes.md" RUN_NUMBER="${GITHUB_RUN_NUMBER}"
           python3 - <<'PY'
-          import hashlib, os, pathlib
+          import hashlib, json, os, pathlib
           env = os.environ
           tag, marketing, channel = env["RELEASE_TAG"], env["MARKETING"], env["CHANNEL"]
           dist = pathlib.Path("dist")
@@ -846,12 +923,15 @@ jobs:
           print("\n".join(lines))
 
           installers = env.get("HAS_INSTALLER") == "true"
+          # 包名里的后端：老源码 -cuda / -vulkan，v2.0 起没有
+          suffixes = [f"-{b}" if b != "none" else "" for b in json.loads(env.get("QT_BACKENDS") or '["none"]')]
+          gpu = suffixes != [""]
           qt_assets = {}
-          for backend in ("cuda", "vulkan"):
-              qt_assets[f"windows-x64-{backend}"] = [f"Friday-{tag}-windows-x64-{backend}.zip"] + (
-                  [f"Friday-{tag}-windows-x64-{backend}-setup.exe"] if installers else [])
-              qt_assets[f"linux-x64-{backend}"] = [f"Friday-{tag}-linux-x64-{backend}.AppImage", f"Friday-{tag}-linux-x64-{backend}.tar.gz"] + (
-                  [f"Friday-{tag}-linux-x64-{backend}.deb"] if installers else [])
+          for suffix in suffixes:
+              qt_assets[f"windows-x64{suffix}"] = [f"Friday-{tag}-windows-x64{suffix}.zip"] + (
+                  [f"Friday-{tag}-windows-x64{suffix}-setup.exe"] if installers else [])
+              qt_assets[f"linux-x64{suffix}"] = [f"Friday-{tag}-linux-x64{suffix}.AppImage", f"Friday-{tag}-linux-x64{suffix}.tar.gz"] + (
+                  [f"Friday-{tag}-linux-x64{suffix}.deb"] if installers else [])
           missing = [key for key, names in qt_assets.items() if not all((dist / n).exists() for n in names)]
           stable = channel == "stable"
           lines = [
@@ -871,13 +951,14 @@ jobs:
           if env["HAS_QT"] == "true":
               win_ext = "-setup.exe` / `.zip" if installers else ".zip"
               linux_ext = ".deb` / `.AppImage` / `.tar.gz" if installers else ".AppImage` / `.tar.gz"
-              lines += [
-                  "",
-                  "### Windows（10 / 11，x64）",
-                  "",
-                  f"- `Friday-{tag}-windows-x64-cuda{win_ext}`：NVIDIA 显卡（GTX 10 系列及更新，建议驱动 570 以上），本地模型、生图、生视频用 CUDA 加速",
-                  f"- `Friday-{tag}-windows-x64-vulkan{win_ext}`：AMD / Intel / NVIDIA 显卡通用（需要支持 Vulkan 1.2 的显卡驱动），拿不准就选这个",
-              ]
+              lines += ["", "### Windows（10 / 11，x64）", ""]
+              if gpu:
+                  lines += [
+                      f"- `Friday-{tag}-windows-x64-cuda{win_ext}`：NVIDIA 显卡（GTX 10 系列及更新，建议驱动 570 以上），本地模型、生图、生视频用 CUDA 加速",
+                      f"- `Friday-{tag}-windows-x64-vulkan{win_ext}`：AMD / Intel / NVIDIA 显卡通用（需要支持 Vulkan 1.2 的显卡驱动），拿不准就选这个",
+                  ]
+              else:
+                  lines += [f"- `Friday-{tag}-windows-x64{win_ext}`：接在线大模型（设置 › 密钥 里添加），不需要显卡"]
               if installers:
                   lines += [
                       "- 安装程序（`-setup.exe`）：双击安装到 `C:\\Program Files\\Friday`（可改位置），建桌面和开始菜单快捷方式，在「设置 › 应用」里可以卸载；"
@@ -892,9 +973,14 @@ jobs:
                   "",
                   "### Linux（x64，glibc 2.35 以上：Ubuntu 22.04 / Debian 12 / Fedora 36 及更新）",
                   "",
-                  f"- `Friday-{tag}-linux-x64-cuda{linux_ext}`：NVIDIA 显卡（专有驱动 570 以上）",
-                  f"- `Friday-{tag}-linux-x64-vulkan{linux_ext}`：AMD / Intel / NVIDIA 通用（Mesa 或厂商的 Vulkan 驱动，需要 libvulkan1）",
               ]
+              if gpu:
+                  lines += [
+                      f"- `Friday-{tag}-linux-x64-cuda{linux_ext}`：NVIDIA 显卡（专有驱动 570 以上）",
+                      f"- `Friday-{tag}-linux-x64-vulkan{linux_ext}`：AMD / Intel / NVIDIA 通用（Mesa 或厂商的 Vulkan 驱动，需要 libvulkan1）",
+                  ]
+              else:
+                  lines += [f"- `Friday-{tag}-linux-x64{linux_ext}`：接在线大模型，不需要显卡"]
               if installers:
                   lines += ["- deb（Debian / Ubuntu 系）：`sudo apt install ./Friday-*.deb`，装到 `/opt/friday`，应用菜单里有 Friday，"
                             "命令行 `friday` / `friday-cli`；`sudo apt remove friday` 卸载；更新时弹一次密码确认"]
@@ -903,8 +989,12 @@ jobs:
                   "- tar.gz：解压后运行 `Friday/AppRun`；朗读功能需要系统装有 speech-dispatcher",
                   "- 数据在 `~/.local/share/Friday`（或 `$XDG_DATA_HOME/Friday`）",
                   "",
-                  "Windows / Linux 版同样读取 latest.json 按「系统-架构-后端」和安装方式（便携版 / 安装程序 / AppImage / deb / tar.gz）取对应的包更新。",
+                  "Windows / Linux 版同样读取 latest.json 按「系统-架构" + ("-后端" if gpu else "") + "」和安装方式（便携版 / 安装程序 / AppImage / deb / tar.gz）取对应的包更新。",
               ]
+              if not gpu:
+                  lines += ["", "从 1.x 升级：v2.0 起不再带本地模型（不用 CUDA / Vulkan），1.x 的 CUDA 版、Vulkan 版都自动更新到这一套包；"
+                            "`-upgrade-cuda` / `-upgrade-vulkan` 两种 zip / tar.gz 只给 1.x 自动更新用（内容相同，只是包信息里的名字不同），不用下载。"
+                            "以前下载的本地模型还在缓存目录里，不再使用，可以手动删掉。"]
               if missing:
                   lines += ["", f"> ⚠️ 本次缺少以下 Windows / Linux 安装包（构建失败，详见构建日志）：{'、'.join(missing)}"]
           else:
@@ -991,26 +1081,39 @@ jobs:
                   "size": path.stat().st_size,
               }
 
-          # Qt 版按 "<系统>-<架构>-<后端>" 取自己的包；Windows 条目是 zip，安装程序挂在 installer 下；Linux 条目是 AppImage，
-          # tar.gz 挂在 tarball 下、deb 挂在 deb 下（应用按自己的安装方式取，见源码 qt/docs/PACKAGING.md §4）
+          # Qt 版按 "<系统>-<架构>"（v2.0 之前是 "<系统>-<架构>-<后端>"）取自己的包；Windows 条目是 zip，安装程序挂在 installer 下；
+          # Linux 条目是 AppImage，tar.gz 挂在 tarball 下、deb 挂在 deb 下（应用按自己的安装方式取，见源码 qt/docs/PACKAGING.md §4）
           # （macOS 版的 ReleaseEntry 是编译器合成的 Codable，解码时忽略这个多出来的键）
-          assets = {}
-          for backend in ("cuda", "vulkan"):
-              win = asset(f"Friday-{tag}-windows-x64-{backend}.zip")
+          def qt_entry(suffix, zip_name=None, tarball_name=None):
+              entries = {}
+              win = asset(zip_name or f"Friday-{tag}-windows-x64{suffix}.zip")
               if win:
-                  installer = asset(f"Friday-{tag}-windows-x64-{backend}-setup.exe")
+                  installer = asset(f"Friday-{tag}-windows-x64-setup.exe" if zip_name else f"Friday-{tag}-windows-x64{suffix}-setup.exe")
                   if installer:
                       win["installer"] = installer
-                  assets[f"windows-x64-{backend}"] = win
-              appimage = asset(f"Friday-{tag}-linux-x64-{backend}.AppImage")
+                  entries["windows-x64"] = win
+              appimage = asset(f"Friday-{tag}-linux-x64.AppImage" if tarball_name else f"Friday-{tag}-linux-x64{suffix}.AppImage")
               if appimage:
-                  tarball = asset(f"Friday-{tag}-linux-x64-{backend}.tar.gz")
+                  tarball = asset(tarball_name or f"Friday-{tag}-linux-x64{suffix}.tar.gz")
                   if tarball:
                       appimage["tarball"] = tarball
-                  deb = asset(f"Friday-{tag}-linux-x64-{backend}.deb")
+                  deb = asset(f"Friday-{tag}-linux-x64.deb" if tarball_name else f"Friday-{tag}-linux-x64{suffix}.deb")
                   if deb:
                       appimage["deb"] = deb
-                  assets[f"linux-x64-{backend}"] = appimage
+                  entries["linux-x64"] = appimage
+              return entries
+
+          assets = {}
+          for backend in ("cuda", "vulkan"):
+              for platform, item in qt_entry(f"-{backend}").items():
+                  assets[f"{platform}-{backend}"] = item
+          if not assets:
+              # v2.0 起：一个平台一套包；1.x 的老键指向同一套包，便携 zip / tar.gz 换成 package.json 对得上的 -upgrade-<后端>
+              assets.update(qt_entry(""))
+              for backend in ("cuda", "vulkan"):
+                  for platform, item in qt_entry("", f"Friday-{tag}-windows-x64-upgrade-{backend}.zip",
+                                                 f"Friday-{tag}-linux-x64-upgrade-{backend}.tar.gz").items():
+                      assets[f"{platform}-{backend}"] = item
 
           entry = {
               "tag": tag,
