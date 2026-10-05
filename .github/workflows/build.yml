@@ -815,6 +815,8 @@ jobs:
         env:
           TESTS: ${{ steps.tests_win.outcome }}${{ steps.tests_linux.outcome }}
           INSTALLER: ${{ steps.verify_installer.outcome }}${{ steps.verify_deb.outcome }}
+        # Windows 默认的 shell 是 pwsh，这几行是 bash 写法
+        shell: bash
         run: |
           case "${TESTS}" in *failure*) echo "::error title=单元测试失败::产物已上传，但单元测试没有全部通过，详见「Unit tests」一步的输出" ;; esac
           case "${INSTALLER}" in *failure*) echo "::error title=安装包核对失败::产物已上传，但安装程序 / deb 没能装上、启动或卸掉，详见「Verify installer / deb」一步的输出" ;; esac
