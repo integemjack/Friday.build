@@ -1,113 +1,113 @@
 {
   "beta": {
-    "tag": "v2.0.0-beta",
-    "version": "2.0.0",
-    "build": 130,
+    "tag": "v2.0.1-beta",
+    "version": "2.0.1",
+    "build": 131,
     "channel": "beta",
-    "date": "2026-10-05T08:49:14Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-macOS-arm64.dmg",
-    "sha256": "f9b6fd5931141f8bbc92b0e980aee9a1675df8e4f5914ddbbe01a19c28ad6692",
-    "size": 11725496,
-    "notes": "v2.0：去掉本地推理（CUDA / Vulkan / Metal 本地 GPU）和相关依赖，只接在线大模型——Qt 删 llama.cpp / stable-diffusion.cpp 推理库、模型下载与模型库、KV 缓存、�",
+    "date": "2026-10-05T09:11:12Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-macOS-arm64.dmg",
+    "sha256": "575f5c928a086c7781f681a3c6e2bc1fd366cc799b1463c37d83f9dea44ab2d9",
+    "size": 10438587,
+    "notes": "v2.0：去掉设置里整个「学习」页面及自学习功能——复盘、学到的经验与 save_lesson / forget_lesson、按意思想起与动作前想起、探索与 adopt_result、自己造�",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v2.0.0-beta",
-    "source": "7555bc95fd7ff3863138e0eb94c1cd74b4b02d80",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v2.0.1-beta",
+    "source": "d185d5b11e399d0e8e1ae7aeab072416e74ae559",
     "branch": "v2.0",
     "assets": {
       "windows-x64": {
-        "name": "Friday-v2.0.0-beta-windows-x64.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-windows-x64.zip",
-        "sha256": "3130936a777e81262409bfc348e709411c3db8c7c597a71c798bbea39dc1bf12",
-        "size": 54035620,
+        "name": "Friday-v2.0.1-beta-windows-x64.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-windows-x64.zip",
+        "sha256": "86ab847dbb4a5dd234d121439d8ba4e09c83ae90aa010a5fd0afd642cad4301b",
+        "size": 53184742,
         "installer": {
-          "name": "Friday-v2.0.0-beta-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-windows-x64-setup.exe",
-          "sha256": "612056b13215b814385e01c075a9df089eaa2135936e770482750f2d9ed637ff",
-          "size": 36593014
+          "name": "Friday-v2.0.1-beta-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-windows-x64-setup.exe",
+          "sha256": "3ec5c9daf344f9951b503e1ea36b64dddaf81cad6a78780cdda5de52e353623a",
+          "size": 36157176
         }
       },
       "linux-x64": {
-        "name": "Friday-v2.0.0-beta-linux-x64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-linux-x64.AppImage",
-        "sha256": "e145dda7bd77b30f989e90d2c21dd54b4f8f298f286ab0a9f5c5685c32e842d4",
-        "size": 66058744,
+        "name": "Friday-v2.0.1-beta-linux-x64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-linux-x64.AppImage",
+        "sha256": "6f2ab2437c671bf06f6a421e86abe31bf1130c1e8f0c79c232518a9db8ad1a7c",
+        "size": 64809464,
         "tarball": {
-          "name": "Friday-v2.0.0-beta-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-linux-x64.tar.gz",
-          "sha256": "d23c5f50a51fdd90712af8bee805ac89a647c41b64a24b658a71c76087fe3441",
-          "size": 72053575
+          "name": "Friday-v2.0.1-beta-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-linux-x64.tar.gz",
+          "sha256": "f8776dd442f649432c842bc52cf6415ab708ee098f0f9162ea9418c1790657b1",
+          "size": 70677074
         },
         "deb": {
-          "name": "Friday-v2.0.0-beta-linux-x64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-linux-x64.deb",
-          "sha256": "714d1559e6fc76702cf34db2c6f61cf73c3f0e46742e22286129c95ab1f72ad1",
-          "size": 49348156
+          "name": "Friday-v2.0.1-beta-linux-x64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-linux-x64.deb",
+          "sha256": "28282c53799df8f744153b758cf7627e2eda7d9590764cc70f802e538a5205b1",
+          "size": 48504824
         }
       },
       "windows-x64-cuda": {
-        "name": "Friday-v2.0.0-beta-windows-x64-upgrade-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-windows-x64-upgrade-cuda.zip",
-        "sha256": "e663d2fd8d0f9529c3c270f100b73b31ceceeea1c8393233af47476655347644",
-        "size": 56243365,
+        "name": "Friday-v2.0.1-beta-windows-x64-upgrade-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-windows-x64-upgrade-cuda.zip",
+        "sha256": "f4c6697a87d759ac1470f9bc56133e66320a4cd022b28007cd62df013c0275e6",
+        "size": 55360202,
         "installer": {
-          "name": "Friday-v2.0.0-beta-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-windows-x64-setup.exe",
-          "sha256": "612056b13215b814385e01c075a9df089eaa2135936e770482750f2d9ed637ff",
-          "size": 36593014
+          "name": "Friday-v2.0.1-beta-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-windows-x64-setup.exe",
+          "sha256": "3ec5c9daf344f9951b503e1ea36b64dddaf81cad6a78780cdda5de52e353623a",
+          "size": 36157176
         }
       },
       "linux-x64-cuda": {
-        "name": "Friday-v2.0.0-beta-linux-x64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-linux-x64.AppImage",
-        "sha256": "e145dda7bd77b30f989e90d2c21dd54b4f8f298f286ab0a9f5c5685c32e842d4",
-        "size": 66058744,
+        "name": "Friday-v2.0.1-beta-linux-x64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-linux-x64.AppImage",
+        "sha256": "6f2ab2437c671bf06f6a421e86abe31bf1130c1e8f0c79c232518a9db8ad1a7c",
+        "size": 64809464,
         "tarball": {
-          "name": "Friday-v2.0.0-beta-linux-x64-upgrade-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-linux-x64-upgrade-cuda.tar.gz",
-          "sha256": "b3c0c132d687693e912e51f5a85838bbc7aa222745513540f777e81c44462649",
-          "size": 72086268
+          "name": "Friday-v2.0.1-beta-linux-x64-upgrade-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-linux-x64-upgrade-cuda.tar.gz",
+          "sha256": "0b46c1b8ea2d03477163a149af20dfb285d076abf4a6e84c32bbb0e0a9707f81",
+          "size": 70713883
         },
         "deb": {
-          "name": "Friday-v2.0.0-beta-linux-x64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-linux-x64.deb",
-          "sha256": "714d1559e6fc76702cf34db2c6f61cf73c3f0e46742e22286129c95ab1f72ad1",
-          "size": 49348156
+          "name": "Friday-v2.0.1-beta-linux-x64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-linux-x64.deb",
+          "sha256": "28282c53799df8f744153b758cf7627e2eda7d9590764cc70f802e538a5205b1",
+          "size": 48504824
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v2.0.0-beta-windows-x64-upgrade-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-windows-x64-upgrade-vulkan.zip",
-        "sha256": "4ba73b64466acc4af76221c8d4c9f0a23fcd3b1292179e286c9f39fe12a00420",
-        "size": 56243367,
+        "name": "Friday-v2.0.1-beta-windows-x64-upgrade-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-windows-x64-upgrade-vulkan.zip",
+        "sha256": "b5209e4caff582070e39f3b640a0c7be3d6f24d60f7ef7d3874523a4d6e0eef3",
+        "size": 55360204,
         "installer": {
-          "name": "Friday-v2.0.0-beta-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-windows-x64-setup.exe",
-          "sha256": "612056b13215b814385e01c075a9df089eaa2135936e770482750f2d9ed637ff",
-          "size": 36593014
+          "name": "Friday-v2.0.1-beta-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-windows-x64-setup.exe",
+          "sha256": "3ec5c9daf344f9951b503e1ea36b64dddaf81cad6a78780cdda5de52e353623a",
+          "size": 36157176
         }
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v2.0.0-beta-linux-x64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-linux-x64.AppImage",
-        "sha256": "e145dda7bd77b30f989e90d2c21dd54b4f8f298f286ab0a9f5c5685c32e842d4",
-        "size": 66058744,
+        "name": "Friday-v2.0.1-beta-linux-x64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-linux-x64.AppImage",
+        "sha256": "6f2ab2437c671bf06f6a421e86abe31bf1130c1e8f0c79c232518a9db8ad1a7c",
+        "size": 64809464,
         "tarball": {
-          "name": "Friday-v2.0.0-beta-linux-x64-upgrade-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-linux-x64-upgrade-vulkan.tar.gz",
-          "sha256": "8daca64e63848f3d5d101e80ac06f0d43de6c12b97a4794bb6fb13ff98fee04b",
-          "size": 72086276
+          "name": "Friday-v2.0.1-beta-linux-x64-upgrade-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-linux-x64-upgrade-vulkan.tar.gz",
+          "sha256": "df17c0e2f32e530a32c011d1924744c827c58a05eecb28d5eca467101e90743e",
+          "size": 70713886
         },
         "deb": {
-          "name": "Friday-v2.0.0-beta-linux-x64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.0-beta/Friday-v2.0.0-beta-linux-x64.deb",
-          "sha256": "714d1559e6fc76702cf34db2c6f61cf73c3f0e46742e22286129c95ab1f72ad1",
-          "size": 49348156
+          "name": "Friday-v2.0.1-beta-linux-x64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.0.1-beta/Friday-v2.0.1-beta-linux-x64.deb",
+          "sha256": "28282c53799df8f744153b758cf7627e2eda7d9590764cc70f802e538a5205b1",
+          "size": 48504824
         }
       }
     }
   },
-  "updatedAt": "2026-10-05T08:49:14Z",
+  "updatedAt": "2026-10-05T09:11:12Z",
   "stable": {
     "tag": "v1.21.2",
     "version": "1.21.2",
