@@ -11,7 +11,8 @@ name: Build and release Friday
 #      qt：Windows / Linux 的 Qt 版（调用源码里的 qt/ci/ 脚本）：Windows 出 zip 便携版 + 安装程序
 #      （-setup.exe，源码 qt/installer/ 的自制安装器；在运行器上静默装一遍、卸一遍核对），Linux 出 AppImage + tar.gz + deb
 #      （deb 在运行器上 apt 装一遍核对）；老源码没有安装程序时只出 zip。
-#      Linux 有 x64 和 arm64 两种架构（arm64 在 GitHub 的 ubuntu-22.04-arm 运行器上原生构建，Qt 用官方的 linux_gcc_arm64；
+#      Linux 有 x64 和 arm64 两种架构（arm64 在 GitHub 的 ubuntu-24.04-arm 运行器上原生构建，Qt 用官方的 linux_gcc_arm64：
+#      它是在 Ubuntu 24.04 上编的，要 glibc 2.38+，22.04 上连 Qt 自己的工具都跑不起来，所以 arm64 包要 glibc 2.39；
 #      只有 v2.0 起的源码出 arm64，带本地推理的老源码只出 x64）。Qt 官方没有其他 Linux 架构的预编译包，不出。
 #      v2.0 起源码不带本地推理：每个平台一套包；老源码（还有 qt/ci/build_backends.sh）照旧 CUDA 与 Vulkan 各一套；
 #   5. release：macOS 成功才发布（Qt 某个组合失败照样发布其余产物，并在说明里注明缺哪些）；
@@ -147,13 +148,14 @@ jobs:
           QT_BACKENDS='["none"]'
           if [ -f src/qt/ci/build_backends.sh ]; then QT_BACKENDS='["cuda","vulkan"]'; fi
           # Qt 版的构建矩阵（运行器、平台、Qt 的 arch、后端）：Windows x64、Linux x64 各平台 × 后端；
-          # v2.0 起（不带本地推理）Linux 另出 arm64。22.04（glibc 2.35）上构建，包才能在较老的发行版上运行
+          # v2.0 起（不带本地推理）Linux 另出 arm64。x64 在 22.04（glibc 2.35）上构建，包才能在较老的发行版上运行；
+          # arm64 只能在 24.04 上构建（Qt 官方的 arm64 二进制要 glibc 2.38+）
           QT_MATRIX="$(QT_BACKENDS="${QT_BACKENDS}" python3 -c '
           import json, os
           backends = json.loads(os.environ["QT_BACKENDS"])
           platforms = [("windows-2022", "windows-x64", "win64_msvc2022_64"), ("ubuntu-22.04", "linux-x64", "linux_gcc_64")]
           if backends == ["none"]:
-              platforms.append(("ubuntu-22.04-arm", "linux-arm64", "linux_gcc_arm64"))
+              platforms.append(("ubuntu-24.04-arm", "linux-arm64", "linux_gcc_arm64"))
           print(json.dumps([{"os": o, "platform": p, "qt_arch": a, "backend": b} for o, p, a in platforms for b in backends]))
           ')"
           # macOS 版还用 MLX（本地模型跑在 Metal 上）时才要装 Metal 编译器
@@ -549,11 +551,14 @@ jobs:
           # 老源码（带本地推理）另要 Vulkan 加载器（libvulkan-dev 提供链接用的 libvulkan.so：LunarG 的 Linux SDK 只带头文件和 glslc，不带加载器）
           VULKAN=()
           if [ "${{ matrix.backend }}" != "none" ]; then VULKAN=(libvulkan1 libvulkan-dev); fi
+          # 24.04（arm64 的运行器）把部分库改名成 *t64（64 位 time_t 迁移）
+          T64=""
+          if grep -q '^VERSION_ID="2[4-9]' /etc/os-release; then T64=t64; fi
           sudo apt-get install -y --no-install-recommends \
             g++-12 ninja-build ccache pigz file desktop-file-utils patchelf \
             libgl1-mesa-dev libegl1 libopengl0 libxkbcommon0 libxkbcommon-x11-0 \
             libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 \
-            libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 libxcb-xinput0 libfontconfig1 libfreetype6 libdbus-1-3 libglib2.0-0 \
+            libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 libxcb-xinput0 libfontconfig1 libfreetype6 libdbus-1-3 "libglib2.0-0${T64}" \
             libwayland-client0 libwayland-cursor0 libwayland-egl1 \
             libspeechd2 libpulse0 libva2 libva-drm2 libva-x11-2 libvdpau1 \
             "${VULKAN[@]}"
@@ -987,7 +992,7 @@ jobs:
                   "- 不需要另装 VC++ 运行库；没有代码签名，首次运行时 SmartScreen 提示请点「更多信息 → 仍要运行」",
                   "- 数据在 `%APPDATA%\\Friday`，和程序目录分开；覆盖、删除或卸载程序都不影响会话和设置",
                   "",
-                  f"### Linux（{' / '.join(linux_arches)}，glibc 2.35 以上：Ubuntu 22.04 / Debian 12 / Fedora 36 及更新）",
+                  "### Linux（x64，glibc 2.35 以上：Ubuntu 22.04 / Debian 12 / Fedora 36 及更新）" if gpu else "### Linux（x64 / arm64）",
                   "",
               ]
               if gpu:
@@ -997,8 +1002,10 @@ jobs:
                   ]
               else:
                   lines += [
-                      f"- `Friday-{tag}-linux-x64{linux_ext}`：x86_64（Intel / AMD 处理器）的电脑和服务器",
-                      f"- `Friday-{tag}-linux-arm64{linux_ext}`：ARM64（aarch64）：树莓派 4 / 5（64 位系统）、ARM 服务器、ARM 笔记本",
+                      f"- `Friday-{tag}-linux-x64{linux_ext}`：x86_64（Intel / AMD 处理器）的电脑和服务器；"
+                      "glibc 2.35 以上：Ubuntu 22.04 / Debian 12 / Fedora 36 及更新",
+                      f"- `Friday-{tag}-linux-arm64{linux_ext}`：ARM64（aarch64）的服务器、笔记本、树莓派 4 / 5；"
+                      "glibc 2.39 以上：Ubuntu 24.04 / Debian 13 / Fedora 40 及更新（树莓派用 64 位的 Raspberry Pi OS 13 或 Ubuntu 24.04）",
                       "- 都是接在线大模型，不需要显卡；`uname -m` 输出 x86_64 选 x64，aarch64 选 arm64",
                   ]
               if installers:
