@@ -1,187 +1,187 @@
 {
   "beta": {
-    "tag": "v2.2.2-beta",
-    "version": "2.2.2",
-    "build": 163,
+    "tag": "v2.2.4-beta",
+    "version": "2.2.4",
+    "build": 165,
     "channel": "beta",
-    "date": "2026-10-06T18:22:57Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-macOS-arm64.dmg",
-    "sha256": "2c7d5faea1359c3021f779fdce18de928e85f244ddcaf55f853d878e477671df",
-    "size": 13297680,
-    "notes": "卡片拖动：被拖的卡片保持原来的大小跟着鼠标走，排进某一组时只把落点腾出来（强调色空位框，拖动中各边宽度冻结不收窄），新开一列 / 一行时�",
+    "date": "2026-10-06T19:27:45Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-macOS-arm64.dmg",
+    "sha256": "5930d0dc8c93cdbece9e9394c95810e0d95fb806a25986717a8f45926e9225c3",
+    "size": 13309046,
+    "notes": "终端：Agent 用 run_in_terminal 开的终端一出现就选中它（卡片开着时切过去，收着的话自动打开后停在它上面；连着同一台机器的几个客户端都这样——原",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v2.2.2-beta",
-    "source": "2f6f9135e07b3dbb4888cc611ad08b6dcb89960e",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v2.2.4-beta",
+    "source": "c5c36d0c82a279891c370a8316698f70ad7fbb67",
     "branch": "v2.2",
     "assets": {
       "windows-x64": {
-        "name": "Friday-v2.2.2-beta-windows-x64.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-windows-x64.zip",
-        "sha256": "c7f45bcbabd1f9419321612a0c2f61be5a3462dd97c073de11ccc154a0017daf",
-        "size": 55451743,
+        "name": "Friday-v2.2.4-beta-windows-x64.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-windows-x64.zip",
+        "sha256": "c1b109d38f3da10dbe28ddc00dc9b20d9ed5aa8d48cdf92ede056044ab7e5638",
+        "size": 55456060,
         "installer": {
-          "name": "Friday-v2.2.2-beta-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-windows-x64-setup.exe",
-          "sha256": "b2c8cd6fd71a6c08df81b9bf8e0485facee794dba72094fd0dea4b5ed6498164",
-          "size": 37102054
+          "name": "Friday-v2.2.4-beta-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-windows-x64-setup.exe",
+          "sha256": "78804593684ecd0630fc613a7240fe3610e818ac55e02adc8ccbf1cc58ef4e7a",
+          "size": 37098471
         },
         "server": {
-          "name": "Friday-v2.2.2-beta-server-windows-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-server-windows-x64.tar.gz",
-          "sha256": "4214f57a4987ddde8f1270ee2ac1c2e2292f70cc60c32b8336c5d5e1682a6128",
-          "size": 12834503,
-          "version": "2.2.2",
+          "name": "Friday-v2.2.4-beta-server-windows-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-server-windows-x64.tar.gz",
+          "sha256": "8286b280c53f7479eace512ea6567d1d8c50e1d3fefd250042c6e36380e9fc2b",
+          "size": 12834586,
+          "version": "2.2.4",
           "protocol": 1
         }
       },
       "linux-x64": {
-        "name": "Friday-v2.2.2-beta-linux-x64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-linux-x64.AppImage",
-        "sha256": "a0dae978c14bb88ecc4fbc4f053b4ba10ae21d6fb50d3525e36da89a036a2d71",
+        "name": "Friday-v2.2.4-beta-linux-x64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-linux-x64.AppImage",
+        "sha256": "5a452f8b55a7b31c46388d7431c79cbd15699053cf5451fe5c28b5977b25e008",
         "size": 68262392,
         "tarball": {
-          "name": "Friday-v2.2.2-beta-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-linux-x64.tar.gz",
-          "sha256": "b55d3e4b587b9f3f4fb222b261524ec9434521fad092abd6225bd2119c7dce04",
-          "size": 74489291
+          "name": "Friday-v2.2.4-beta-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-linux-x64.tar.gz",
+          "sha256": "4dfda4f4a18adab2d240cffdc89993c32d7bfed6d26bfb19a779e61c4c63de1e",
+          "size": 74493358
         },
         "deb": {
-          "name": "Friday-v2.2.2-beta-linux-x64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-linux-x64.deb",
-          "sha256": "4cac00e9eadbe0bfbfab555a01f4399a1d78802a9de0666428aa7b5f4c9103ae",
-          "size": 50994820
+          "name": "Friday-v2.2.4-beta-linux-x64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-linux-x64.deb",
+          "sha256": "a08845d01d0581250215bfe4840fbf8d62569480913768a9ba669b7496e8a9b1",
+          "size": 50993160
         },
         "server": {
-          "name": "Friday-v2.2.2-beta-server-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-server-linux-x64.tar.gz",
-          "sha256": "0b1a6ecf8a457297e6217613823deb7e3e8ee9edd61090d6c292a8ad2c405f49",
-          "size": 34410010,
-          "version": "2.2.2",
+          "name": "Friday-v2.2.4-beta-server-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-server-linux-x64.tar.gz",
+          "sha256": "007ab08e8d328b6dc79f65f28ea3c94c27a7b3620a219d1a9351e305104925ee",
+          "size": 34410168,
+          "version": "2.2.4",
           "protocol": 1
         }
       },
       "linux-arm64": {
-        "name": "Friday-v2.2.2-beta-linux-arm64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-linux-arm64.AppImage",
-        "sha256": "34e4a8d15b4adfe761632dac13797700d8ff58716fa49a1551ff4971f3a0178f",
-        "size": 67045896,
+        "name": "Friday-v2.2.4-beta-linux-arm64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-linux-arm64.AppImage",
+        "sha256": "1d4b3b9a1e05ff923de46b57a998e4043189da235a522f3cb4e293ed65b97f0d",
+        "size": 67058184,
         "tarball": {
-          "name": "Friday-v2.2.2-beta-linux-arm64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-linux-arm64.tar.gz",
-          "sha256": "78bedfea93b0edbb946dd013d2b944967b29eed7932167f449bde76c1309eae6",
-          "size": 73443243
+          "name": "Friday-v2.2.4-beta-linux-arm64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-linux-arm64.tar.gz",
+          "sha256": "8ea551820b1bd410b4c78df5c4fc4d190c41114ecbc645a5b429d64124dd6670",
+          "size": 73452029
         },
         "deb": {
-          "name": "Friday-v2.2.2-beta-linux-arm64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-linux-arm64.deb",
-          "sha256": "940ef80a7ab1a78ce6231c57a28a7714c6869fdad03ff3e257bf999830d8b1e7",
-          "size": 47836104
+          "name": "Friday-v2.2.4-beta-linux-arm64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-linux-arm64.deb",
+          "sha256": "18b99615e16a2240e068b3e7b46a29be4320b5c50d76dad67cbf408908559731",
+          "size": 47854824
         },
         "server": {
-          "name": "Friday-v2.2.2-beta-server-linux-arm64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-server-linux-arm64.tar.gz",
-          "sha256": "b2a69cf4b3062a9e3c175ad3ce227c86660c4867ee8d401527bb067dfd2fc1e4",
-          "size": 33229322,
-          "version": "2.2.2",
+          "name": "Friday-v2.2.4-beta-server-linux-arm64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-server-linux-arm64.tar.gz",
+          "sha256": "ed0b2c97b89e3e41533646f73c4b5e550745d6cdf960ea7eb6ef79d27dc50e4e",
+          "size": 33230090,
+          "version": "2.2.4",
           "protocol": 1
         }
       },
       "windows-x64-cuda": {
-        "name": "Friday-v2.2.2-beta-windows-x64-upgrade-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-windows-x64-upgrade-cuda.zip",
-        "sha256": "5e6deaf7929575c56436ab1855890972782c465ce9e12ef22c8d00acec5bf757",
-        "size": 57720570,
+        "name": "Friday-v2.2.4-beta-windows-x64-upgrade-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-windows-x64-upgrade-cuda.zip",
+        "sha256": "fa7fb96123045c329a7ab0f24eba57ba859d45715dd1649e7ea9e66de006f6d8",
+        "size": 57726828,
         "installer": {
-          "name": "Friday-v2.2.2-beta-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-windows-x64-setup.exe",
-          "sha256": "b2c8cd6fd71a6c08df81b9bf8e0485facee794dba72094fd0dea4b5ed6498164",
-          "size": 37102054
+          "name": "Friday-v2.2.4-beta-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-windows-x64-setup.exe",
+          "sha256": "78804593684ecd0630fc613a7240fe3610e818ac55e02adc8ccbf1cc58ef4e7a",
+          "size": 37098471
         },
         "server": {
-          "name": "Friday-v2.2.2-beta-server-windows-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-server-windows-x64.tar.gz",
-          "sha256": "4214f57a4987ddde8f1270ee2ac1c2e2292f70cc60c32b8336c5d5e1682a6128",
-          "size": 12834503,
-          "version": "2.2.2",
+          "name": "Friday-v2.2.4-beta-server-windows-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-server-windows-x64.tar.gz",
+          "sha256": "8286b280c53f7479eace512ea6567d1d8c50e1d3fefd250042c6e36380e9fc2b",
+          "size": 12834586,
+          "version": "2.2.4",
           "protocol": 1
         }
       },
       "linux-x64-cuda": {
-        "name": "Friday-v2.2.2-beta-linux-x64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-linux-x64.AppImage",
-        "sha256": "a0dae978c14bb88ecc4fbc4f053b4ba10ae21d6fb50d3525e36da89a036a2d71",
+        "name": "Friday-v2.2.4-beta-linux-x64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-linux-x64.AppImage",
+        "sha256": "5a452f8b55a7b31c46388d7431c79cbd15699053cf5451fe5c28b5977b25e008",
         "size": 68262392,
         "tarball": {
-          "name": "Friday-v2.2.2-beta-linux-x64-upgrade-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-linux-x64-upgrade-cuda.tar.gz",
-          "sha256": "bb445955951145634d7ddc0df3107ce41ee962b6aecd7d65101cb21d11891595",
-          "size": 74530263
+          "name": "Friday-v2.2.4-beta-linux-x64-upgrade-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-linux-x64-upgrade-cuda.tar.gz",
+          "sha256": "4335ecd7c53978ce2a48b21789d81d21102346a3401a91fc3c2e549097cbd20f",
+          "size": 74534120
         },
         "deb": {
-          "name": "Friday-v2.2.2-beta-linux-x64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-linux-x64.deb",
-          "sha256": "4cac00e9eadbe0bfbfab555a01f4399a1d78802a9de0666428aa7b5f4c9103ae",
-          "size": 50994820
+          "name": "Friday-v2.2.4-beta-linux-x64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-linux-x64.deb",
+          "sha256": "a08845d01d0581250215bfe4840fbf8d62569480913768a9ba669b7496e8a9b1",
+          "size": 50993160
         },
         "server": {
-          "name": "Friday-v2.2.2-beta-server-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-server-linux-x64.tar.gz",
-          "sha256": "0b1a6ecf8a457297e6217613823deb7e3e8ee9edd61090d6c292a8ad2c405f49",
-          "size": 34410010,
-          "version": "2.2.2",
+          "name": "Friday-v2.2.4-beta-server-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-server-linux-x64.tar.gz",
+          "sha256": "007ab08e8d328b6dc79f65f28ea3c94c27a7b3620a219d1a9351e305104925ee",
+          "size": 34410168,
+          "version": "2.2.4",
           "protocol": 1
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v2.2.2-beta-windows-x64-upgrade-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-windows-x64-upgrade-vulkan.zip",
-        "sha256": "0f20b3ea411f6f3ec9c2bde20d179a29e185684d82fd3c49b348d70ee80fbd8b",
-        "size": 57720572,
+        "name": "Friday-v2.2.4-beta-windows-x64-upgrade-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-windows-x64-upgrade-vulkan.zip",
+        "sha256": "8b2ad39327cf81dbba9041b052bd1149ebaff2e5281cfb236af817edf011e1a1",
+        "size": 57726830,
         "installer": {
-          "name": "Friday-v2.2.2-beta-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-windows-x64-setup.exe",
-          "sha256": "b2c8cd6fd71a6c08df81b9bf8e0485facee794dba72094fd0dea4b5ed6498164",
-          "size": 37102054
+          "name": "Friday-v2.2.4-beta-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-windows-x64-setup.exe",
+          "sha256": "78804593684ecd0630fc613a7240fe3610e818ac55e02adc8ccbf1cc58ef4e7a",
+          "size": 37098471
         },
         "server": {
-          "name": "Friday-v2.2.2-beta-server-windows-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-server-windows-x64.tar.gz",
-          "sha256": "4214f57a4987ddde8f1270ee2ac1c2e2292f70cc60c32b8336c5d5e1682a6128",
-          "size": 12834503,
-          "version": "2.2.2",
+          "name": "Friday-v2.2.4-beta-server-windows-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-server-windows-x64.tar.gz",
+          "sha256": "8286b280c53f7479eace512ea6567d1d8c50e1d3fefd250042c6e36380e9fc2b",
+          "size": 12834586,
+          "version": "2.2.4",
           "protocol": 1
         }
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v2.2.2-beta-linux-x64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-linux-x64.AppImage",
-        "sha256": "a0dae978c14bb88ecc4fbc4f053b4ba10ae21d6fb50d3525e36da89a036a2d71",
+        "name": "Friday-v2.2.4-beta-linux-x64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-linux-x64.AppImage",
+        "sha256": "5a452f8b55a7b31c46388d7431c79cbd15699053cf5451fe5c28b5977b25e008",
         "size": 68262392,
         "tarball": {
-          "name": "Friday-v2.2.2-beta-linux-x64-upgrade-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-linux-x64-upgrade-vulkan.tar.gz",
-          "sha256": "b37d9eb62bf4e1d76ab8bd33aa63c16709efc79c8f0b81f2e4d477015ac3f9b3",
-          "size": 74530277
+          "name": "Friday-v2.2.4-beta-linux-x64-upgrade-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-linux-x64-upgrade-vulkan.tar.gz",
+          "sha256": "ae07aa34e8f92129521504bbe7b4584140e9692c6102b352786ee7bd15174dc9",
+          "size": 74534126
         },
         "deb": {
-          "name": "Friday-v2.2.2-beta-linux-x64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-linux-x64.deb",
-          "sha256": "4cac00e9eadbe0bfbfab555a01f4399a1d78802a9de0666428aa7b5f4c9103ae",
-          "size": 50994820
+          "name": "Friday-v2.2.4-beta-linux-x64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-linux-x64.deb",
+          "sha256": "a08845d01d0581250215bfe4840fbf8d62569480913768a9ba669b7496e8a9b1",
+          "size": 50993160
         },
         "server": {
-          "name": "Friday-v2.2.2-beta-server-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.2-beta/Friday-v2.2.2-beta-server-linux-x64.tar.gz",
-          "sha256": "0b1a6ecf8a457297e6217613823deb7e3e8ee9edd61090d6c292a8ad2c405f49",
-          "size": 34410010,
-          "version": "2.2.2",
+          "name": "Friday-v2.2.4-beta-server-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.2.4-beta/Friday-v2.2.4-beta-server-linux-x64.tar.gz",
+          "sha256": "007ab08e8d328b6dc79f65f28ea3c94c27a7b3620a219d1a9351e305104925ee",
+          "size": 34410168,
+          "version": "2.2.4",
           "protocol": 1
         }
       }
     }
   },
-  "updatedAt": "2026-10-06T18:58:20Z",
+  "updatedAt": "2026-10-06T19:27:45Z",
   "stable": {
     "tag": "v2.2.3",
     "version": "2.2.3",
