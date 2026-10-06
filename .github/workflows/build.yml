@@ -15,6 +15,8 @@ name: Build and release Friday
 #   5. release：macOS 成功才发布（Qt 某个组合失败照样发布其余产物，并在说明里注明缺哪些）；
 #      正式版和预发布各只保留最新的一个 Release（旧的连安装包一起删，标签保留以便继续计数）；
 #   6. 发布后更新仓库根目录的 latest.json（每个渠道最新的一次发布，含各平台安装包 assets），Friday 应用定期读它来自动更新。
+#      v2.1 起 Windows / Linux 另出远程用的 friday-server 包（Friday-<标签>-server-<平台>.tar.gz），挂在 assets 各平台条目的 server 下：
+#      Friday 连远程机器时发现没装或版本旧就下载它、经 SSH 装上去（源码 qt/docs/REMOTE.md §9）。
 on:
   repository_dispatch:
     types: [build]
@@ -997,6 +999,11 @@ jobs:
                   lines += ["", "从 1.x 升级：v2.0 起不再带本地模型（不用 CUDA / Vulkan），1.x 的 CUDA 版、Vulkan 版都自动更新到这一套包；"
                             "`-upgrade-cuda` / `-upgrade-vulkan` 两种 zip / tar.gz 只给 1.x 自动更新用（内容相同，只是包信息里的名字不同），不用下载。"
                             "以前下载的本地模型还在缓存目录里，不再使用，可以手动删掉。"]
+              servers = [f"Friday-{tag}-server-{p}.tar.gz" for p in ("linux-x64", "windows-x64") if (dist / f"Friday-{tag}-server-{p}.tar.gz").exists()]
+              if servers:
+                  lines += ["", "### 远程服务 friday-server（v2.1 起）", "",
+                            f"- {' / '.join(f'`{n}`' for n in servers)}：远程 Friday 的无界面服务。Friday 经 SSH / WSL 连远程机器时，"
+                            "发现对方没装或版本旧会自动下载对应的包、装到对方的 `~/.friday-server/`（空闲时换上新版本），不用手动下载"]
               if missing:
                   lines += ["", f"> ⚠️ 本次缺少以下 Windows / Linux 安装包（构建失败，详见构建日志）：{'、'.join(missing)}"]
           else:
@@ -1067,7 +1074,7 @@ jobs:
           # 每个渠道只记录最新的一次发布；应用按渠道读取并与自己的版本比较
           export MIN_OS="${MIN_OS:-26.0}" BASENAME="Friday-${RELEASE_TAG}-macOS-arm64" REPO="${GITHUB_REPOSITORY}" RUN_NUMBER="${GITHUB_RUN_NUMBER}"
           python3 - <<'PY'
-          import datetime, json, os, pathlib
+          import datetime, json, os, pathlib, tarfile
           tag, channel, basename, repo = os.environ["RELEASE_TAG"], os.environ["CHANNEL"], os.environ["BASENAME"], os.environ["REPO"]
           sums = {line.split()[1].lstrip("*"): line.split()[0] for line in pathlib.Path("dist/SHA256SUMS.txt").read_text().splitlines() if line.strip()}
           zip_name, dmg_name = f"{basename}.zip", f"{basename}.dmg"
@@ -1083,6 +1090,22 @@ jobs:
                   "size": path.stat().st_size,
               }
 
+          # 远程用的 friday-server 包（v2.1 起）：版本、协议版本从包里的 friday-server/server.json 读（friday-server --version 的输出），
+          # 客户端只装协议版本和自己一样的
+          def server_entry(platform):
+              item = asset(f"Friday-{tag}-server-{platform}.tar.gz")
+              if not item:
+                  return None
+              try:
+                  with tarfile.open(pathlib.Path("dist") / item["name"], "r:gz") as tar:
+                      info = json.load(tar.extractfile("friday-server/server.json"))
+              except Exception as error:
+                  print(f"读不了 {item['name']} 里的 server.json，不写进 latest.json：{error}")
+                  return None
+              item["version"] = str(info.get("version", ""))
+              item["protocol"] = int(info.get("protocol", 0))
+              return item
+
           # Qt 版按 "<系统>-<架构>"（v2.0 之前是 "<系统>-<架构>-<后端>"）取自己的包；Windows 条目是 zip，安装程序挂在 installer 下；
           # Linux 条目是 AppImage，tar.gz 挂在 tarball 下、deb 挂在 deb 下（应用按自己的安装方式取，见源码 qt/docs/PACKAGING.md §4）
           # （macOS 版的 ReleaseEntry 是编译器合成的 Codable，解码时忽略这个多出来的键）
@@ -1093,6 +1116,9 @@ jobs:
                   installer = asset(f"Friday-{tag}-windows-x64-setup.exe" if zip_name else f"Friday-{tag}-windows-x64{suffix}-setup.exe")
                   if installer:
                       win["installer"] = installer
+                  server = server_entry("windows-x64")
+                  if server:
+                      win["server"] = server
                   entries["windows-x64"] = win
               appimage = asset(f"Friday-{tag}-linux-x64.AppImage" if tarball_name else f"Friday-{tag}-linux-x64{suffix}.AppImage")
               if appimage:
@@ -1102,6 +1128,9 @@ jobs:
                   deb = asset(f"Friday-{tag}-linux-x64.deb" if tarball_name else f"Friday-{tag}-linux-x64{suffix}.deb")
                   if deb:
                       appimage["deb"] = deb
+                  server = server_entry("linux-x64")
+                  if server:
+                      appimage["server"] = server
                   entries["linux-x64"] = appimage
               return entries
 
