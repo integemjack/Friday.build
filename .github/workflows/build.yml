@@ -11,6 +11,8 @@ name: Build and release Friday
 #      qt：Windows / Linux 的 Qt 版（调用源码里的 qt/ci/ 脚本）：Windows 出 zip 便携版 + 安装程序
 #      （-setup.exe，源码 qt/installer/ 的自制安装器；在运行器上静默装一遍、卸一遍核对），Linux 出 AppImage + tar.gz + deb
 #      （deb 在运行器上 apt 装一遍核对）；老源码没有安装程序时只出 zip。
+#      Linux 有 x64 和 arm64 两种架构（arm64 在 GitHub 的 ubuntu-22.04-arm 运行器上原生构建，Qt 用官方的 linux_gcc_arm64；
+#      只有 v2.0 起的源码出 arm64，带本地推理的老源码只出 x64）。Qt 官方没有其他 Linux 架构的预编译包，不出。
 #      v2.0 起源码不带本地推理：每个平台一套包；老源码（还有 qt/ci/build_backends.sh）照旧 CUDA 与 Vulkan 各一套；
 #   5. release：macOS 成功才发布（Qt 某个组合失败照样发布其余产物，并在说明里注明缺哪些）；
 #      正式版和预发布各只保留最新的一个 Release（旧的连安装包一起删，标签保留以便继续计数）；
@@ -72,6 +74,7 @@ jobs:
       has_qt: ${{ steps.inspect.outputs.has_qt }}
       has_installer: ${{ steps.inspect.outputs.has_installer }}
       qt_backends: ${{ steps.inspect.outputs.qt_backends }}
+      qt_matrix: ${{ steps.inspect.outputs.qt_matrix }}
       has_mlx: ${{ steps.inspect.outputs.has_mlx }}
       release_tag: ${{ steps.version.outputs.release_tag }}
       marketing: ${{ steps.version.outputs.marketing }}
@@ -143,6 +146,16 @@ jobs:
           # v2.0 起不带，每个平台一套（矩阵里记作 none，包名、latest.json 的键都不带后端）
           QT_BACKENDS='["none"]'
           if [ -f src/qt/ci/build_backends.sh ]; then QT_BACKENDS='["cuda","vulkan"]'; fi
+          # Qt 版的构建矩阵（运行器、平台、Qt 的 arch、后端）：Windows x64、Linux x64 各平台 × 后端；
+          # v2.0 起（不带本地推理）Linux 另出 arm64。22.04（glibc 2.35）上构建，包才能在较老的发行版上运行
+          QT_MATRIX="$(QT_BACKENDS="${QT_BACKENDS}" python3 -c '
+          import json, os
+          backends = json.loads(os.environ["QT_BACKENDS"])
+          platforms = [("windows-2022", "windows-x64", "win64_msvc2022_64"), ("ubuntu-22.04", "linux-x64", "linux_gcc_64")]
+          if backends == ["none"]:
+              platforms.append(("ubuntu-22.04-arm", "linux-arm64", "linux_gcc_arm64"))
+          print(json.dumps([{"os": o, "platform": p, "qt_arch": a, "backend": b} for o, p, a in platforms for b in backends]))
+          ')"
           # macOS 版还用 MLX（本地模型跑在 Metal 上）时才要装 Metal 编译器
           HAS_MLX=false
           if grep -q 'mlx-swift' src/Friday/Friday.xcodeproj/project.pbxproj; then HAS_MLX=true; fi
@@ -152,6 +165,7 @@ jobs:
             echo "has_qt=${HAS_QT}"
             echo "has_installer=${HAS_INSTALLER}"
             echo "qt_backends=${QT_BACKENDS}"
+            echo "qt_matrix=${QT_MATRIX}"
             echo "has_mlx=${HAS_MLX}"
           } >> "${GITHUB_OUTPUT}"
           echo "提交 ${SHA}，最低 macOS ${MIN_OS:-26.0}，构建 Qt 版=${HAS_QT}（${QT_BACKENDS}），安装程序 / deb=${HAS_INSTALLER}，MLX=${HAS_MLX}"
@@ -474,7 +488,7 @@ jobs:
         run: security delete-keychain "${{ steps.signing.outputs.keychain }}" || true
 
   # ---------------------------------------------------------------------------
-  # Windows / Linux（Qt 6）：v2.0 起每个平台一个包（矩阵的 backend 是 none）；
+  # Windows / Linux（Qt 6）：v2.0 起每个平台一个包（矩阵的 backend 是 none），Linux 有 x64 和 arm64；
   # v2.0 之前的源码带本地推理（llama.cpp / stable-diffusion.cpp），CUDA 与 Vulkan 各一个包
   # 工具链版本（Qt，老源码还有 CUDA / Vulkan SDK / 依赖标签）都钉在源码的 qt/ci/deps.env 里
   # ---------------------------------------------------------------------------
@@ -487,15 +501,9 @@ jobs:
     timeout-minutes: ${{ matrix.backend == 'cuda' && 350 || 180 }}
     strategy:
       fail-fast: false
+      # prepare 算好的组合：{os, platform, qt_arch, backend}（Windows x64、Linux x64 / arm64）
       matrix:
-        os: [windows-2022, ubuntu-22.04]
-        backend: ${{ fromJSON(needs.prepare.outputs.qt_backends) }}
-        include:
-          - os: windows-2022
-            platform: windows-x64
-          # 22.04（glibc 2.35）上构建，包才能在较老的发行版上运行
-          - os: ubuntu-22.04
-            platform: linux-x64
+        include: ${{ fromJSON(needs.prepare.outputs.qt_matrix) }}
     env:
       FRIDAY_DEPS_DIR: ${{ github.workspace }}/deps
       BACKEND_OUT: ${{ github.workspace }}/build/backend
@@ -559,7 +567,8 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.FRIDAY_QT_VERSION }}
-          arch: ${{ runner.os == 'Windows' && 'win64_msvc2022_64' || 'linux_gcc_64' }}
+          # host 按运行器自动取（arm64 的 Linux 运行器是 linux_arm64）
+          arch: ${{ matrix.qt_arch }}
           modules: ${{ env.FRIDAY_QT_MODULES }}
           aqtsource: ${{ env.FRIDAY_AQT_SOURCE }}
           cache: true
@@ -930,12 +939,15 @@ jobs:
           # 包名里的后端：老源码 -cuda / -vulkan，v2.0 起没有
           suffixes = [f"-{b}" if b != "none" else "" for b in json.loads(env.get("QT_BACKENDS") or '["none"]')]
           gpu = suffixes != [""]
+          # Linux 的架构：v2.0 起 x64 和 arm64，带本地推理的老源码只有 x64（和 prepare 的 qt_matrix 一致）
+          linux_arches = ["x64"] if gpu else ["x64", "arm64"]
           qt_assets = {}
           for suffix in suffixes:
               qt_assets[f"windows-x64{suffix}"] = [f"Friday-{tag}-windows-x64{suffix}.zip"] + (
                   [f"Friday-{tag}-windows-x64{suffix}-setup.exe"] if installers else [])
-              qt_assets[f"linux-x64{suffix}"] = [f"Friday-{tag}-linux-x64{suffix}.AppImage", f"Friday-{tag}-linux-x64{suffix}.tar.gz"] + (
-                  [f"Friday-{tag}-linux-x64{suffix}.deb"] if installers else [])
+              for arch in linux_arches:
+                  qt_assets[f"linux-{arch}{suffix}"] = [f"Friday-{tag}-linux-{arch}{suffix}.AppImage", f"Friday-{tag}-linux-{arch}{suffix}.tar.gz"] + (
+                      [f"Friday-{tag}-linux-{arch}{suffix}.deb"] if installers else [])
           missing = [key for key, names in qt_assets.items() if not all((dist / n).exists() for n in names)]
           stable = channel == "stable"
           lines = [
@@ -975,7 +987,7 @@ jobs:
                   "- 不需要另装 VC++ 运行库；没有代码签名，首次运行时 SmartScreen 提示请点「更多信息 → 仍要运行」",
                   "- 数据在 `%APPDATA%\\Friday`，和程序目录分开；覆盖、删除或卸载程序都不影响会话和设置",
                   "",
-                  "### Linux（x64，glibc 2.35 以上：Ubuntu 22.04 / Debian 12 / Fedora 36 及更新）",
+                  f"### Linux（{' / '.join(linux_arches)}，glibc 2.35 以上：Ubuntu 22.04 / Debian 12 / Fedora 36 及更新）",
                   "",
               ]
               if gpu:
@@ -984,7 +996,11 @@ jobs:
                       f"- `Friday-{tag}-linux-x64-vulkan{linux_ext}`：AMD / Intel / NVIDIA 通用（Mesa 或厂商的 Vulkan 驱动，需要 libvulkan1）",
                   ]
               else:
-                  lines += [f"- `Friday-{tag}-linux-x64{linux_ext}`：接在线大模型，不需要显卡"]
+                  lines += [
+                      f"- `Friday-{tag}-linux-x64{linux_ext}`：x86_64（Intel / AMD 处理器）的电脑和服务器",
+                      f"- `Friday-{tag}-linux-arm64{linux_ext}`：ARM64（aarch64）：树莓派 4 / 5（64 位系统）、ARM 服务器、ARM 笔记本",
+                      "- 都是接在线大模型，不需要显卡；`uname -m` 输出 x86_64 选 x64，aarch64 选 arm64",
+                  ]
               if installers:
                   lines += ["- deb（Debian / Ubuntu 系）：`sudo apt install ./Friday-*.deb`，装到 `/opt/friday`，应用菜单里有 Friday，"
                             "命令行 `friday` / `friday-cli`；`sudo apt remove friday` 卸载；更新时弹一次密码确认"]
@@ -999,7 +1015,7 @@ jobs:
                   lines += ["", "从 1.x 升级：v2.0 起不再带本地模型（不用 CUDA / Vulkan），1.x 的 CUDA 版、Vulkan 版都自动更新到这一套包；"
                             "`-upgrade-cuda` / `-upgrade-vulkan` 两种 zip / tar.gz 只给 1.x 自动更新用（内容相同，只是包信息里的名字不同），不用下载。"
                             "以前下载的本地模型还在缓存目录里，不再使用，可以手动删掉。"]
-              servers = [f"Friday-{tag}-server-{p}.tar.gz" for p in ("linux-x64", "windows-x64") if (dist / f"Friday-{tag}-server-{p}.tar.gz").exists()]
+              servers = [f"Friday-{tag}-server-{p}.tar.gz" for p in ("linux-x64", "linux-arm64", "windows-x64") if (dist / f"Friday-{tag}-server-{p}.tar.gz").exists()]
               if servers:
                   lines += ["", "### 远程服务 friday-server（v2.1 起）", "",
                             f"- {' / '.join(f'`{n}`' for n in servers)}：远程 Friday 的无界面服务。Friday 经 SSH / WSL 连远程机器时，"
@@ -1106,8 +1122,24 @@ jobs:
               item["protocol"] = int(info.get("protocol", 0))
               return item
 
+          # Linux 条目是 AppImage，tar.gz 挂在 tarball 下、deb 挂在 deb 下；arch 是 x64 / arm64
+          def linux_entry(arch, suffix, tarball_name=None):
+              appimage = asset(f"Friday-{tag}-linux-{arch}.AppImage" if tarball_name else f"Friday-{tag}-linux-{arch}{suffix}.AppImage")
+              if not appimage:
+                  return None
+              tarball = asset(tarball_name or f"Friday-{tag}-linux-{arch}{suffix}.tar.gz")
+              if tarball:
+                  appimage["tarball"] = tarball
+              deb = asset(f"Friday-{tag}-linux-{arch}.deb" if tarball_name else f"Friday-{tag}-linux-{arch}{suffix}.deb")
+              if deb:
+                  appimage["deb"] = deb
+              server = server_entry(f"linux-{arch}")
+              if server:
+                  appimage["server"] = server
+              return appimage
+
           # Qt 版按 "<系统>-<架构>"（v2.0 之前是 "<系统>-<架构>-<后端>"）取自己的包；Windows 条目是 zip，安装程序挂在 installer 下；
-          # Linux 条目是 AppImage，tar.gz 挂在 tarball 下、deb 挂在 deb 下（应用按自己的安装方式取，见源码 qt/docs/PACKAGING.md §4）
+          # Linux 条目见 linux_entry（应用按自己的安装方式取，见源码 qt/docs/PACKAGING.md §4）
           # （macOS 版的 ReleaseEntry 是编译器合成的 Codable，解码时忽略这个多出来的键）
           def qt_entry(suffix, zip_name=None, tarball_name=None):
               entries = {}
@@ -1120,18 +1152,11 @@ jobs:
                   if server:
                       win["server"] = server
                   entries["windows-x64"] = win
-              appimage = asset(f"Friday-{tag}-linux-x64.AppImage" if tarball_name else f"Friday-{tag}-linux-x64{suffix}.AppImage")
-              if appimage:
-                  tarball = asset(tarball_name or f"Friday-{tag}-linux-x64{suffix}.tar.gz")
-                  if tarball:
-                      appimage["tarball"] = tarball
-                  deb = asset(f"Friday-{tag}-linux-x64.deb" if tarball_name else f"Friday-{tag}-linux-x64{suffix}.deb")
-                  if deb:
-                      appimage["deb"] = deb
-                  server = server_entry("linux-x64")
-                  if server:
-                      appimage["server"] = server
-                  entries["linux-x64"] = appimage
+              # 给 1.x 老键的升级包（tarball_name）只有 x64：1.x 没有 arm64 版
+              for arch in ("x64",) if tarball_name else ("x64", "arm64"):
+                  item = linux_entry(arch, suffix, tarball_name)
+                  if item:
+                      entries[f"linux-{arch}"] = item
               return entries
 
           assets = {}
