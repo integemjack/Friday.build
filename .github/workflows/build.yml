@@ -322,8 +322,8 @@ jobs:
           host: mac
           target: desktop
           arch: clang_64
-          # friday-server 只链接 Core / Network / Concurrent / Gui / WebSockets
-          modules: qtwebsockets
+          # friday-server 只链接 Core / Network / Concurrent / Gui / WebSockets；qtimageformats 给 webp、heic 插件
+          modules: qtwebsockets qtimageformats
           aqtsource: ${{ env.FRIDAY_AQT_SOURCE }}
           cache: true
           cache-key-prefix: qt-macos-helper
