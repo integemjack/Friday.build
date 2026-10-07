@@ -8,6 +8,8 @@ name: Build and release Friday
 #      每次打包自动 +1（按已有标签数）；main 分支的提交发正式版（标签 vX.Y.Z），其他分支发预发布（vX.Y.Z-beta）；
 #   4. macos：导入 Developer ID 证书，调用源码里的 Friday/Tools/CI/build.sh 构建、签名、打包，再签 dmg、公证并钉票据
 #      （缺证书或公证密钥、公证不通过都直接失败，不发未公证的包）；
+#      v2.3 起 Friday.app 自带 friday-server（Qt 版 core 的 macOS 构建，在 Contents/Helpers/，连同 Qt 框架、插件）：
+#      源码有 qt/ci/build_macos_helper.sh 时先装 Qt、编好，build.sh 放进 App 一起签名、公证（源码 qt/docs/ASSISTANT.md §2.2）；
 #      qt：Windows / Linux 的 Qt 版（调用源码里的 qt/ci/ 脚本）：Windows 出 zip 便携版 + 安装程序
 #      （-setup.exe，源码 qt/installer/ 的自制安装器；在运行器上静默装一遍、卸一遍核对），Linux 出 AppImage + tar.gz + deb
 #      （deb 在运行器上 apt 装一遍核对）；老源码没有安装程序时只出 zip。
@@ -298,6 +300,47 @@ jobs:
           sudo xcode-select -s "${XCODE}"
           xcodebuild -version
           sw_vers
+
+      # v2.3 起：Friday.app 自带的 friday-server（Mac 本机的会话归助手管、别的机器经 SSH 连进来时的桥）
+      - name: Check friday-server helper
+        id: helper
+        run: |
+          set -euo pipefail
+          if [ -f src/qt/ci/build_macos_helper.sh ] && [ -f src/qt/ci/deps.env ]; then
+            echo "enabled=true" >> "${GITHUB_OUTPUT}"
+            grep -E '^[A-Z0-9_]+=' src/qt/ci/deps.env | tr -d '\r' | tee -a "${GITHUB_ENV}"
+          else
+            echo "enabled=false" >> "${GITHUB_OUTPUT}"
+            echo "源码没有 qt/ci/build_macos_helper.sh：App 不带 friday-server"
+          fi
+
+      - name: Install Qt ${{ env.FRIDAY_QT_VERSION }} (friday-server helper)
+        if: steps.helper.outputs.enabled == 'true'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.FRIDAY_QT_VERSION }}
+          host: mac
+          target: desktop
+          arch: clang_64
+          # friday-server 只链接 Core / Network / Concurrent / Gui / WebSockets
+          modules: qtwebsockets
+          aqtsource: ${{ env.FRIDAY_AQT_SOURCE }}
+          cache: true
+          cache-key-prefix: qt-macos-helper
+
+      - name: Build friday-server helper
+        if: steps.helper.outputs.enabled == 'true'
+        env:
+          FRIDAY_VERSION: ${{ needs.prepare.outputs.marketing }}
+          FRIDAY_BUILD_NUMBER: ${{ github.run_number }}
+          FRIDAY_RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
+          FRIDAY_RELEASE_CHANNEL: ${{ needs.prepare.outputs.channel }}
+        run: |
+          set -euo pipefail
+          STAGE="${RUNNER_TEMP}/friday-helper"
+          bash src/qt/ci/build_macos_helper.sh --out "${STAGE}" --build-dir "${RUNNER_TEMP}/friday-helper-build"
+          # build.sh 看到它就放进 App、签名
+          echo "FRIDAY_HELPER_STAGE=${STAGE}" >> "${GITHUB_ENV}"
 
       - name: Install Metal toolchain
         if: needs.prepare.outputs.has_mlx == 'true'
