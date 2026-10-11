@@ -849,7 +849,8 @@ jobs:
           retention-days: 14
           overwrite: true
 
-      # 安装程序真装一遍：运行器上是管理员（没有 UAC 确认框），静默装到临时目录 → 核对文件、friday-cli 能起、「应用和功能」的注册信息
+      # 安装程序真装一遍：运行器上是管理员（没有 UAC 确认框），静默装到临时目录 → 核对文件、命令行能起（v2.8 起是 friday.com → friday.exe，
+      # 之前是 friday-cli.exe）、「应用和功能」的注册信息
       # → 静默卸载 → 目录（收尾进程异步删）和注册信息都没了。失败不挡发布，最后一步把 job 标红
       - name: Verify installer (Windows)
         id: verify_installer
@@ -866,11 +867,15 @@ jobs:
           try {
             $p = Start-Process -FilePath $setup.FullName -ArgumentList "/S /D=$dir" -Wait -PassThru
             if ($p.ExitCode -ne 0) { throw "静默安装失败（退出码 $($p.ExitCode)）" }
-            foreach ($f in 'friday.exe', 'friday-cli.exe', 'uninstall.exe', 'FridaySetupUI.exe', 'package.json') {
+            # v2.8 起命令行并进 friday.exe，终端里先跑 friday.com；之前的源码是 friday-cli.exe
+            $cli = if (Test-Path -LiteralPath (Join-Path $dir 'friday.com')) { 'friday.com' } else { 'friday-cli.exe' }
+            foreach ($f in 'friday.exe', $cli, 'uninstall.exe', 'FridaySetupUI.exe', 'package.json') {
               if (-not (Test-Path -LiteralPath (Join-Path $dir $f))) { throw "装完缺 $f" }
             }
-            & (Join-Path $dir 'friday-cli.exe') --version
-            if ($LASTEXITCODE -ne 0) { throw "装好的 friday-cli --version 退出码 $LASTEXITCODE" }
+            $version = (& (Join-Path $dir $cli) --version | Out-String).Trim()
+            if ($LASTEXITCODE -ne 0) { throw "装好的 $cli --version 退出码 $LASTEXITCODE" }
+            if (-not $version) { throw "装好的 $cli --version 没有输出" }
+            Write-Host "$cli --version：$version"
             $arp = Get-ItemProperty -LiteralPath $arpKey
             if ($arp.InstallLocation -ne $dir) { throw "注册表里的 InstallLocation 是 '$($arp.InstallLocation)'，不是 $dir" }
             Write-Host "应用和功能：$($arp.DisplayName) $($arp.DisplayVersion)（$($arp.EstimatedSize) KB），卸载：$($arp.QuietUninstallString)"
@@ -884,7 +889,7 @@ jobs:
             if (Test-Path -LiteralPath $log) { Write-Host '--- friday-setup.log ---'; Get-Content -LiteralPath $log -Encoding utf8 | Select-Object -Last 40 }
           }
 
-      # deb 真装一遍：apt 补依赖 → /usr/bin/friday-cli 能起 → 卸掉
+      # deb 真装一遍：apt 补依赖 → 命令行能起（v2.8 起是 /usr/bin/friday 带参数，之前是 /usr/bin/friday-cli）→ 卸掉
       - name: Verify deb (Linux)
         id: verify_deb
         if: runner.os == 'Linux' && needs.prepare.outputs.has_installer == 'true'
@@ -896,7 +901,8 @@ jobs:
           sudo apt-get install -y "${DEB}"
           test -x /opt/friday/AppRun
           test -f /usr/share/applications/friday.desktop
-          env -u LD_LIBRARY_PATH QT_QPA_PLATFORM=offscreen /usr/bin/friday-cli --version
+          if [ -x /usr/bin/friday-cli ]; then CLI=/usr/bin/friday-cli; else CLI=/usr/bin/friday; fi
+          env -u LD_LIBRARY_PATH QT_QPA_PLATFORM=offscreen "${CLI}" --version
           sudo apt-get remove -y friday
           test ! -e /opt/friday/usr/bin/friday
           echo "deb 核对通过：apt 安装、启动、卸载"
@@ -1085,7 +1091,8 @@ jobs:
                   ]
               if installers:
                   lines += ["- deb（Debian / Ubuntu 系）：`sudo apt install ./Friday-*.deb`，装到 `/opt/friday`，应用菜单里有 Friday，"
-                            "命令行 `friday` / `friday-cli`；`sudo apt remove friday` 卸载；更新时弹一次密码确认"]
+                            "命令行 `friday`（2.8 起带了参数就是命令行，`friday .` 在当前目录干活；之前是 `friday-cli`）；"
+                            "`sudo apt remove friday` 卸载；更新时弹一次密码确认"]
               lines += [
                   "- AppImage：`chmod +x Friday-*.AppImage` 后直接运行；系统没有 FUSE 时加 `--appimage-extract-and-run` 参数，或改用 tar.gz",
                   "- tar.gz：解压后运行 `Friday/AppRun`；朗读功能需要系统装有 speech-dispatcher",
