@@ -10,6 +10,9 @@ name: Build and release Friday
 #      （缺证书或公证密钥、公证不通过都直接失败，不发未公证的包）；
 #      v2.3 起 Friday.app 自带 friday-server（Qt 版 core 的 macOS 构建，在 Contents/Helpers/，连同 Qt 框架、插件）：
 #      源码有 qt/ci/build_macos_helper.sh 时先装 Qt、编好，build.sh 放进 App 一起签名、公证（源码 qt/docs/ASSISTANT.md §2.2）；
+#      v2.8 起（源码有 qt/ci/package_macos_server.sh）App 不再带它（Mac 上的助手在 Friday.app 里，Swift 写的）：单独打成
+#      Friday-<标签>-server-macos-arm64.tar.gz，签名、公证，别的机器经 SSH 连这台 Mac 时装它（只做 --attach 的桥，
+#      挂在 latest.json 的 assets["macos-arm64"].server 下）；
 #      qt：Windows / Linux 的 Qt 版（调用源码里的 qt/ci/ 脚本）：Windows 出 zip 便携版 + 安装程序
 #      （-setup.exe，源码 qt/installer/ 的自制安装器；在运行器上静默装一遍、卸一遍核对），Linux 出 AppImage + tar.gz + deb
 #      （deb 在运行器上 apt 装一遍核对）；老源码没有安装程序时只出 zip。
@@ -20,7 +23,8 @@ name: Build and release Friday
 #   5. release：macOS 成功才发布（Qt 某个组合失败照样发布其余产物，并在说明里注明缺哪些）；
 #      正式版和预发布各只保留最新的一个 Release（旧的连安装包一起删，标签保留以便继续计数）；
 #   6. 发布后更新仓库根目录的 latest.json（每个渠道最新的一次发布，含各平台安装包 assets），Friday 应用定期读它来自动更新。
-#      v2.1 起 Windows / Linux 另出远程用的 friday-server 包（Friday-<标签>-server-<平台>.tar.gz），挂在 assets 各平台条目的 server 下：
+#      v2.1 起 Windows / Linux 另出远程用的 friday-server 包（Friday-<标签>-server-<平台>.tar.gz），挂在 assets 各平台条目的 server 下
+#      （v2.8 起 macOS 也有，见上）：
 #      Friday 连远程机器时发现没装或版本旧就下载它、经 SSH 装上去（源码 qt/docs/REMOTE.md §9）。
 on:
   repository_dispatch:
@@ -308,6 +312,8 @@ jobs:
           set -euo pipefail
           if [ -f src/qt/ci/build_macos_helper.sh ] && [ -f src/qt/ci/deps.env ]; then
             echo "enabled=true" >> "${GITHUB_OUTPUT}"
+            # v2.8 起单独打成服务端包，不放进 App
+            if [ -f src/qt/ci/package_macos_server.sh ]; then echo "package=true" >> "${GITHUB_OUTPUT}"; else echo "package=false" >> "${GITHUB_OUTPUT}"; fi
             grep -E '^[A-Z0-9_]+=' src/qt/ci/deps.env | tr -d '\r' | tee -a "${GITHUB_ENV}"
           else
             echo "enabled=false" >> "${GITHUB_OUTPUT}"
@@ -339,8 +345,13 @@ jobs:
           set -euo pipefail
           STAGE="${RUNNER_TEMP}/friday-helper"
           bash src/qt/ci/build_macos_helper.sh --out "${STAGE}" --build-dir "${RUNNER_TEMP}/friday-helper-build"
-          # build.sh 看到它就放进 App、签名
-          echo "FRIDAY_HELPER_STAGE=${STAGE}" >> "${GITHUB_ENV}"
+          if [ "${{ steps.helper.outputs.package }}" = "true" ]; then
+            # v2.8 起：签名身份导入之后由 package_macos_server.sh 打成服务端包（下面 Package friday-server for macOS）
+            echo "FRIDAY_SERVER_STAGE=${STAGE}" >> "${GITHUB_ENV}"
+          else
+            # 2.7 以前：build.sh 看到它就放进 App、签名
+            echo "FRIDAY_HELPER_STAGE=${STAGE}" >> "${GITHUB_ENV}"
+          fi
 
       - name: Install Metal toolchain
         if: needs.prepare.outputs.has_mlx == 'true'
@@ -419,6 +430,15 @@ jobs:
           printf 'CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO\n' > "${XCODE_XCCONFIG_FILE}"
           bash src/Friday/Tools/CI/build.sh
 
+      # v2.8 起：friday-server 不在 App 里（Mac 上的助手在 Friday.app 里），单独打成服务端包（Developer ID 签名、hardened runtime），
+      # 下一步和 dmg 一起公证。别的机器经 SSH 连这台 Mac 时装它，只做 --attach 的桥（源码 qt/docs/ASSISTANT.md §2.2）
+      - name: Package friday-server for macOS
+        if: env.FRIDAY_SERVER_STAGE != ''
+        env:
+          CODE_SIGN_IDENTITY: ${{ vars.CODE_SIGN_IDENTITY }}
+          LABEL: ${{ needs.prepare.outputs.release_tag }}
+        run: bash src/qt/ci/package_macos_server.sh --stage "${FRIDAY_SERVER_STAGE}" --tag "${LABEL}" --out dist
+
       # build.sh 只签 app，dmg 在这里补 Developer ID 签名；公证 dmg（Apple 会一并登记里面 app 的票据），
       # 把票据钉到 dmg 和 app 上，用钉过票据的 app 重打 zip（自动更新用 zip），最后用 Gatekeeper 的判定确认已公证。
       # 缺公证密钥或公证没通过都直接失败：未公证的包打开时会被 Gatekeeper 拦下，不能发出去。
@@ -484,6 +504,18 @@ jobs:
           rm -f "${ZIP}"
           ditto -c -k --sequesterRsrc --keepParent "${APP}" "${ZIP}"
 
+          # v2.8 起的服务端包：解开、打成 zip 交给公证（只是登记；单个程序钉不了票据，装到用户机器上也不带隔离属性）
+          SERVER="dist/Friday-${LABEL}-server-macos-arm64.tar.gz"
+          if [ -f "${SERVER}" ]; then
+            echo "▶ 公证 friday-server 包"
+            SERVER_DIR="${RUNNER_TEMP}/friday-server-notary"
+            rm -rf "${SERVER_DIR}" && mkdir -p "${SERVER_DIR}"
+            tar -xzf "${SERVER}" -C "${SERVER_DIR}"
+            ditto -c -k --keepParent "${SERVER_DIR}/friday-server" "${SERVER_DIR}.zip"
+            notarize "${SERVER_DIR}.zip"
+            rm -rf "${SERVER_DIR}" "${SERVER_DIR}.zip"
+          fi
+
           echo "▶ 校验公证票据与 Gatekeeper 判定"
           xcrun stapler validate "${APP}"
           [ -f "${DMG}" ] && xcrun stapler validate "${DMG}"
@@ -503,7 +535,7 @@ jobs:
           else
             echo "::warning::运行器关闭了 Gatekeeper 评估，只校验了钉上的票据"
           fi
-          (cd dist && shopt -s nullglob && shasum -a 256 *.zip *.dmg > SHA256SUMS.txt && cat SHA256SUMS.txt)
+          (cd dist && shopt -s nullglob && shasum -a 256 *.zip *.dmg *.tar.gz > SHA256SUMS.txt && cat SHA256SUMS.txt)
 
       # GitHub 的产物服务偶尔整段超时（CreateArtifact 重试 5 次都失败）：等一分钟再传一次，免得一次抖动挡住整轮发布
       - name: Upload artifact
@@ -1065,11 +1097,13 @@ jobs:
                   lines += ["", "从 1.x 升级：v2.0 起不再带本地模型（不用 CUDA / Vulkan），1.x 的 CUDA 版、Vulkan 版都自动更新到这一套包；"
                             "`-upgrade-cuda` / `-upgrade-vulkan` 两种 zip / tar.gz 只给 1.x 自动更新用（内容相同，只是包信息里的名字不同），不用下载。"
                             "以前下载的本地模型还在缓存目录里，不再使用，可以手动删掉。"]
-              servers = [f"Friday-{tag}-server-{p}.tar.gz" for p in ("linux-x64", "linux-arm64", "windows-x64") if (dist / f"Friday-{tag}-server-{p}.tar.gz").exists()]
+              servers = [f"Friday-{tag}-server-{p}.tar.gz" for p in ("linux-x64", "linux-arm64", "windows-x64", "macos-arm64") if (dist / f"Friday-{tag}-server-{p}.tar.gz").exists()]
               if servers:
                   lines += ["", "### 远程服务 friday-server（v2.1 起）", "",
                             f"- {' / '.join(f'`{n}`' for n in servers)}：远程 Friday 的无界面服务。Friday 经 SSH / WSL 连远程机器时，"
                             "发现对方没装或版本旧会自动下载对应的包、装到对方的 `~/.friday-server/`（空闲时换上新版本），不用手动下载"]
+                  if f"Friday-{tag}-server-macos-arm64.tar.gz" in servers:
+                      lines += ["- macOS 的这个包只给别的电脑经 SSH 连这台 Mac 时用（自动装到 `~/.friday-server/`）：v2.8 起 Friday.app 不再带它，Mac 上的助手就在 Friday.app 里"]
               if missing:
                   lines += ["", f"> ⚠️ 本次缺少以下 Windows / Linux 安装包（构建失败，详见构建日志）：{'、'.join(missing)}"]
           else:
@@ -1213,7 +1247,12 @@ jobs:
           for backend in ("cuda", "vulkan"):
               for platform, item in qt_entry(f"-{backend}").items():
                   assets[f"{platform}-{backend}"] = item
-          if not assets:
+          # v2.8 起：Mac 上的 friday-server（别的电脑经 SSH 连进来用）单独成包，挂在 assets["macos-arm64"].server 下；
+          # 条目本身写 App 的 zip（Qt 版解析 assets 时只收带 url 的条目，macOS 版只读 server）
+          mac_server = server_entry("macos-arm64")
+          if mac_server and asset(zip_name):
+              assets["macos-arm64"] = dict(asset(zip_name), server=mac_server)
+          if not [key for key in assets if key != "macos-arm64"]:
               # v2.0 起：一个平台一套包；1.x 的老键指向同一套包，便携 zip / tar.gz 换成 package.json 对得上的 -upgrade-<后端>
               assets.update(qt_entry(""))
               for backend in ("cuda", "vulkan"):
