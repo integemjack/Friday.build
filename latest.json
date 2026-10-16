@@ -195,198 +195,198 @@
       }
     }
   },
-  "updatedAt": "2026-10-16T02:28:07Z",
+  "updatedAt": "2026-10-16T02:56:15Z",
   "stable": {
-    "tag": "v2.11.34",
-    "version": "2.11.34",
-    "build": 297,
+    "tag": "v2.11.35",
+    "version": "2.11.35",
+    "build": 298,
     "channel": "stable",
-    "date": "2026-10-16T02:28:07Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-macOS-arm64.dmg",
-    "sha256": "cffce1c0153384023f0dad16bff42044e2b0600f6b10b5f24deb9db509360d58",
-    "size": 25028365,
-    "notes": "设置 › 自我改进精简排版（Qt + Swift）：三节脚注砍到一两句（细节留在 MEMORY.md），远程说明只在顶上说一次；改进建议「上次找」「改进者自己」成�",
+    "date": "2026-10-16T02:56:15Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-macOS-arm64.dmg",
+    "sha256": "745121f53badddb97dc00f4f007dfa1fbcd2550e440dfc38bb0d1201f65c4178",
+    "size": 25029159,
+    "notes": "设置 › 自我改进 › 提示词文件的版本历史行重排（Qt + Swift）：时间不再做标签（和长说明抢宽度，时间折成两行、说明不省略把「回滚到这里」挤出",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v2.11.34",
-    "source": "a45cd80a120f9d8ebae707864688a4e36d693fdf",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v2.11.35",
+    "source": "e7396330759e8a637eb7c400a27a43ddc0715963",
     "branch": "main",
     "assets": {
       "macos-arm64": {
-        "name": "Friday-v2.11.34-macOS-arm64.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-macOS-arm64.zip",
-        "sha256": "cffce1c0153384023f0dad16bff42044e2b0600f6b10b5f24deb9db509360d58",
-        "size": 25028365,
+        "name": "Friday-v2.11.35-macOS-arm64.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-macOS-arm64.zip",
+        "sha256": "745121f53badddb97dc00f4f007dfa1fbcd2550e440dfc38bb0d1201f65c4178",
+        "size": 25029159,
         "server": {
-          "name": "Friday-v2.11.34-server-macos-arm64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-server-macos-arm64.tar.gz",
-          "sha256": "cfffe9e3ca66bff3973018c111d337415ac8698eb5b7a20cc5c9d6a71c2caa48",
-          "size": 13483044,
-          "version": "2.11.34",
+          "name": "Friday-v2.11.35-server-macos-arm64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-server-macos-arm64.tar.gz",
+          "sha256": "030c1adc55a6ccad2835847217e39c0835ce48b82d30900f08ea4c90080194f8",
+          "size": 13483075,
+          "version": "2.11.35",
           "protocol": 1
         }
       },
       "windows-x64": {
-        "name": "Friday-v2.11.34-windows-x64.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-windows-x64.zip",
-        "sha256": "344d7fca3c24ba42417a7fc387688cb93c5959ae716502eff126c49f474bd30a",
-        "size": 57561652,
+        "name": "Friday-v2.11.35-windows-x64.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-windows-x64.zip",
+        "sha256": "9ea945be9a273f7fad1f52eb9a997c7abff7f22ba1942715c73c4c1eff7003b8",
+        "size": 57561283,
         "installer": {
-          "name": "Friday-v2.11.34-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-windows-x64-setup.exe",
-          "sha256": "18c12cf6221008a5d077f350f304027f9f2ca9f75cc721d5b6265d98b472d56a",
-          "size": 39915869
+          "name": "Friday-v2.11.35-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-windows-x64-setup.exe",
+          "sha256": "b47fc1d1088d94e2f11de726f4a8124eb9ee42744fc18b5c303bc00a6fc35b9a",
+          "size": 39918078
         },
         "server": {
-          "name": "Friday-v2.11.34-server-windows-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-server-windows-x64.tar.gz",
-          "sha256": "af414848da25498cc0c1420fafbfe310e88c144f2704bec4efe0dbb331ae6f66",
-          "size": 22463409,
-          "version": "2.11.34",
+          "name": "Friday-v2.11.35-server-windows-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-server-windows-x64.tar.gz",
+          "sha256": "4bb8c6046d5f321d11bf73f112fe44405038743e6642ce4a426d46ce3769cfc9",
+          "size": 22463449,
+          "version": "2.11.35",
           "protocol": 1
         }
       },
       "linux-x64": {
-        "name": "Friday-v2.11.34-linux-x64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-linux-x64.AppImage",
-        "sha256": "09d374f5c37776f94bcc3283f11aae88b274cdbb52d1cd4a39c17cdf30e2ff0d",
+        "name": "Friday-v2.11.35-linux-x64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-linux-x64.AppImage",
+        "sha256": "0a7c94943b12674a244aa46f4d85c80c89092f2302cb66ff0e49d45bdc0d8253",
         "size": 70089208,
         "tarball": {
-          "name": "Friday-v2.11.34-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-linux-x64.tar.gz",
-          "sha256": "6e83d95b82399fd5a18bb3e035cad6b71b657e5c6bd0b1bfadc5f9cd9d4e2d52",
-          "size": 76455258
+          "name": "Friday-v2.11.35-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-linux-x64.tar.gz",
+          "sha256": "ffc077605ae3aa9a8946a7c2ae446f73f06648b84759d422ea50af934a24e637",
+          "size": 76454887
         },
         "deb": {
-          "name": "Friday-v2.11.34-linux-x64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-linux-x64.deb",
-          "sha256": "5d1852a2b0fb0ebc5c8888285cd8034b4b83d4c0ad7c1f7740b4c7e61afadc6d",
-          "size": 52514368
+          "name": "Friday-v2.11.35-linux-x64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-linux-x64.deb",
+          "sha256": "0bfaf2989a607bef8fb94a53cb3482f304ae6b350ff7db13e988f66e591315a9",
+          "size": 52512980
         },
         "server": {
-          "name": "Friday-v2.11.34-server-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-server-linux-x64.tar.gz",
-          "sha256": "85573fd195def18254c45a79b9bb77ea9c8b2a0ad9a6cae4bd8aa87f26229211",
-          "size": 40370976,
-          "version": "2.11.34",
+          "name": "Friday-v2.11.35-server-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-server-linux-x64.tar.gz",
+          "sha256": "42e46ec21e507423134c117f792da0fd8a1209afa877267b65af3ad06e324cff",
+          "size": 40370464,
+          "version": "2.11.35",
           "protocol": 1
         }
       },
       "linux-arm64": {
-        "name": "Friday-v2.11.34-linux-arm64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-linux-arm64.AppImage",
-        "sha256": "bc7954480799ce912aabbf0e6be33417b2141606c2a875cea04fec54339ffd22",
+        "name": "Friday-v2.11.35-linux-arm64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-linux-arm64.AppImage",
+        "sha256": "fc94c915902719d555d02ceb691934ce906462fc59bdda79a07be2b5302eb769",
         "size": 68868616,
         "tarball": {
-          "name": "Friday-v2.11.34-linux-arm64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-linux-arm64.tar.gz",
-          "sha256": "485551b8363ae050324b60d049d66226adbb780b9aa980c2ff6b886bf6e33678",
-          "size": 75428244
+          "name": "Friday-v2.11.35-linux-arm64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-linux-arm64.tar.gz",
+          "sha256": "714aefb7f6d2921f45731b6cd39a65c49b5cfca145945ee1c23448ec1093abe3",
+          "size": 75428841
         },
         "deb": {
-          "name": "Friday-v2.11.34-linux-arm64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-linux-arm64.deb",
-          "sha256": "e7cf503a681f82e61af6d4fb816a22c42fb8e45721750f654e72bbaefb154bed",
-          "size": 49831180
+          "name": "Friday-v2.11.35-linux-arm64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-linux-arm64.deb",
+          "sha256": "0ea95121db2aed818efbbccefdabe9ce762ba6d2fe831dac77742bc91a37bf49",
+          "size": 49811280
         },
         "server": {
-          "name": "Friday-v2.11.34-server-linux-arm64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-server-linux-arm64.tar.gz",
-          "sha256": "4276323c1246717a67b75ab51c9d71eb88651ed73a89a7ad7a3a96b1598d5b18",
-          "size": 38917052,
-          "version": "2.11.34",
+          "name": "Friday-v2.11.35-server-linux-arm64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-server-linux-arm64.tar.gz",
+          "sha256": "0937eeace2017c1428f0ddb9862ea00d1238d1963d39c4a17ca2be34931eabc6",
+          "size": 38917306,
+          "version": "2.11.35",
           "protocol": 1
         }
       },
       "windows-x64-cuda": {
-        "name": "Friday-v2.11.34-windows-x64-upgrade-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-windows-x64-upgrade-cuda.zip",
-        "sha256": "91bd762aa65c1fb699874f94062586caca8f99378386b79be39acfffc573ffbf",
-        "size": 59901735,
+        "name": "Friday-v2.11.35-windows-x64-upgrade-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-windows-x64-upgrade-cuda.zip",
+        "sha256": "459a5383c4ffa786f5a049b3cd46816d61413b5681b7a2483ffd5d434677b352",
+        "size": 59902130,
         "installer": {
-          "name": "Friday-v2.11.34-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-windows-x64-setup.exe",
-          "sha256": "18c12cf6221008a5d077f350f304027f9f2ca9f75cc721d5b6265d98b472d56a",
-          "size": 39915869
+          "name": "Friday-v2.11.35-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-windows-x64-setup.exe",
+          "sha256": "b47fc1d1088d94e2f11de726f4a8124eb9ee42744fc18b5c303bc00a6fc35b9a",
+          "size": 39918078
         },
         "server": {
-          "name": "Friday-v2.11.34-server-windows-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-server-windows-x64.tar.gz",
-          "sha256": "af414848da25498cc0c1420fafbfe310e88c144f2704bec4efe0dbb331ae6f66",
-          "size": 22463409,
-          "version": "2.11.34",
+          "name": "Friday-v2.11.35-server-windows-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-server-windows-x64.tar.gz",
+          "sha256": "4bb8c6046d5f321d11bf73f112fe44405038743e6642ce4a426d46ce3769cfc9",
+          "size": 22463449,
+          "version": "2.11.35",
           "protocol": 1
         }
       },
       "linux-x64-cuda": {
-        "name": "Friday-v2.11.34-linux-x64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-linux-x64.AppImage",
-        "sha256": "09d374f5c37776f94bcc3283f11aae88b274cdbb52d1cd4a39c17cdf30e2ff0d",
+        "name": "Friday-v2.11.35-linux-x64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-linux-x64.AppImage",
+        "sha256": "0a7c94943b12674a244aa46f4d85c80c89092f2302cb66ff0e49d45bdc0d8253",
         "size": 70089208,
         "tarball": {
-          "name": "Friday-v2.11.34-linux-x64-upgrade-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-linux-x64-upgrade-cuda.tar.gz",
-          "sha256": "ee5b632529d559717f8d1e6c3718da22f6bcef6fb105509ef629160bb5c9f779",
-          "size": 76496260
+          "name": "Friday-v2.11.35-linux-x64-upgrade-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-linux-x64-upgrade-cuda.tar.gz",
+          "sha256": "735c9013a586c4b4ba28e7f74fe89c3abdb0305967da9168f630d3c45cdff8b4",
+          "size": 76496840
         },
         "deb": {
-          "name": "Friday-v2.11.34-linux-x64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-linux-x64.deb",
-          "sha256": "5d1852a2b0fb0ebc5c8888285cd8034b4b83d4c0ad7c1f7740b4c7e61afadc6d",
-          "size": 52514368
+          "name": "Friday-v2.11.35-linux-x64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-linux-x64.deb",
+          "sha256": "0bfaf2989a607bef8fb94a53cb3482f304ae6b350ff7db13e988f66e591315a9",
+          "size": 52512980
         },
         "server": {
-          "name": "Friday-v2.11.34-server-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-server-linux-x64.tar.gz",
-          "sha256": "85573fd195def18254c45a79b9bb77ea9c8b2a0ad9a6cae4bd8aa87f26229211",
-          "size": 40370976,
-          "version": "2.11.34",
+          "name": "Friday-v2.11.35-server-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-server-linux-x64.tar.gz",
+          "sha256": "42e46ec21e507423134c117f792da0fd8a1209afa877267b65af3ad06e324cff",
+          "size": 40370464,
+          "version": "2.11.35",
           "protocol": 1
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v2.11.34-windows-x64-upgrade-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-windows-x64-upgrade-vulkan.zip",
-        "sha256": "49ded49187387df20841b94753f96b3811887022d9850b93e8e7fb063a52c303",
-        "size": 59901737,
+        "name": "Friday-v2.11.35-windows-x64-upgrade-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-windows-x64-upgrade-vulkan.zip",
+        "sha256": "60231eb8ebaa08055830e358fc264720b51b6e4c9d240ececc96897baf6a8b53",
+        "size": 59902132,
         "installer": {
-          "name": "Friday-v2.11.34-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-windows-x64-setup.exe",
-          "sha256": "18c12cf6221008a5d077f350f304027f9f2ca9f75cc721d5b6265d98b472d56a",
-          "size": 39915869
+          "name": "Friday-v2.11.35-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-windows-x64-setup.exe",
+          "sha256": "b47fc1d1088d94e2f11de726f4a8124eb9ee42744fc18b5c303bc00a6fc35b9a",
+          "size": 39918078
         },
         "server": {
-          "name": "Friday-v2.11.34-server-windows-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-server-windows-x64.tar.gz",
-          "sha256": "af414848da25498cc0c1420fafbfe310e88c144f2704bec4efe0dbb331ae6f66",
-          "size": 22463409,
-          "version": "2.11.34",
+          "name": "Friday-v2.11.35-server-windows-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-server-windows-x64.tar.gz",
+          "sha256": "4bb8c6046d5f321d11bf73f112fe44405038743e6642ce4a426d46ce3769cfc9",
+          "size": 22463449,
+          "version": "2.11.35",
           "protocol": 1
         }
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v2.11.34-linux-x64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-linux-x64.AppImage",
-        "sha256": "09d374f5c37776f94bcc3283f11aae88b274cdbb52d1cd4a39c17cdf30e2ff0d",
+        "name": "Friday-v2.11.35-linux-x64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-linux-x64.AppImage",
+        "sha256": "0a7c94943b12674a244aa46f4d85c80c89092f2302cb66ff0e49d45bdc0d8253",
         "size": 70089208,
         "tarball": {
-          "name": "Friday-v2.11.34-linux-x64-upgrade-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-linux-x64-upgrade-vulkan.tar.gz",
-          "sha256": "c6c02c229bd40aa43a96b9d50a9b167215cfbeb90c1a5de55aad23e7121d81da",
-          "size": 76496229
+          "name": "Friday-v2.11.35-linux-x64-upgrade-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-linux-x64-upgrade-vulkan.tar.gz",
+          "sha256": "9db2d7283e91a0f77b86df0ebbcf9154dcb67a25772b7afce470a389ec916693",
+          "size": 76496865
         },
         "deb": {
-          "name": "Friday-v2.11.34-linux-x64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-linux-x64.deb",
-          "sha256": "5d1852a2b0fb0ebc5c8888285cd8034b4b83d4c0ad7c1f7740b4c7e61afadc6d",
-          "size": 52514368
+          "name": "Friday-v2.11.35-linux-x64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-linux-x64.deb",
+          "sha256": "0bfaf2989a607bef8fb94a53cb3482f304ae6b350ff7db13e988f66e591315a9",
+          "size": 52512980
         },
         "server": {
-          "name": "Friday-v2.11.34-server-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.34/Friday-v2.11.34-server-linux-x64.tar.gz",
-          "sha256": "85573fd195def18254c45a79b9bb77ea9c8b2a0ad9a6cae4bd8aa87f26229211",
-          "size": 40370976,
-          "version": "2.11.34",
+          "name": "Friday-v2.11.35-server-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.11.35/Friday-v2.11.35-server-linux-x64.tar.gz",
+          "sha256": "42e46ec21e507423134c117f792da0fd8a1209afa877267b65af3ad06e324cff",
+          "size": 40370464,
+          "version": "2.11.35",
           "protocol": 1
         }
       }
