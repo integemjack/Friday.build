@@ -622,7 +622,7 @@ jobs:
           set -euo pipefail
           sudo apt-get update -y
           # g++-12：C++20 支持更完整，且 22.04 自带的 libstdc++ 就是 12，编出来的程序在原版 22.04 上能跑
-          # 其余：Qt 运行 / 部署（xcb、Wayland、朗读、多媒体；v2.12 起内置浏览器 QtWebEngine 的 NSS、X 扩展、GBM / DRM）、AppImage 工具需要的库；
+          # 其余：Qt 运行 / 部署（xcb、Wayland、朗读、多媒体；v2.12 起内置浏览器 QtWebEngine 的 NSS、X 扩展、GBM / DRM，arm64 的 WebEngine 链系统的 minizip）、AppImage 工具需要的库；
           # 老源码（带本地推理）另要 Vulkan 加载器（libvulkan-dev 提供链接用的 libvulkan.so：LunarG 的 Linux SDK 只带头文件和 glslc，不带加载器）
           VULKAN=()
           if [ "${{ matrix.backend }}" != "none" ]; then VULKAN=(libvulkan1 libvulkan-dev); fi
@@ -636,7 +636,7 @@ jobs:
             libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 libxcb-xinput0 libfontconfig1 libfreetype6 libdbus-1-3 "libglib2.0-0${T64}" \
             libwayland-client0 libwayland-cursor0 libwayland-egl1 \
             libspeechd2 libpulse0 libva2 libva-drm2 libva-x11-2 libvdpau1 \
-            libnss3 libnspr4 libxcomposite1 libxdamage1 libxrandr2 libxtst6 libxkbfile1 libxshmfence1 libgbm1 libdrm2 "libasound2${T64}" \
+            libnss3 libnspr4 libxcomposite1 libxdamage1 libxrandr2 libxtst6 libxkbfile1 libxshmfence1 libgbm1 libdrm2 "libasound2${T64}" "libminizip1${T64}" \
             "${VULKAN[@]}"
           {
             echo "CC=gcc-12"
