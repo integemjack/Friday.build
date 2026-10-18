@@ -83,6 +83,7 @@ jobs:
       qt_backends: ${{ steps.inspect.outputs.qt_backends }}
       qt_matrix: ${{ steps.inspect.outputs.qt_matrix }}
       has_mlx: ${{ steps.inspect.outputs.has_mlx }}
+      remote_protocol: ${{ steps.inspect.outputs.remote_protocol }}
       release_tag: ${{ steps.version.outputs.release_tag }}
       marketing: ${{ steps.version.outputs.marketing }}
       channel: ${{ steps.version.outputs.channel }}
@@ -167,6 +168,12 @@ jobs:
           # macOS 版还用 MLX（本地模型跑在 Metal 上）时才要装 Metal 编译器
           HAS_MLX=false
           if grep -q 'mlx-swift' src/Friday/Friday.xcodeproj/project.pbxproj; then HAS_MLX=true; fi
+          # v2.23 起 Friday 连远程机器时装的就是桌面包（不再有 friday-server 包；源码 qt/docs/REMOTE.md §9）：latest.json 的条目写上
+          # 远程连接的协议版本（RemoteProtocol::version），客户端只装协议一样的。老源码（没有 Swift 版的远程桥 RemoteBridge.swift）不写
+          REMOTE_PROTOCOL=""
+          if [ -f src/Friday/Friday/App/RemoteBridge.swift ] && [ -f src/qt/src/core/remote/RemoteProtocol.h ]; then
+            REMOTE_PROTOCOL="$(sed -n 's/.*static constexpr int version = \([0-9][0-9]*\);.*/\1/p' src/qt/src/core/remote/RemoteProtocol.h | head -1)"
+          fi
           {
             echo "sha=${SHA}"
             echo "min_os=${MIN_OS:-26.0}"
@@ -175,6 +182,7 @@ jobs:
             echo "qt_backends=${QT_BACKENDS}"
             echo "qt_matrix=${QT_MATRIX}"
             echo "has_mlx=${HAS_MLX}"
+            echo "remote_protocol=${REMOTE_PROTOCOL}"
           } >> "${GITHUB_OUTPUT}"
           echo "提交 ${SHA}，最低 macOS ${MIN_OS:-26.0}，构建 Qt 版=${HAS_QT}（${QT_BACKENDS}），安装程序 / deb=${HAS_INSTALLER}，MLX=${HAS_MLX}"
 
@@ -1001,6 +1009,7 @@ jobs:
           HAS_INSTALLER: ${{ needs.prepare.outputs.has_installer }}
           QT_BACKENDS: ${{ needs.prepare.outputs.qt_backends }}
           QT_RESULT: ${{ needs.qt.result }}
+          REMOTE_PROTOCOL: ${{ needs.prepare.outputs.remote_protocol }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
@@ -1106,6 +1115,12 @@ jobs:
                             "`-upgrade-cuda` / `-upgrade-vulkan` 两种 zip / tar.gz 只给 1.x 自动更新用（内容相同，只是包信息里的名字不同），不用下载。"
                             "以前下载的本地模型还在缓存目录里，不再使用，可以手动删掉。"]
               servers = [f"Friday-{tag}-server-{p}.tar.gz" for p in ("linux-x64", "linux-arm64", "windows-x64", "macos-arm64") if (dist / f"Friday-{tag}-server-{p}.tar.gz").exists()]
+              if env.get("REMOTE_PROTOCOL") and not servers:
+                  # v2.23 起没有单独的 friday-server 包：连远程时装的就是上面的桌面包
+                  lines += ["", "### 连接远程机器", "",
+                            "- Friday 经 SSH / WSL 连远程机器时，对方没装就自动装上这里的桌面包：Linux 用 tar.gz（装到 `~/.local/opt/Friday`，"
+                            "没有桌面的服务器上是无头模式；缺系统库时提示用 apt-get 装），Windows 用安装程序（只为当前用户装），Mac 用 zip（装到 `~/Applications`）",
+                            "- 以前装在 `~/.friday-server/` 的服务端换成指向新程序的链接，旧版本的 Friday 照样能连"]
               if servers:
                   lines += ["", "### 远程服务 friday-server（v2.1 起）", "",
                             f"- {' / '.join(f'`{n}`' for n in servers)}：远程 Friday 的无界面服务。Friday 经 SSH / WSL 连远程机器时，"
@@ -1177,6 +1192,7 @@ jobs:
           SOURCE_REF: ${{ needs.prepare.outputs.ref }}
           BRANCH: ${{ needs.prepare.outputs.ref_name }}
           MIN_OS: ${{ needs.prepare.outputs.min_os }}
+          REMOTE_PROTOCOL: ${{ needs.prepare.outputs.remote_protocol }}
         run: |
           set -euo pipefail
           # 每个渠道只记录最新的一次发布；应用按渠道读取并与自己的版本比较
@@ -1285,6 +1301,9 @@ jobs:
               "branch": os.environ.get("BRANCH", ""),
               "assets": assets,
           }
+          # v2.23 起：远程连接的协议版本（客户端给远程装桌面包前核对；老源码没有这一项）
+          if os.environ.get("REMOTE_PROTOCOL", "").isdigit():
+              entry["remoteProtocol"] = int(os.environ["REMOTE_PROTOCOL"])
           pathlib.Path(os.environ["RUNNER_TEMP"], "latest-entry.json").write_text(json.dumps(entry, ensure_ascii=False))
           PY
           cd self
