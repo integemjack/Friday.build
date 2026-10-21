@@ -132,6 +132,8 @@ jobs:
             /qt/ci/deps.env
             /qt/ci/build_backends.sh
             /qt/installer/CMakeLists.txt
+            /qt/src/core/remote/RemoteProtocol.h
+            /qt/src/core/remote/RemoteDeploy.h
 
       - name: Inspect source
         id: inspect
@@ -169,9 +171,11 @@ jobs:
           HAS_MLX=false
           if grep -q 'mlx-swift' src/Friday/Friday.xcodeproj/project.pbxproj; then HAS_MLX=true; fi
           # v2.23 起 Friday 连远程机器时装的就是桌面包（不再有 friday-server 包；源码 qt/docs/REMOTE.md §9）：latest.json 的条目写上
-          # 远程连接的协议版本（RemoteProtocol::version），客户端只装协议一样的。老源码（没有 Swift 版的远程桥 RemoteBridge.swift）不写
+          # 远程连接的协议版本（RemoteProtocol::version），客户端只装协议一样的。老源码（RemoteDeploy.h 里还没有桌面端的受管布局
+          # ~/.local/opt/Friday，即 v2.23 以前）不写。以前判断的是 Swift 版远程桥 RemoteBridge.swift，但上面的稀疏检出没拉它和
+          # RemoteProtocol.h，v2.52 又删了它，所以一直没写上，客户端认不出桌面包的协议、有桌面的远程从不升级
           REMOTE_PROTOCOL=""
-          if [ -f src/Friday/Friday/App/RemoteBridge.swift ] && [ -f src/qt/src/core/remote/RemoteProtocol.h ]; then
+          if [ -f src/qt/src/core/remote/RemoteProtocol.h ] && grep -q 'local/opt/Friday' src/qt/src/core/remote/RemoteDeploy.h 2>/dev/null; then
             REMOTE_PROTOCOL="$(sed -n 's/.*static constexpr int version = \([0-9][0-9]*\);.*/\1/p' src/qt/src/core/remote/RemoteProtocol.h | head -1)"
           fi
           {
