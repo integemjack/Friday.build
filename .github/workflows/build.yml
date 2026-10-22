@@ -333,7 +333,10 @@ jobs:
           fi
 
       - name: Install Qt ${{ env.FRIDAY_QT_VERSION }} (friday-server helper)
+        id: qt_helper
         if: steps.helper.outputs.enabled == 'true'
+        # 失败了下面换 sha1 校验再装一次（原因见 Qt 任务里的「Prepare aqt with sha1 checksums」）
+        continue-on-error: true
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.FRIDAY_QT_VERSION }}
@@ -343,6 +346,42 @@ jobs:
           # friday-server 只链接 Core / Network / Concurrent / Gui / WebSockets；qtimageformats 给 webp、heic 插件
           modules: qtwebsockets qtimageformats
           aqtsource: ${{ env.FRIDAY_AQT_SOURCE }}
+          cache: true
+          cache-key-prefix: qt-macos-helper
+
+      - name: Prepare aqt with sha1 checksums (friday-server helper)
+        if: steps.qt_helper.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          DIR="${RUNNER_TEMP}/aqt-sha1"
+          rm -rf "${DIR}"
+          case "${FRIDAY_AQT_SOURCE}" in
+            git+*@*)
+              SRC="${FRIDAY_AQT_SOURCE#git+}"
+              git clone --quiet --config core.autocrlf=false --filter=blob:none "${SRC%@*}" "${DIR}"
+              git -C "${DIR}" checkout --quiet "${SRC##*@}"
+              ;;
+            *)
+              python3 -m pip download --quiet --no-deps --no-binary :all: -d "${DIR}.dl" "${FRIDAY_AQT_SOURCE}"
+              mkdir -p "${DIR}"
+              tar -xzf "${DIR}.dl"/*.tar.gz -C "${DIR}" --strip-components=1
+              ;;
+          esac
+          perl -pi -e 's/^hash_algorithm : sha256(\r?)$/hash_algorithm : sha1$1/' "${DIR}/aqt/settings.ini"
+          perl -pi -e 's/self\._download_update_xml\(extensions_xml_url, True\)/self._download_update_xml(extensions_xml_url)/' "${DIR}/aqt/archives.py"
+          grep -q '^hash_algorithm : sha1' "${DIR}/aqt/settings.ini"
+          grep -q 'self\._download_update_xml(extensions_xml_url)' "${DIR}/aqt/archives.py"
+
+      - name: Install Qt ${{ env.FRIDAY_QT_VERSION }} (friday-server helper, sha1 checksums)
+        if: steps.qt_helper.outcome == 'failure'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.FRIDAY_QT_VERSION }}
+          host: mac
+          target: desktop
+          arch: clang_64
+          modules: qtwebsockets qtimageformats
+          aqtsource: ${{ runner.temp }}/aqt-sha1
           cache: true
           cache-key-prefix: qt-macos-helper
 
@@ -657,6 +696,9 @@ jobs:
           } >> "${GITHUB_ENV}"
 
       - name: Install Qt ${{ env.FRIDAY_QT_VERSION }}
+        id: qt
+        # 失败了下面换 sha1 校验再装一次
+        continue-on-error: true
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.FRIDAY_QT_VERSION }}
@@ -664,6 +706,45 @@ jobs:
           arch: ${{ matrix.qt_arch }}
           modules: ${{ env.FRIDAY_QT_MODULES }}
           aqtsource: ${{ env.FRIDAY_AQT_SOURCE }}
+          cache: true
+          cache-key-prefix: qt-${{ matrix.platform }}
+
+      # Qt 重发一个版本后，download.qt.io 要过一阵才给新文件生成 .sha256（2026-10-22 重发 6.11.3，几个小时都没有）：
+      # 这期间 aqt 下归档报校验失败，扩展仓库（qtwebengine）的 Updates.xml 拿不到校验还会被悄悄跳过、报找不到 qtwebengine。
+      # 缓存键带运行器的系统版本，镜像一升级就得重新下载，正好撞上。上面装失败就换改过的 aqt 再装：
+      # 归档按 Qt 随包发布的 .sha1 校验，扩展仓库的 Updates.xml 缺校验时照主仓库那样警告后继续
+      - name: Prepare aqt with sha1 checksums
+        if: steps.qt.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          DIR="${RUNNER_TEMP}/aqt-sha1"
+          rm -rf "${DIR}"
+          case "${FRIDAY_AQT_SOURCE}" in
+            git+*@*)
+              SRC="${FRIDAY_AQT_SOURCE#git+}"
+              git clone --quiet --config core.autocrlf=false --filter=blob:none "${SRC%@*}" "${DIR}"
+              git -C "${DIR}" checkout --quiet "${SRC##*@}"
+              ;;
+            *)
+              python -m pip download --quiet --no-deps --no-binary :all: -d "${DIR}.dl" "${FRIDAY_AQT_SOURCE}"
+              mkdir -p "${DIR}"
+              tar -xzf "${DIR}.dl"/*.tar.gz -C "${DIR}" --strip-components=1
+              ;;
+          esac
+          perl -pi -e 's/^hash_algorithm : sha256(\r?)$/hash_algorithm : sha1$1/' "${DIR}/aqt/settings.ini"
+          perl -pi -e 's/self\._download_update_xml\(extensions_xml_url, True\)/self._download_update_xml(extensions_xml_url)/' "${DIR}/aqt/archives.py"
+          grep -q '^hash_algorithm : sha1' "${DIR}/aqt/settings.ini"
+          grep -q 'self\._download_update_xml(extensions_xml_url)' "${DIR}/aqt/archives.py"
+
+      - name: Install Qt ${{ env.FRIDAY_QT_VERSION }} (sha1 checksums)
+        if: steps.qt.outcome == 'failure'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.FRIDAY_QT_VERSION }}
+          arch: ${{ matrix.qt_arch }}
+          modules: ${{ env.FRIDAY_QT_MODULES }}
+          aqtsource: ${{ runner.temp }}/aqt-sha1
           cache: true
           cache-key-prefix: qt-${{ matrix.platform }}
 
