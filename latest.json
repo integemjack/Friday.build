@@ -136,198 +136,198 @@
     },
     "remoteProtocol": 1
   },
-  "updatedAt": "2026-10-23T05:30:37Z",
+  "updatedAt": "2026-10-23T07:30:49Z",
   "stable": {
-    "tag": "v2.75.0",
-    "version": "2.75.0",
-    "build": 435,
+    "tag": "v2.76.0",
+    "version": "2.76.0",
+    "build": 436,
     "channel": "stable",
-    "date": "2026-10-23T05:30:37Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-macOS-arm64.dmg",
-    "sha256": "6b00710f863bdda317054749d2886935c23eba125253dbdd2e2d5a6955564669",
-    "size": 29509293,
-    "notes": "合并 v2.75：任务模式「极限性能」改成「工作流」：主智能体按用户的要求定制完整流程（目标 + 步骤：任务、谁来做、依赖、验收标准），框架按依�",
+    "date": "2026-10-23T07:30:49Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-macOS-arm64.dmg",
+    "sha256": "eeac0c46cc73d33278690d913f489b100be8852e18a31990ca0381f0169c4d92",
+    "size": 29511491,
+    "notes": "合并 v2.76：在线模型接入时默认分档（reasoning_effort 低 / 中 / 高），智谱、方舟、百炼、硅基流动分档时照样带自己的开关，不认思考参数的服务自动去",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v2.75.0",
-    "source": "3c02cf5e1c69f34af63917b7fb909527be2f5899",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v2.76.0",
+    "source": "352e651d0c6d5544117e0e7d48134757e2f2196e",
     "branch": "main",
     "assets": {
       "macos-arm64": {
-        "name": "Friday-v2.75.0-macOS-arm64.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-macOS-arm64.zip",
-        "sha256": "6b00710f863bdda317054749d2886935c23eba125253dbdd2e2d5a6955564669",
-        "size": 29509293,
+        "name": "Friday-v2.76.0-macOS-arm64.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-macOS-arm64.zip",
+        "sha256": "eeac0c46cc73d33278690d913f489b100be8852e18a31990ca0381f0169c4d92",
+        "size": 29511491,
         "server": {
-          "name": "Friday-v2.75.0-server-macos-arm64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-server-macos-arm64.tar.gz",
-          "sha256": "93a5a605dff56bd31ba7a2f738c943b151881b2bac76ab304cbd454c5aae71f2",
-          "size": 14286625,
-          "version": "2.75.0",
+          "name": "Friday-v2.76.0-server-macos-arm64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-server-macos-arm64.tar.gz",
+          "sha256": "03aa4bff98ec5d94278bada93b5a579c7286f501a22b5653972e5c9545d28206",
+          "size": 14286232,
+          "version": "2.76.0",
           "protocol": 1
         }
       },
       "windows-x64": {
-        "name": "Friday-v2.75.0-windows-x64.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-windows-x64.zip",
-        "sha256": "5bdffbd5ac8f27b111d00ef59c0dab59e977a0c4aa796d7dd77f99852484189d",
-        "size": 160186368,
+        "name": "Friday-v2.76.0-windows-x64.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-windows-x64.zip",
+        "sha256": "92b99b75c4a42a7c57a7803c9cfeb7d000c3a8b0252fd1ce25a03dd4fb384b0b",
+        "size": 160185480,
         "installer": {
-          "name": "Friday-v2.75.0-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-windows-x64-setup.exe",
-          "sha256": "a44108c98ba1928325c4f8cd381385b1f7596900c499246f5c41cae491d2c893",
-          "size": 116894752
+          "name": "Friday-v2.76.0-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-windows-x64-setup.exe",
+          "sha256": "9ff5a7a9a9f86ebfee535276505287c647959c69df4981af91e18fb2a88963ee",
+          "size": 116876842
         },
         "server": {
-          "name": "Friday-v2.75.0-server-windows-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-server-windows-x64.tar.gz",
-          "sha256": "f6d9fd3905e5b883ce43c9ac79fb0869eb0114b7e0b843e7090a3fd363de8acf",
-          "size": 23949867,
-          "version": "2.75.0",
+          "name": "Friday-v2.76.0-server-windows-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-server-windows-x64.tar.gz",
+          "sha256": "b879daa0ae2c38b1b54c2adc746f003fd8284b421c41796734c9201a2b3a91c1",
+          "size": 23950760,
+          "version": "2.76.0",
           "protocol": 1
         }
       },
       "linux-x64": {
-        "name": "Friday-v2.75.0-linux-x64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-linux-x64.AppImage",
-        "sha256": "40ddb504cd0d02ac07bbbfc9671537aca3c8b39d5590d366ad555db38072f9b6",
+        "name": "Friday-v2.76.0-linux-x64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-linux-x64.AppImage",
+        "sha256": "df60df3c06d8b81c53f4f797e8b5c11254cc97a30aa88b49012c119ca0f5f37f",
         "size": 170699256,
         "tarball": {
-          "name": "Friday-v2.75.0-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-linux-x64.tar.gz",
-          "sha256": "46a15c161da2455d28cd116f52971fe2a585f9ae1de659e6bb61f072e000c7b4",
-          "size": 184967144
+          "name": "Friday-v2.76.0-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-linux-x64.tar.gz",
+          "sha256": "67747781ebae4cba8788e6b812661b1e808e5defbdb8709dd0ba649ef4a22f38",
+          "size": 184969508
         },
         "deb": {
-          "name": "Friday-v2.75.0-linux-x64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-linux-x64.deb",
-          "sha256": "963376201f192592252fda3f1bc2c8559d699082fcec2181440cfce7542b00ee",
-          "size": 134337548
+          "name": "Friday-v2.76.0-linux-x64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-linux-x64.deb",
+          "sha256": "01789dc0194798475959212fa261d290de94dc0678c1d17a8b6e8a52c412e2ff",
+          "size": 134344920
         },
         "server": {
-          "name": "Friday-v2.75.0-server-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-server-linux-x64.tar.gz",
-          "sha256": "9da7b136bb2c892410e4d366bc5cbd96b616b45d1b00bb5bde1141033295149c",
-          "size": 41553020,
-          "version": "2.75.0",
+          "name": "Friday-v2.76.0-server-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-server-linux-x64.tar.gz",
+          "sha256": "f96f9a91294240839f0a6a8c2af6c207b7b921bd3151ca724439b606d21606eb",
+          "size": 41553363,
+          "version": "2.76.0",
           "protocol": 1
         }
       },
       "linux-arm64": {
-        "name": "Friday-v2.75.0-linux-arm64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-linux-arm64.AppImage",
-        "sha256": "7df44d7cbaff4a3f62d57fc9a2946b8db0dbf671d23d63b6750bd0e49fec1d91",
-        "size": 165001736,
+        "name": "Friday-v2.76.0-linux-arm64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-linux-arm64.AppImage",
+        "sha256": "7e2678316a2f076ec556704d7fcf5d0e98d9ad87bdcd3a04db5e007edaa547e7",
+        "size": 165022216,
         "tarball": {
-          "name": "Friday-v2.75.0-linux-arm64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-linux-arm64.tar.gz",
-          "sha256": "7e5b2d0dfc126649b6ed36b138da8a855879136cd8f8d3245a9ec1eb35639587",
-          "size": 179807353
+          "name": "Friday-v2.76.0-linux-arm64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-linux-arm64.tar.gz",
+          "sha256": "5b3198e735e80a15116ea7ddaff05be6b9da821a0d8e33856b77e1ea1fea17cf",
+          "size": 179807195
         },
         "deb": {
-          "name": "Friday-v2.75.0-linux-arm64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-linux-arm64.deb",
-          "sha256": "8505ff9ee2111a74e3fb21ed82a325474dd5c3d97973c5cdac1580097f83658f",
-          "size": 123906624
+          "name": "Friday-v2.76.0-linux-arm64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-linux-arm64.deb",
+          "sha256": "8cdbc3524fac08fb432141ba625c7b7eac018e888aab6c9f176742dd1ac9d77f",
+          "size": 123909420
         },
         "server": {
-          "name": "Friday-v2.75.0-server-linux-arm64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-server-linux-arm64.tar.gz",
-          "sha256": "7c2f56411c04c816fd1e8008787e0193662d614ecbc9934ec8cceff7e5de0d55",
-          "size": 40040013,
-          "version": "2.75.0",
+          "name": "Friday-v2.76.0-server-linux-arm64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-server-linux-arm64.tar.gz",
+          "sha256": "c3516d98015008ac01969df383285b31515e1ffa57ffd3fc55a1b51c9450cea4",
+          "size": 40043146,
+          "version": "2.76.0",
           "protocol": 1
         }
       },
       "windows-x64-cuda": {
-        "name": "Friday-v2.75.0-windows-x64-upgrade-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-windows-x64-upgrade-cuda.zip",
-        "sha256": "c2f4c47d79324d22c09056f11f4aeeaf8dee007c38ace684f99ad7d7c50fa22d",
-        "size": 165554443,
+        "name": "Friday-v2.76.0-windows-x64-upgrade-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-windows-x64-upgrade-cuda.zip",
+        "sha256": "01a8f8a148b3d15879234c12d170fac0d7a83643ce0b700a6dd5824020b7946d",
+        "size": 165555139,
         "installer": {
-          "name": "Friday-v2.75.0-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-windows-x64-setup.exe",
-          "sha256": "a44108c98ba1928325c4f8cd381385b1f7596900c499246f5c41cae491d2c893",
-          "size": 116894752
+          "name": "Friday-v2.76.0-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-windows-x64-setup.exe",
+          "sha256": "9ff5a7a9a9f86ebfee535276505287c647959c69df4981af91e18fb2a88963ee",
+          "size": 116876842
         },
         "server": {
-          "name": "Friday-v2.75.0-server-windows-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-server-windows-x64.tar.gz",
-          "sha256": "f6d9fd3905e5b883ce43c9ac79fb0869eb0114b7e0b843e7090a3fd363de8acf",
-          "size": 23949867,
-          "version": "2.75.0",
+          "name": "Friday-v2.76.0-server-windows-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-server-windows-x64.tar.gz",
+          "sha256": "b879daa0ae2c38b1b54c2adc746f003fd8284b421c41796734c9201a2b3a91c1",
+          "size": 23950760,
+          "version": "2.76.0",
           "protocol": 1
         }
       },
       "linux-x64-cuda": {
-        "name": "Friday-v2.75.0-linux-x64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-linux-x64.AppImage",
-        "sha256": "40ddb504cd0d02ac07bbbfc9671537aca3c8b39d5590d366ad555db38072f9b6",
+        "name": "Friday-v2.76.0-linux-x64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-linux-x64.AppImage",
+        "sha256": "df60df3c06d8b81c53f4f797e8b5c11254cc97a30aa88b49012c119ca0f5f37f",
         "size": 170699256,
         "tarball": {
-          "name": "Friday-v2.75.0-linux-x64-upgrade-cuda.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-linux-x64-upgrade-cuda.tar.gz",
-          "sha256": "b02982d9ed87cd74754d1219ee52d85dc939ecf78c4091ce734ae01499809c66",
-          "size": 184984174
+          "name": "Friday-v2.76.0-linux-x64-upgrade-cuda.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-linux-x64-upgrade-cuda.tar.gz",
+          "sha256": "d59efc3b42d58336ca1d4d228c14e3d6dafa2446875087a2165d6252f7465621",
+          "size": 184985615
         },
         "deb": {
-          "name": "Friday-v2.75.0-linux-x64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-linux-x64.deb",
-          "sha256": "963376201f192592252fda3f1bc2c8559d699082fcec2181440cfce7542b00ee",
-          "size": 134337548
+          "name": "Friday-v2.76.0-linux-x64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-linux-x64.deb",
+          "sha256": "01789dc0194798475959212fa261d290de94dc0678c1d17a8b6e8a52c412e2ff",
+          "size": 134344920
         },
         "server": {
-          "name": "Friday-v2.75.0-server-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-server-linux-x64.tar.gz",
-          "sha256": "9da7b136bb2c892410e4d366bc5cbd96b616b45d1b00bb5bde1141033295149c",
-          "size": 41553020,
-          "version": "2.75.0",
+          "name": "Friday-v2.76.0-server-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-server-linux-x64.tar.gz",
+          "sha256": "f96f9a91294240839f0a6a8c2af6c207b7b921bd3151ca724439b606d21606eb",
+          "size": 41553363,
+          "version": "2.76.0",
           "protocol": 1
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v2.75.0-windows-x64-upgrade-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-windows-x64-upgrade-vulkan.zip",
-        "sha256": "e8941adb880f9f570b9c57d62151033068fa2fffbb1b6f1cbfd708dce6b1c3dc",
-        "size": 165554445,
+        "name": "Friday-v2.76.0-windows-x64-upgrade-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-windows-x64-upgrade-vulkan.zip",
+        "sha256": "ac563f7dff927c4548a237beb15f5789c10b34fb9c9b324a691adbf34e685a2a",
+        "size": 165555141,
         "installer": {
-          "name": "Friday-v2.75.0-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-windows-x64-setup.exe",
-          "sha256": "a44108c98ba1928325c4f8cd381385b1f7596900c499246f5c41cae491d2c893",
-          "size": 116894752
+          "name": "Friday-v2.76.0-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-windows-x64-setup.exe",
+          "sha256": "9ff5a7a9a9f86ebfee535276505287c647959c69df4981af91e18fb2a88963ee",
+          "size": 116876842
         },
         "server": {
-          "name": "Friday-v2.75.0-server-windows-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-server-windows-x64.tar.gz",
-          "sha256": "f6d9fd3905e5b883ce43c9ac79fb0869eb0114b7e0b843e7090a3fd363de8acf",
-          "size": 23949867,
-          "version": "2.75.0",
+          "name": "Friday-v2.76.0-server-windows-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-server-windows-x64.tar.gz",
+          "sha256": "b879daa0ae2c38b1b54c2adc746f003fd8284b421c41796734c9201a2b3a91c1",
+          "size": 23950760,
+          "version": "2.76.0",
           "protocol": 1
         }
       },
       "linux-x64-vulkan": {
-        "name": "Friday-v2.75.0-linux-x64.AppImage",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-linux-x64.AppImage",
-        "sha256": "40ddb504cd0d02ac07bbbfc9671537aca3c8b39d5590d366ad555db38072f9b6",
+        "name": "Friday-v2.76.0-linux-x64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-linux-x64.AppImage",
+        "sha256": "df60df3c06d8b81c53f4f797e8b5c11254cc97a30aa88b49012c119ca0f5f37f",
         "size": 170699256,
         "tarball": {
-          "name": "Friday-v2.75.0-linux-x64-upgrade-vulkan.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-linux-x64-upgrade-vulkan.tar.gz",
-          "sha256": "1c8a244a4556d2f91bbfaa674fa676645bfb342c3aa2526a6ad22dd36a51be8d",
-          "size": 184984183
+          "name": "Friday-v2.76.0-linux-x64-upgrade-vulkan.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-linux-x64-upgrade-vulkan.tar.gz",
+          "sha256": "4fec9a65b07b3e1b9ce826780b278e6d5ebaca034b77dbdb344b58c0d22154ca",
+          "size": 184985710
         },
         "deb": {
-          "name": "Friday-v2.75.0-linux-x64.deb",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-linux-x64.deb",
-          "sha256": "963376201f192592252fda3f1bc2c8559d699082fcec2181440cfce7542b00ee",
-          "size": 134337548
+          "name": "Friday-v2.76.0-linux-x64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-linux-x64.deb",
+          "sha256": "01789dc0194798475959212fa261d290de94dc0678c1d17a8b6e8a52c412e2ff",
+          "size": 134344920
         },
         "server": {
-          "name": "Friday-v2.75.0-server-linux-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.75.0/Friday-v2.75.0-server-linux-x64.tar.gz",
-          "sha256": "9da7b136bb2c892410e4d366bc5cbd96b616b45d1b00bb5bde1141033295149c",
-          "size": 41553020,
-          "version": "2.75.0",
+          "name": "Friday-v2.76.0-server-linux-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.76.0/Friday-v2.76.0-server-linux-x64.tar.gz",
+          "sha256": "f96f9a91294240839f0a6a8c2af6c207b7b921bd3151ca724439b606d21606eb",
+          "size": 41553363,
+          "version": "2.76.0",
           "protocol": 1
         }
       }
