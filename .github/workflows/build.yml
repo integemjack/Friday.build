@@ -307,6 +307,22 @@ jobs:
           token: ${{ secrets.SOURCE_TOKEN }}
           path: src
           fetch-depth: 1
+          # v2.79 起核心程序 friday.core（integemjack/friday.core）是子模块 core/；老源码没有子模块，这一项不起作用
+          submodules: true
+
+      # v2.79 起 Swift 版和 Qt 版都静态链核心程序 friday.core（Rust）：版本按 src/core/rust-toolchain.toml 装，目标平台由构建脚本按需 rustup target add
+      - name: Rust (friday.core)
+        if: hashFiles('src/core/Cargo.toml') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v rustup >/dev/null; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain none
+            echo "${HOME}/.cargo/bin" >> "${GITHUB_PATH}"
+            export PATH="${HOME}/.cargo/bin:${PATH}"
+          fi
+          cd src/core
+          cargo --version
 
       - name: Select Xcode 26
         run: |
@@ -654,6 +670,22 @@ jobs:
           token: ${{ secrets.SOURCE_TOKEN }}
           path: src
           fetch-depth: 1
+          # v2.79 起核心程序 friday.core（integemjack/friday.core）是子模块 core/；老源码没有子模块，这一项不起作用
+          submodules: true
+
+      # v2.79 起 Swift 版和 Qt 版都静态链核心程序 friday.core（Rust）：版本按 src/core/rust-toolchain.toml 装，目标平台由构建脚本按需 rustup target add
+      - name: Rust (friday.core)
+        if: hashFiles('src/core/Cargo.toml') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v rustup >/dev/null; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain none
+            echo "${HOME}/.cargo/bin" >> "${GITHUB_PATH}"
+            export PATH="${HOME}/.cargo/bin:${PATH}"
+          fi
+          cd src/core
+          cargo --version
 
       - name: Load pinned versions (qt/ci/deps.env)
         shell: bash
