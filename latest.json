@@ -196,94 +196,120 @@
     },
     "remoteProtocol": 1
   },
-  "updatedAt": "2026-11-11T17:04:49Z",
+  "updatedAt": "2026-11-11T17:11:36Z",
   "stable": {
-    "tag": "v2.97.22",
-    "version": "2.97.22",
-    "build": 493,
+    "tag": "v2.97.23",
+    "version": "2.97.23",
+    "build": 494,
     "channel": "stable",
-    "date": "2026-11-11T17:04:49Z",
-    "zip": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-macOS-arm64.zip",
-    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-macOS-arm64.dmg",
-    "sha256": "f4abd7b4af1e2054c292f4809a8557b8a54d73008ba1395a587f1809ed516737",
-    "size": 34821710,
-    "notes": "接入 OpenCode 能力（Friday.Powers 的 opencode Power）：模型菜单「OpenCode ▸ 服务商 ▸ 模型」列本机 / 远程那台 OpenCode 里的模型，选了的对话交给 OpenCode 自己",
+    "date": "2026-11-11T17:11:36Z",
+    "zip": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-macOS-arm64.zip",
+    "dmg": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-macOS-arm64.dmg",
+    "sha256": "075a0fc4e485c394ccde835a40c88e24cb44175cc7defea4bd740da4338d0291",
+    "size": 34821839,
+    "notes": "本地能力的对话请求在流时拉着它（powerLease：retain / release），OpenCode 一轮跑超过 15 分钟也不会被当成闲置停掉（Qt + Swift）",
     "minOS": "26.0",
-    "release": "https://github.com/integemjack/Friday.build/releases/tag/v2.97.22",
-    "source": "3e6df603211631f5e694bc619f90243df0502ca6",
+    "release": "https://github.com/integemjack/Friday.build/releases/tag/v2.97.23",
+    "source": "fe1be4f73860908da8d256be5d6f076e5dfd523c",
     "branch": "main",
     "assets": {
       "macos-arm64": {
-        "name": "Friday-v2.97.22-macOS-arm64.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-macOS-arm64.zip",
-        "sha256": "f4abd7b4af1e2054c292f4809a8557b8a54d73008ba1395a587f1809ed516737",
-        "size": 34821710,
+        "name": "Friday-v2.97.23-macOS-arm64.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-macOS-arm64.zip",
+        "sha256": "075a0fc4e485c394ccde835a40c88e24cb44175cc7defea4bd740da4338d0291",
+        "size": 34821839,
         "server": {
-          "name": "Friday-v2.97.22-server-macos-arm64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-server-macos-arm64.tar.gz",
-          "sha256": "c26293ff68495a67bfd58129f15946a8b97e6007d0535f8e611a16b1045d2266",
-          "size": 16623572,
-          "version": "2.97.22",
+          "name": "Friday-v2.97.23-server-macos-arm64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-server-macos-arm64.tar.gz",
+          "sha256": "bddd4b31c644863fbf4ff13c2c8ff8896b003183c25e671f415d9b41c48bcf8b",
+          "size": 16625041,
+          "version": "2.97.23",
           "protocol": 1
         }
       },
       "windows-x64": {
-        "name": "Friday-v2.97.22-windows-x64.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-windows-x64.zip",
-        "sha256": "a3b40f7e530c638c4f8500dc85e02788b4dea3f8cc2548b3b852b803de1d7f1a",
-        "size": 60954627,
+        "name": "Friday-v2.97.23-windows-x64.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-windows-x64.zip",
+        "sha256": "bb886991676f179c002e2f3e9f8354b13d11d3f8ad0b0c499534136ec7300b2f",
+        "size": 60954576,
         "installer": {
-          "name": "Friday-v2.97.22-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-windows-x64-setup.exe",
-          "sha256": "e55e5ea202eb544fdd7d79dbc559dec0287558457a9b69afca1a8638c2874f48",
-          "size": 42348338
+          "name": "Friday-v2.97.23-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-windows-x64-setup.exe",
+          "sha256": "824d8c48c47738bc5a6a79d4fc3262c2d339589f4c5e5270704af2b2a5b15962",
+          "size": 42352396
         },
         "server": {
-          "name": "Friday-v2.97.22-server-windows-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-server-windows-x64.tar.gz",
-          "sha256": "a77bf2148454319c5320aced76866a392a50e67b2999f7f2f08e783818d1eae3",
-          "size": 27910118,
-          "version": "2.97.22",
+          "name": "Friday-v2.97.23-server-windows-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-server-windows-x64.tar.gz",
+          "sha256": "b4d268be7afb29d67741d05230ed820bfec2265e6b7f8cd4398d8fde04a1e7da",
+          "size": 27914053,
+          "version": "2.97.23",
+          "protocol": 1
+        }
+      },
+      "linux-arm64": {
+        "name": "Friday-v2.97.23-linux-arm64.AppImage",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-linux-arm64.AppImage",
+        "sha256": "ec4e60bd82e07dc6a51613d730a92a15c2c28bf06548f2ac838a91dd6065b8d6",
+        "size": 77068808,
+        "tarball": {
+          "name": "Friday-v2.97.23-linux-arm64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-linux-arm64.tar.gz",
+          "sha256": "7655bf7de2af27fe2f9466c075a868241eb7db9d996973d36ff32566c90ba42c",
+          "size": 84843169
+        },
+        "deb": {
+          "name": "Friday-v2.97.23-linux-arm64.deb",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-linux-arm64.deb",
+          "sha256": "43f963a3291e02be2b52dc3d01ab36226781ad16b1c78feb32a6cda720c88b56",
+          "size": 55656200
+        },
+        "server": {
+          "name": "Friday-v2.97.23-server-linux-arm64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-server-linux-arm64.tar.gz",
+          "sha256": "49b8657c0a9934449aac4767e20ad6bf2f67af99b6aef0f27d19b3f9a339d170",
+          "size": 47166842,
+          "version": "2.97.23",
           "protocol": 1
         }
       },
       "windows-x64-cuda": {
-        "name": "Friday-v2.97.22-windows-x64-upgrade-cuda.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-windows-x64-upgrade-cuda.zip",
-        "sha256": "7a8a89da94fc28bb93ba603552b1ce7cec08bc0d9de1d0d9a178adcee2a78962",
-        "size": 63436356,
+        "name": "Friday-v2.97.23-windows-x64-upgrade-cuda.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-windows-x64-upgrade-cuda.zip",
+        "sha256": "69add365203806383fce675c01ee6c29d13bd68cfe8524bcc3975f59d17ba6b5",
+        "size": 63439078,
         "installer": {
-          "name": "Friday-v2.97.22-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-windows-x64-setup.exe",
-          "sha256": "e55e5ea202eb544fdd7d79dbc559dec0287558457a9b69afca1a8638c2874f48",
-          "size": 42348338
+          "name": "Friday-v2.97.23-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-windows-x64-setup.exe",
+          "sha256": "824d8c48c47738bc5a6a79d4fc3262c2d339589f4c5e5270704af2b2a5b15962",
+          "size": 42352396
         },
         "server": {
-          "name": "Friday-v2.97.22-server-windows-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-server-windows-x64.tar.gz",
-          "sha256": "a77bf2148454319c5320aced76866a392a50e67b2999f7f2f08e783818d1eae3",
-          "size": 27910118,
-          "version": "2.97.22",
+          "name": "Friday-v2.97.23-server-windows-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-server-windows-x64.tar.gz",
+          "sha256": "b4d268be7afb29d67741d05230ed820bfec2265e6b7f8cd4398d8fde04a1e7da",
+          "size": 27914053,
+          "version": "2.97.23",
           "protocol": 1
         }
       },
       "windows-x64-vulkan": {
-        "name": "Friday-v2.97.22-windows-x64-upgrade-vulkan.zip",
-        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-windows-x64-upgrade-vulkan.zip",
-        "sha256": "81b8cf482e7e455d608da94390525e60e7b9c5c863951acdb899a7a304af4635",
-        "size": 63436358,
+        "name": "Friday-v2.97.23-windows-x64-upgrade-vulkan.zip",
+        "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-windows-x64-upgrade-vulkan.zip",
+        "sha256": "0eefb83172c14d03d4420f4f4ad6fdb5774114a74e789a3dffaebc9e04c126c8",
+        "size": 63439080,
         "installer": {
-          "name": "Friday-v2.97.22-windows-x64-setup.exe",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-windows-x64-setup.exe",
-          "sha256": "e55e5ea202eb544fdd7d79dbc559dec0287558457a9b69afca1a8638c2874f48",
-          "size": 42348338
+          "name": "Friday-v2.97.23-windows-x64-setup.exe",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-windows-x64-setup.exe",
+          "sha256": "824d8c48c47738bc5a6a79d4fc3262c2d339589f4c5e5270704af2b2a5b15962",
+          "size": 42352396
         },
         "server": {
-          "name": "Friday-v2.97.22-server-windows-x64.tar.gz",
-          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.22/Friday-v2.97.22-server-windows-x64.tar.gz",
-          "sha256": "a77bf2148454319c5320aced76866a392a50e67b2999f7f2f08e783818d1eae3",
-          "size": 27910118,
-          "version": "2.97.22",
+          "name": "Friday-v2.97.23-server-windows-x64.tar.gz",
+          "url": "https://github.com/integemjack/Friday.build/releases/download/v2.97.23/Friday-v2.97.23-server-windows-x64.tar.gz",
+          "sha256": "b4d268be7afb29d67741d05230ed820bfec2265e6b7f8cd4398d8fde04a1e7da",
+          "size": 27914053,
+          "version": "2.97.23",
           "protocol": 1
         }
       }
