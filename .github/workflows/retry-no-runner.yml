@@ -1,0 +1,83 @@
+name: Retry jobs that got no runner
+
+# 「Build and release Friday」偶尔因为 GitHub 的 macOS arm64 机器不够，macOS 那项排 15 分钟没分到机器被取消
+# （注释「The job was not acquired by Runner of type hosted even after multiple attempts」），整次打包失败、不发布。
+# 这里在构建运行结束后检查：有 job 是这样没分到机器的，就 `gh run rerun --failed` 只重跑失败的几项（版本号不变，
+# 成功的平台沿用原结果），等它跑完再看，最多重试到第 MAX_ATTEMPTS 次。真的编译 / 测试失败、手动取消的不重试。
+
+on:
+  workflow_run:
+    workflows: ["Build and release Friday"]
+    types: [completed]
+
+permissions:
+  actions: write
+  checks: read
+
+# 同一次构建运行只留一个重试在跑（重跑结束可能再触发本工作流，后来的排队，轮到时看到已经成功就直接退出）
+concurrency:
+  group: retry-no-runner-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+jobs:
+  retry:
+    name: Retry jobs without a runner
+    if: ${{ github.event.workflow_run.conclusion == 'failure' || github.event.workflow_run.conclusion == 'cancelled' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      RUN_ID: ${{ github.event.workflow_run.id }}
+      MAX_ATTEMPTS: "4"
+    steps:
+      - name: Rerun failed jobs while the cause is "no runner"
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # 当前这次运行（最新一轮）里没分到机器的 job：失败 / 取消、没有机器名、一步没跑，且注释说没分到机器
+          no_runner_jobs() {
+            local ids id
+            ids=$(gh api "repos/$REPO/actions/runs/$RUN_ID/jobs?filter=latest&per_page=100" --paginate \
+              --jq '.jobs[] | select(.conclusion == "failure" or .conclusion == "cancelled")
+                            | select((.runner_name // "") == "" and ((.steps // []) | length) == 0) | .id')
+            for id in $ids; do
+              if gh api "repos/$REPO/check-runs/$id/annotations" --jq '.[].message' \
+                   | grep -q "not acquired by Runner"; then
+                gh api "repos/$REPO/actions/jobs/$id" --jq '.name'
+              fi
+            done
+          }
+
+          while :; do
+            read -r status conclusion attempt < <(gh api "repos/$REPO/actions/runs/$RUN_ID" \
+              --jq '"\(.status) \(.conclusion // "none") \(.run_attempt)"')
+            echo "run $RUN_ID: attempt $attempt, $status / $conclusion"
+
+            if [ "$status" != "completed" ]; then
+              gh run watch "$RUN_ID" -R "$REPO" -i 60 > /dev/null || true
+              continue
+            fi
+            if [ "$conclusion" = "success" ]; then
+              echo "已经成功，不用重试"
+              exit 0
+            fi
+
+            jobs=$(no_runner_jobs)
+            if [ -z "$jobs" ]; then
+              echo "失败不是没分到机器（编译 / 测试失败或手动取消），不重试"
+              exit 0
+            fi
+            echo "没分到机器的 job："
+            while IFS= read -r job; do echo "  - $job"; done <<< "$jobs"
+
+            if [ "$attempt" -ge "$MAX_ATTEMPTS" ]; then
+              echo "::error::已经跑了 $attempt 次仍没分到机器，不再自动重试；稍后手动 gh run rerun $RUN_ID --failed"
+              exit 1
+            fi
+
+            echo "::notice::第 $attempt 次没分到机器，重跑失败的 job"
+            gh run rerun "$RUN_ID" -R "$REPO" --failed
+            sleep 30
+          done
